@@ -572,7 +572,7 @@ export default function MenPage({ cart = [], setCart, wish = [], setWish }) {
 
   // ── Fetch men products from backend
   useEffect(() => {
-    fetch(`https://stylehub-backend-ten.vercel.app/api/products?category=men&limit=100`)
+    fetch(`https://stylehub-backend-tau.vercel.app/api/products?category=men&limit=100`)
       .then(r => r.json())
       .then(data => {
         const list = (data.data?.products || []).map(p => ({
@@ -581,7 +581,7 @@ export default function MenPage({ cart = [], setCart, wish = [], setWish }) {
           price: p.price,
           old: p.salePrice || null,
           brand: p.seller?.brandName || "StyleHub",
-          img: p.images?.[0] ? `https://stylehub-backend-ten.vercel.app${p.images[0]}` : null,
+          img: p.images?.[0] ? `https://stylehub-backend-tau.vercel.app${p.images[0]}` : null,
           sizes: p.sizes || [],
           colors: p.colors || [],
           rating: p.avgRating || 0,

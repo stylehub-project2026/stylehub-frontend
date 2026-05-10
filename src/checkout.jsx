@@ -2,7 +2,7 @@ import { useState, useMemo, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { PRODUCTS, SHNav, SHFooter, SHARED_CSS } from "./shared";
 
-const API = "https://stylehub-backend-ten.vercel.app/api";
+const API = "https://stylehub-backend-tau.vercel.app/api";
 
 // ─── helpers ───
 const toNum = s => parseInt(String(s || "").replace(/\D/g, "")) || 0;
@@ -630,7 +630,7 @@ export default function Checkout({ cart = [], setCart, wish = [], setWish }) {
               price: `LE ${i.product.salePrice || i.product.price}`,
               rawPrice: i.product.salePrice || i.product.price,
               oldPrice: i.product.salePrice ? `LE ${i.product.price}` : null,
-              img: i.product.images?.[0] ? `https://stylehub-backend-ten.vercel.app${i.product.images[0]}` : null,
+              img: i.product.images?.[0] ? `https://stylehub-backend-tau.vercel.app${i.product.images[0]}` : null,
               brand: "StyleHub",
             }
           }));

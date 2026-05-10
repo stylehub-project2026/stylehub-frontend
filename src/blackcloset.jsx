@@ -22,7 +22,7 @@ const SZ = {
 };
 
 // ─── DATA ───
-const API = "https://stylehub-backend-ten.vercel.app/api";
+const API = "https://stylehub-backend-tau.vercel.app/api";
 
 // ─── HEART ───
 const Heart = ({ on }) => (
@@ -100,7 +100,7 @@ export default function BlackClosetBrand({ cart, wish = [], setWish }) {
           brand: "Black Closet",
           price: `LE ${p.price?.toLocaleString()}`,
           oldPrice: p.salePrice ? `LE ${p.salePrice?.toLocaleString()}` : null,
-          img: (p.images && p.images[0]) ? `https://stylehub-backend-ten.vercel.app${p.images[0]}` : null,
+          img: (p.images && p.images[0]) ? `https://stylehub-backend-tau.vercel.app${p.images[0]}` : null,
           imgs: p.images?.slice(1) || [],
           colors: p.colors || [],
           sizes: p.sizes || [],

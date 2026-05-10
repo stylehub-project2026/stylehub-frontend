@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { SHNav, SHFooter, SHARED_CSS, useScrollReveal } from "./shared";
 
-const API = "https://stylehub-backend-ten.vercel.app/api";
+const API = "https://stylehub-backend-tau.vercel.app/api";
 
 const Heart = ({ on }) => (
   <svg width="16" height="16" viewBox="0 0 24 24" fill={on ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -69,7 +69,7 @@ export default function Kids({ cart, setCart, wish, setWish }) {
           price: `LE ${p.price?.toLocaleString()}`,
           oldPrice: p.salePrice ? `LE ${p.salePrice?.toLocaleString()}` : null,
           brand: p.seller?.brandName || "StyleHub",
-          img: p.images?.[0] ? `https://stylehub-backend-ten.vercel.app${p.images[0]}` : null,
+          img: p.images?.[0] ? `https://stylehub-backend-tau.vercel.app${p.images[0]}` : null,
           sizes: p.sizes || [],
           colors: p.colors || [],
           type: p.tags?.[0] || "",

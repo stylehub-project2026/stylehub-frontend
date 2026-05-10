@@ -3,7 +3,7 @@ import { useState, useRef, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { SHNav, SHFooter, useScrollReveal, SHARED_CSS } from "./shared";
 
-const API = "https://stylehub-backend-ten.vercel.app/api";
+const API = "https://stylehub-backend-tau.vercel.app/api";
 
 /* ══════════════════════════════════════════ DATA ══════════════════════════════════════════ */
 const HERO_SLIDES = [
@@ -426,7 +426,7 @@ export default function WomenPage() {
           price: p.price,
           old: p.salePrice || null,
           brand: p.seller?.brandName || "StyleHub",
-          img: p.images?.[0] ? `https://stylehub-backend-ten.vercel.app${p.images[0]}` : null,
+          img: p.images?.[0] ? `https://stylehub-backend-tau.vercel.app${p.images[0]}` : null,
           sizes: p.sizes || [],
           colors: p.colors || [],
           rating: p.avgRating || 0,

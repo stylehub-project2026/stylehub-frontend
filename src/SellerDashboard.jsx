@@ -5,7 +5,7 @@ import {
   XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer
 } from "recharts";
 
-const BACKEND_BASE = "https://stylehub-backend-ten.vercel.app/api";
+const BACKEND_BASE = "https://stylehub-backend-tau.vercel.app/api";
 
 async function sellerRequest(method, path, body = null) {
   const headers = { "Content-Type": "application/json" };
@@ -813,8 +813,8 @@ function ProductsView() {
       (form.mainImages || []).forEach(f => formData.append("images", f));
 
       const url = editProduct
-        ? `https://stylehub-backend-ten.vercel.app/api/products/${editProduct._id}`
-        : "https://stylehub-backend-ten.vercel.app/api/products";
+        ? `https://stylehub-backend-tau.vercel.app/api/products/${editProduct._id}`
+        : "https://stylehub-backend-tau.vercel.app/api/products";
       const method = editProduct ? "PUT" : "POST";
 
       const res = await fetch(url, {
@@ -839,7 +839,7 @@ function ProductsView() {
 
     try {
       const token = localStorage.getItem("sellerToken") || localStorage.getItem("token");
-      const res = await fetch(`https://stylehub-backend-ten.vercel.app/api/products/${productId}`, {
+      const res = await fetch(`https://stylehub-backend-tau.vercel.app/api/products/${productId}`, {
         method: "DELETE",
         headers: { "Authorization": `Bearer ${token}`, "Content-Type": "application/json" },
       });
@@ -880,7 +880,7 @@ function ProductsView() {
             <div className="product-card" key={product._id}>
               <div className="product-card-img">
                 {product.images && product.images.length > 0
-                  ? <img src={`https://stylehub-backend-ten.vercel.app${product.images[0]}`} alt={product.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                  ? <img src={`https://stylehub-backend-tau.vercel.app${product.images[0]}`} alt={product.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
                   : <i className="fas fa-tshirt" />
                 }
               </div>
@@ -1011,7 +1011,7 @@ function ProductsView() {
                 <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: ".3rem" }}>
                   {(v.imageFile || v.existingImage) && (
                     <img
-                      src={v.imageFile ? URL.createObjectURL(v.imageFile) : `https://stylehub-backend-ten.vercel.app${v.existingImage}`}
+                      src={v.imageFile ? URL.createObjectURL(v.imageFile) : `https://stylehub-backend-tau.vercel.app${v.existingImage}`}
                       alt=""
                       style={{ width: 40, height: 40, objectFit: "cover", borderRadius: 6, border: "1.5px solid var(--border)" }}
                     />

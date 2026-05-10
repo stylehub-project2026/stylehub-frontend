@@ -201,7 +201,7 @@ function AccItem({ label, content }) {
 }
 
 // ─── REVIEW SECTION ───
-const API = "https://stylehub-backend-ten.vercel.app/api";
+const API = "https://stylehub-backend-tau.vercel.app/api";
 
 function StarPicker({ value, onChange }) {
   const [hov, setHov] = useState(0);
@@ -400,7 +400,7 @@ export default function ProductDetail({ cart, setCart, wish, setWish }) {
     window.scrollTo(0, 0);
     setLoading(true);
     setP(null);
-    fetch(`https://stylehub-backend-ten.vercel.app/api/products/${id}`)
+    fetch(`https://stylehub-backend-tau.vercel.app/api/products/${id}`)
       .then(r => r.json())
       .then(data => {
         if (data.success) {
@@ -415,8 +415,8 @@ export default function ProductDetail({ cart, setCart, wish, setWish }) {
             oldPrice: raw.salePrice ? `LE ${raw.salePrice}` : null,
             colors: raw.colors?.length > 0 ? raw.colors : [],
             sizes: raw.sizes || [],
-            img: raw.images?.[0] ? `https://stylehub-backend-ten.vercel.app${raw.images[0]}` : null,
-            imgs: raw.images?.slice(1).map(i => `https://stylehub-backend-ten.vercel.app${i}`) || [],
+            img: raw.images?.[0] ? `https://stylehub-backend-tau.vercel.app${raw.images[0]}` : null,
+            imgs: raw.images?.slice(1).map(i => `https://stylehub-backend-tau.vercel.app${i}`) || [],
             rating: 4,
             reviews: 0,
             tab: raw.category || "new",
@@ -446,7 +446,7 @@ export default function ProductDetail({ cart, setCart, wish, setWish }) {
     // ─── LOGGED IN: save to backend FIRST, then update local cart ───
     if (token) {
       try {
-        const res = await fetch("https://stylehub-backend-ten.vercel.app/api/cart", {
+        const res = await fetch("https://stylehub-backend-tau.vercel.app/api/cart", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",

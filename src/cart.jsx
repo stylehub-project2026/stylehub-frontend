@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { PRODUCTS, SHNav, SHFooter, SHARED_CSS } from "./shared";
 
 const SHIPPING = 80;
-const API = "https://stylehub-backend-ten.vercel.app/api";
+const API = "https://stylehub-backend-tau.vercel.app/api";
 
 // ─── BACKEND CART (logged-in users) ───
 function BackendCart({ cart, setCart, wish }) {
@@ -153,7 +153,7 @@ function BackendCart({ cart, setCart, wish }) {
               {items.map(item => {
                 const p = item.product;
                 if (!p) return null;
-                const img = p.images?.[0] ? `https://stylehub-backend-ten.vercel.app${p.images[0]}` : null;
+                const img = p.images?.[0] ? `https://stylehub-backend-tau.vercel.app${p.images[0]}` : null;
                 const price = p.salePrice || p.price;
 
                 return (

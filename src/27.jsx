@@ -14,7 +14,7 @@ const BRAND = {
 };
 
 const SZ = { heroBanner: 420, heroLogoSize: 200, shopCardH: 220, gridCardRatio: "4/4" };
-const API = "https://stylehub-backend-ten.vercel.app/api";
+const API = "https://stylehub-backend-tau.vercel.app/api";
 
 const Heart = ({ on }) => (
   <svg width="16" height="16" viewBox="0 0 24 24" fill={on ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -107,7 +107,7 @@ export default function TwentySevenBrand({ cart, wish = [], setWish }) {
           id: p._id, _id: p._id, name: p.name, brand: "27",
           price: `LE ${p.price?.toLocaleString()}`,
           oldPrice: p.salePrice ? `LE ${p.salePrice?.toLocaleString()}` : null,
-          img: (p.images && p.images[0]) ? `https://stylehub-backend-ten.vercel.app${p.images[0]}` : null,
+          img: (p.images && p.images[0]) ? `https://stylehub-backend-tau.vercel.app${p.images[0]}` : null,
           imgs: p.images?.slice(1) || [],
           colors: p.colors || [], sizes: p.sizes || [],
           rating: p.avgRating || 0, reviews: p.reviewCount || 0,
