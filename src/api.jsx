@@ -157,7 +157,7 @@ export async function subscribeNewsletter(email) { return { success: true }; }
 export async function submitContactForm({ name, email, message }) { return { success: true }; }
 
 /* ─── Real Backend API ─── */
-const BACKEND_BASE = "https://stylehub-backend-ten.vercel.app/api";
+const BACKEND_BASE = "https://stylehub-backend-tau.vercel.app/api";
 
 async function backendRequest(method, path, body = null) {
     const headers = { "Content-Type": "application/json" };
