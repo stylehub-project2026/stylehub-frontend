@@ -880,7 +880,7 @@ function ProductsView() {
             <div className="product-card" key={product._id}>
               <div className="product-card-img">
                 {product.images && product.images.length > 0
-                  ? <img src={`https://stylehub-backend-tau.vercel.app${product.images[0]}`} alt={product.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                  ? <img src={{product.images[0]}`} alt={product.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
                   : <i className="fas fa-tshirt" />
                 }
               </div>
@@ -1011,7 +1011,7 @@ function ProductsView() {
                 <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: ".3rem" }}>
                   {(v.imageFile || v.existingImage) && (
                     <img
-                      src={v.imageFile ? URL.createObjectURL(v.imageFile) : `https://stylehub-backend-tau.vercel.app${v.existingImage}`}
+                      src={v.imageFile ? URL.createObjectURL(v.imageFile) : v.existingImage}
                       alt=""
                       style={{ width: 40, height: 40, objectFit: "cover", borderRadius: 6, border: "1.5px solid var(--border)" }}
                     />
