@@ -1,6 +1,14 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
-import { PRODUCTS, SHARED_CSS, SHFooter, SHNav } from "./shared";
+import { SHARED_CSS, SHFooter, SHNav } from "./shared";
+
+const API = "https://stylehub-backend-tau.vercel.app/api";
+
+const getImageUrl = (img) => {
+  if (!img) return null;
+  if (img.startsWith("http")) return img;
+  return `https://stylehub-backend-tau.vercel.app${img}`;
+};
 
 const PAGE_CSS = `
 .bo-page {
@@ -67,8 +75,6 @@ const PAGE_CSS = `
 @media (max-width: 560px) { .bo-shell { padding-inline: .85rem; } .bo-stage { height: 430px; } .bo-grid, .bo-recs, .bo-summary { grid-template-columns: 1fr; } .bo-actions { flex-direction: column; } .bo-secondary { min-width: 0; } }
 `;
 
-const TOP_PRODUCT_IDS    = [4, 51, 5];
-const BOTTOM_PRODUCT_IDS = [22, 8];
 
 // ── Silhouette Preview — uses body-shape.svg with corrected math & alignment ──
 function SilhouettePreview({ selectedTop, selectedBottom, body }) {
@@ -267,26 +273,63 @@ export default function BuildOutfit({ cart=[], setCart, wish=[] }) {
   const [selectedBottom, setSelectedBottom] = useState(null);
   const [favorites,      setFavorites]      = useState([]);
   const [body, setBody] = useState({ height:170, chest:88, waist:70, hips:96, weight:70 });
+  const [allProducts, setAllProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const adultProducts = useMemo(()=>
-    PRODUCTS.filter(p=>{
-      const brand = String(p.brand||"").toLowerCase();
-      const name  = String(p.name||"").toLowerCase();
-      const desc  = String(p.desc||"").toLowerCase();
-      const isKid = brand==="ninos"||name.includes("kids")||desc.includes("kids")||
-        p.category==="boys"||p.category==="girls"||(p.sizes||[]).some(s=>/\d+y/i.test(s));
-      return !isKid && p.img;
-    }), []
+  useEffect(() => {
+    Promise.all([
+      fetch(`${API}/products?category=women&limit=50`).then(r => r.json()),
+      fetch(`${API}/products?category=men&limit=50`).then(r => r.json()),
+    ]).then(([womenData, menData]) => {
+      const mapProduct = p => ({
+        id: p._id,
+        _id: p._id,
+        name: p.name,
+        brand: p.seller?.brandName || "StyleHub",
+        price: `LE ${p.price?.toLocaleString()}`,
+        oldPrice: p.salePrice ? `LE ${p.salePrice?.toLocaleString()}` : null,
+        img: getImageUrl(p.images?.[0]),
+        sizes: p.sizes || [],
+        colors: p.colors || [],
+        category: p.category,
+        tags: p.tags || [],
+        type: p.tags?.[0] || "",
+      });
+      const all = [
+        ...(womenData.data?.products || []).map(mapProduct),
+        ...(menData.data?.products || []).map(mapProduct),
+      ];
+      setAllProducts(all);
+    }).catch(() => setAllProducts([]))
+    .finally(() => setLoading(false));
+  }, []);
+
+  const topProducts = useMemo(() =>
+    allProducts.filter(p => {
+      const type = (p.type || "").toLowerCase();
+      const tags = (p.tags || []).map(t => t.toLowerCase());
+      return type.includes("top") || type.includes("hoodie") || type.includes("t-shirt") || type.includes("jacket") ||
+        tags.some(t => t.includes("top") || t.includes("hoodie") || t.includes("t-shirt") || t.includes("jacket"));
+    }).slice(0, 6),
+    [allProducts]
   );
 
-  const topProducts     = useMemo(()=>TOP_PRODUCT_IDS.map(id=>adultProducts.find(p=>p.id===id)).filter(Boolean),[adultProducts]);
-  const bottomProducts  = useMemo(()=>BOTTOM_PRODUCT_IDS.map(id=>adultProducts.find(p=>p.id===id)).filter(Boolean),[adultProducts]);
-  const recommendedProducts = useMemo(()=>
-    adultProducts.filter(p=>p.id!==selectedTop?.id&&p.id!==selectedBottom?.id&&!TOP_PRODUCT_IDS.includes(p.id)&&!BOTTOM_PRODUCT_IDS.includes(p.id)).slice(0,3),
-    [adultProducts,selectedBottom?.id,selectedTop?.id]
+  const bottomProducts = useMemo(() =>
+    allProducts.filter(p => {
+      const type = (p.type || "").toLowerCase();
+      const tags = (p.tags || []).map(t => t.toLowerCase());
+      return type.includes("bottom") || type.includes("pant") || type.includes("jeans") || type.includes("skirt") ||
+        tags.some(t => t.includes("bottom") || t.includes("pant") || t.includes("jeans"));
+    }).slice(0, 6),
+    [allProducts]
   );
 
-  const favoritesToShow = favorites.length ? favorites.slice(-4) : [...topProducts,...bottomProducts].slice(0,4);
+  const recommendedProducts = useMemo(() =>
+    allProducts.filter(p => !topProducts.find(t => t.id === p.id) && !bottomProducts.find(b => b.id === p.id)).slice(0, 3),
+    [allProducts, topProducts, bottomProducts]
+  );
+
+  const favoritesToShow = favorites.length ? favorites.slice(-4) : [...topProducts, ...bottomProducts].slice(0, 4);
   const selectedCount   = Number(Boolean(selectedTop)) + Number(Boolean(selectedBottom));
   const total           = parsePrice(selectedTop?.price) + parsePrice(selectedBottom?.price);
 

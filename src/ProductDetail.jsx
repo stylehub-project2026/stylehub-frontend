@@ -321,3 +321,4 @@ function AccordionItem({ title, content }) {
     </div>
   );
 }
+
