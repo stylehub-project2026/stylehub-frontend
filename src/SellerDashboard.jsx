@@ -880,7 +880,7 @@ function ProductsView() {
             <div className="product-card" key={product._id}>
               <div className="product-card-img">
                 {product.images && product.images.length > 0
-                  ? <img src={{product.images[0]}`} alt={product.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                  ? <img src={product.images[0]} alt={product.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
                   : <i className="fas fa-tshirt" />
                 }
               </div>
