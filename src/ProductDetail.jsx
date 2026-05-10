@@ -1,351 +1,321 @@
-import React from "react";
-import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { SHNav, SHFooter, SHARED_CSS, useScrollReveal } from "./shared";
+import React, { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import { SHNav, SHFooter, SHARED_CSS } from "./shared";
 
-// ─── BRAND CONFIG ───
-const BRAND = {
-  name: "Ninos",
-  desc: "Ninos is a kids clothing brand that blends playful design with everyday comfort, offering stylish pieces such as sweatshirts, jackets, bottoms, and tees for children who love to move. Since 2015, NINOS has been dedicated to providing families across Egypt with high-quality products.",
-  logo: "/ninos.jpg",
-  heroBg: "/ninos-hero.jpg",
-  accentColor: "#92A079",
-  heroOverlay: "rgba(248,246,242,.60)",
-};
-
-// ─── SIZE RATIOS ───
-const SZ = {
-  heroBanner: 420,
-  heroLogoSize: 200,
-  shopCardH: 220,
-  gridCardRatio: "4/4",
-};
-
-// ─── DATA ───
 const API = "https://stylehub-backend-tau.vercel.app/api";
 
-// ─── HEART ───
 const Heart = ({ on }) => (
-  <svg width="16" height="16" viewBox="0 0 24 24"
-    fill={on ? "currentColor" : "none"} stroke="currentColor"
-    strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+  <svg width="18" height="18" viewBox="0 0 24 24" fill={on ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
   </svg>
 );
 
-// ─── PRODUCT CARD ───
-function PCard({ p, wish, toggleWish }) {
-  const navigate = useNavigate();
-  return (
-    <div onClick={() => navigate(`/product/${p.id}`)}
-      style={{ background: "#fff", border: "1px solid var(--border)", cursor: "pointer", transition: "box-shadow .25s", borderRadius: 5, overflow: "hidden" }}
-      onMouseEnter={e => e.currentTarget.style.boxShadow = "0 8px 28px rgba(26,26,24,.1)"}
-      onMouseLeave={e => e.currentTarget.style.boxShadow = "none"}>
-      <div style={{ position: "relative", overflow: "hidden", aspectRatio: SZ.gridCardRatio, background: "#f0ece6" }}>
-        <img src={p.img} alt={p.name}
-          style={{ width: "100%", height: "100%", objectFit: "cover", transition: "transform .5s" }}
-          onMouseEnter={e => e.target.style.transform = "scale(1.06)"}
-          onMouseLeave={e => e.target.style.transform = "scale(1)"}
-          onError={e => e.target.style.display = "none"} />
-        {p.oldPrice && (
-          <div style={{ position: "absolute", top: ".7rem", left: ".7rem", background: "var(--red)", color: "#fff", fontSize: ".52rem", letterSpacing: ".1em", padding: ".2rem .55rem", fontWeight: 700, borderRadius: 3 }}>SALE</div>
-        )}
-        <button onClick={e => { e.stopPropagation(); toggleWish(p.id); }}
-          style={{ position: "absolute", top: ".7rem", right: ".7rem", width: 30, height: 30, background: "#fff", border: "none", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", boxShadow: "0 2px 8px rgba(0,0,0,.1)", color: wish.includes(p.id) ? "var(--red)" : "inherit" }}>
-          <Heart on={wish.includes(p.id)} />
-        </button>
-      </div>
-      <div style={{ padding: ".55rem .65rem" }}>
-        <div style={{ fontSize: ".52rem", letterSpacing: ".15em", textTransform: "uppercase", color: "var(--warm)", marginBottom: ".15rem" }}>Ninos</div>
-        <div style={{ fontSize: ".78rem", fontWeight: 500, marginBottom: ".25rem", lineHeight: 1.3 }}>{p.name}</div>
-        <div style={{ display: "flex", gap: ".5rem", alignItems: "center" }}>
-          {p.oldPrice && <span style={{ fontSize: ".68rem", color: "var(--warm)", textDecoration: "line-through" }}>{p.oldPrice}</span>}
-          <span style={{ fontSize: ".78rem", fontWeight: 600, color: p.oldPrice ? "var(--red)" : "" }}>{p.price}</span>
-        </div>
-      </div>
-    </div>
-  );
-}
+const StarIcon = ({ filled }) => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill={filled ? "#c8a96e" : "none"} stroke="#c8a96e" strokeWidth="2">
+    <polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26" />
+  </svg>
+);
 
-// ─── MAIN PAGE ───
-export default function NinosBrand({ cart, wish = [], setWish }) {
-  const [allProducts, setAllProducts] = useState([]);
+export default function ProductDetail({ cart, setCart, wish, setWish }) {
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [selSizes, setSelSizes] = useState(null);
-  const [selColors, setSelColors] = useState(null);
-  const [sortBy, setSortBy] = useState("default");
-  const [selCategory, setSelCategory] = useState("all");
-  const [selType, setSelType] = useState("all");
-  const [page, setPage] = useState(1);
-  const PER_PAGE = 9;
+  const [selectedSize, setSelectedSize] = useState(null);
+  const [selectedImg, setSelectedImg] = useState(0);
+  const [reviews, setReviews] = useState([]);
+  const [addedToCart, setAddedToCart] = useState(false);
+  const [sizeError, setSizeError] = useState(false);
 
-  const navigate = useNavigate();
-  const addRef = useScrollReveal();
-  const toggleWish = id => setWish(w => w.includes(id) ? w.filter(x => x !== id) : [...w, id]);
-  const toggleSize = s => { setSelSizes(p => p === s ? null : s); setPage(1); };
-  const toggleColor = c => { setSelColors(p => p === c ? null : c); setPage(1); };
-  const toggleType = t => { setSelType(p => p === t ? "all" : t); setPage(1); };
-  const toNum = s => parseInt((s || "").toString().replace(/\D/g, "")) || 0;
-  const scrollGrid = () => document.getElementById("ninos-grid")?.scrollIntoView({ behavior: "smooth" });
+  const getImageUrl = (img) => {
+    if (!img) return null;
+    if (img.startsWith("http")) return img;
+    return `https://stylehub-backend-tau.vercel.app${img}`;
+  };
 
-  // Fetch products from backend
   useEffect(() => {
     setLoading(true);
-    fetch(`${API}/products?brand=Ninos&limit=100`)
+    fetch(`${API}/products/${id}`)
       .then(r => r.json())
       .then(data => {
-        const prods = (data.data?.products || []).map(p => ({
-          id: p._id,
-          _id: p._id,
-          name: p.name,
-          brand: "Ninos",
-          price: `LE ${p.price?.toLocaleString()}`,
-          oldPrice: p.salePrice ? `LE ${p.salePrice?.toLocaleString()}` : null,
-          img: (p.images && p.images[0]) ? p.images[0] : null,
-          imgs: p.images?.slice(1) || [],
-          colors: p.colors || [],
-          sizes: p.sizes || [],
-          rating: p.avgRating || 0,
-          reviews: p.reviewCount || 0,
-          desc: p.description || "",
-          category: p.category || "kids",
-          type: p.tags?.[0] || "tops",
-          mongoId: p._id,
-        }));
-        setAllProducts(prods);
+        const raw = data.data?.product;
+        if (!raw) return;
+        setProduct({
+          id: raw._id,
+          _id: raw._id,
+          name: raw.name,
+          brand: raw.seller?.brandName || "StyleHub",
+          price: raw.price,
+          salePrice: raw.salePrice,
+          description: raw.description,
+          sizes: raw.sizes || [],
+          colors: raw.colors || [],
+          images: raw.images || [],
+          rating: raw.avgRating || 0,
+          reviewCount: raw.reviewCount || 0,
+          stock: raw.stock || 0,
+          category: raw.category,
+          tags: raw.tags || [],
+        });
       })
-      .catch(() => setAllProducts([]))
+      .catch(() => {})
       .finally(() => setLoading(false));
-  }, []);
+  }, [id]);
 
-  const ALL_SIZES = [...new Set(allProducts.flatMap(p => p.sizes))];
-  const ALL_COLORS = [...new Set(allProducts.flatMap(p => p.colors))];
+  useEffect(() => {
+    if (!id) return;
+    fetch(`${API}/products/${id}/reviews`)
+      .then(r => r.json())
+      .then(data => setReviews(data.data?.reviews || []))
+      .catch(() => {});
+  }, [id]);
 
-  let filtered = allProducts;
-  if (selCategory !== "all") filtered = filtered.filter(p => p.category === selCategory);
-  if (selType !== "all") filtered = filtered.filter(p => p.type === selType);
-  if (selSizes) filtered = filtered.filter(p => p.sizes.includes(selSizes));
-  if (selColors) filtered = filtered.filter(p => p.colors.includes(selColors));
-  if (sortBy === "low") filtered = [...filtered].sort((a, b) => toNum(a.price) - toNum(b.price));
-  if (sortBy === "high") filtered = [...filtered].sort((a, b) => toNum(b.price) - toNum(a.price));
-  if (sortBy === "sale") filtered = filtered.filter(p => p.oldPrice);
+  const toggleWish = () => {
+    setWish(w => w.includes(id) ? w.filter(x => x !== id) : [...w, id]);
+  };
 
-  const totalPages = Math.ceil(filtered.length / PER_PAGE);
-  const paginated = filtered.slice((page - 1) * PER_PAGE, page * PER_PAGE);
+  const handleAddToCart = async () => {
+    if (product.sizes.length > 0 && !selectedSize) {
+      setSizeError(true);
+      return;
+    }
+    setSizeError(false);
+
+    const token = localStorage.getItem("token");
+    if (token && product._id) {
+      await fetch(`${API}/cart`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ productId: product._id, quantity: 1, size: selectedSize }),
+      }).catch(console.error);
+    }
+
+    setCart(prev => {
+      const existing = prev.find(x => x.id === product.id && x.size === selectedSize);
+      if (existing) return prev.map(x => x.id === product.id && x.size === selectedSize ? { ...x, qty: x.qty + 1 } : x);
+      return [...prev, {
+        id: product.id, size: selectedSize, qty: 1,
+        product: { id: product.id, _id: product._id, name: product.name, price: `LE ${product.price?.toLocaleString()}`, salePrice: product.salePrice ? `LE ${product.salePrice?.toLocaleString()}` : null, img: getImageUrl(product.images[0]), brand: product.brand }
+      }];
+    });
+
+    setAddedToCart(true);
+    setTimeout(() => setAddedToCart(false), 2000);
+  };
 
   if (loading) return (
     <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "var(--cream)" }}>
-      <div style={{ fontFamily: "'DM Sans',sans-serif", color: "var(--warm)", fontSize: ".9rem" }}>Loading products...</div>
+      <div style={{ color: "var(--warm)", fontFamily: "'DM Sans',sans-serif" }}>Loading...</div>
     </div>
   );
+
+  if (!product) return (
+    <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "var(--cream)" }}>
+      <div style={{ textAlign: "center" }}>
+        <div style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: "2rem", marginBottom: "1rem" }}>Product not found</div>
+        <button onClick={() => navigate(-1)} style={{ background: "var(--dark)", color: "#fff", border: "none", padding: ".7rem 2rem", cursor: "pointer", fontFamily: "'DM Sans',sans-serif", fontSize: ".75rem", letterSpacing: ".1em", textTransform: "uppercase" }}>Go Back</button>
+      </div>
+    </div>
+  );
+
+  const allImages = product.images;
+  const isWished = wish?.includes(id);
+  const discountPct = product.salePrice ? Math.round((1 - product.salePrice / product.price) * 100) : null;
 
   return (
     <div style={{ minHeight: "100vh", background: "var(--cream)" }}>
-      <style>{SHARED_CSS + PAGE_CSS}</style>
+      <style>{SHARED_CSS}</style>
       <SHNav cart={cart} wish={wish} />
 
-      {/* ════════════════════════════════
-          1. HERO BANNER — white bg inside border
-      ════════════════════════════════ */}
-      <section style={{
-        position: "relative", height: SZ.heroBanner, overflow: "hidden",
-        background: "#ffffff",
-        display: "flex", alignItems: "center",
-        margin: "1.5rem", borderRadius: 10,
-        border: "2px solid rgba(26,26,24,.2)",
-        boxShadow: "0 4px 24px rgba(26,26,24,.07)"
-      }}>
-        <img src={BRAND.heroBg} alt="" aria-hidden
-          style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", opacity: .08, borderRadius: 10 }}
-          onError={e => e.target.style.display = "none"} />
-        <div style={{ position: "absolute", inset: 0, background: BRAND.heroOverlay, borderRadius: 10 }} />
+      {/* Breadcrumb */}
+      <div style={{ padding: "1rem 5%", fontSize: ".7rem", color: "var(--warm)", fontFamily: "'DM Sans',sans-serif", display: "flex", gap: ".5rem", alignItems: "center" }}>
+        <span onClick={() => navigate("/")} style={{ cursor: "pointer" }}>Home</span>
+        <span>›</span>
+        <span onClick={() => navigate(-1)} style={{ cursor: "pointer" }}>{product.brand}</span>
+        <span>›</span>
+        <span style={{ color: "var(--dark)" }}>{product.name}</span>
+      </div>
 
-        <div style={{ position: "relative", zIndex: 2, display: "flex", alignItems: "center", gap: "4rem", padding: "0 6%", width: "100%" }}>
+      {/* Main Content */}
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "4rem", padding: "1rem 5% 4rem", maxWidth: 1200, margin: "0 auto" }}>
 
-          {/* LOGO */}
-          <div style={{ width: SZ.heroLogoSize, height: SZ.heroLogoSize, borderRadius: "50%", overflow: "hidden", flexShrink: 0, border: "3px solid rgba(26,26,24,.15)", boxShadow: "0 8px 32px rgba(26,26,24,.12)" }}>
-            <img src={BRAND.logo} alt={BRAND.name}
-              style={{ width: "100%", height: "100%", objectFit: "contain" }}
-              onError={e => e.target.style.display = "none"} />
-          </div>
-
-          {/* TEXT */}
-          <div>
-            <div style={{ fontSize: ".6rem", letterSpacing: ".35em", textTransform: "uppercase", color: "var(--warm)", marginBottom: ".6rem" }}>StyleHub</div>
-            <h1 style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: "clamp(2.5rem,5vw,4rem)", fontWeight: 400, lineHeight: 1, marginBottom: ".8rem", color: "var(--dark)" }}>{BRAND.name}</h1>
-            <p style={{ fontSize: ".8rem", lineHeight: 1.7, color: "#555", maxWidth: 480 }}>{BRAND.desc}</p>
-          </div>
-        </div>
-      </section>
-
-      {/* ════════════════════════════════
-          2. SEE WHAT'S POPULAR — text + blob
-      ════════════════════════════════ */}
-      <section style={{ background: "#ffffff", padding: "5rem 6%", borderBottom: "2px solid rgba(26,26,24,.12)" }}>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "5rem", alignItems: "center" }}>
-
-          {/* LEFT TEXT */}
-          <div className="reveal" ref={addRef}>
-            <div style={{ fontSize: ".58rem", letterSpacing: ".3em", textTransform: "uppercase", color: "var(--warm)", marginBottom: "1rem" }}>Ninos Collection</div>
-            <h2 style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: "clamp(1.9rem,3vw,2.8rem)", fontWeight: 400, lineHeight: 1.2, marginBottom: "1.2rem" }}>See What's Popular</h2>
-            <p style={{ fontSize: ".86rem", lineHeight: 1.85, color: "#555252", marginBottom: "2rem", maxWidth: 400 }}>{BRAND.desc}</p>
-            <button onClick={scrollGrid} className="ninos-cta-btn">Click Here</button>
-          </div>
-
-          {/* RIGHT — decorative dark blob */}
-          <div style={{ position: "relative", minHeight: "300px" }}>
-            <div style={{ position: "absolute", right: "-6%", top: "-22%", width: "52%", height: "144%", background: "var(--dark)", borderRadius: "60% 0 0 60%", zIndex: 0 }} />
-          </div>
-
-        </div>
-      </section>
-
-      {/* ════════════════════════════════
-          3. ALL PRODUCTS — filters + grid
-      ════════════════════════════════ */}
-      <div style={{ display: "flex", gap: "2.5rem", padding: "3rem 6%", alignItems: "flex-start", background: "var(--cream)" }}>
-
-        {/* SIDEBAR */}
-        <div style={{ width: 185, flexShrink: 0, position: "sticky", top: "70px" }}>
-
-          {/* Sort */}
-          <div style={{ marginBottom: "1.8rem" }}>
-            <div className="filter-label">Sort By</div>
-            {[["default", "Default"], ["low", "Price: Low → High"], ["high", "Price: High → Low"], ["sale", "On Sale"]].map(([val, label]) => (
-              <div key={val} onClick={() => setSortBy(val)}
-                style={{ fontSize: ".75rem", padding: ".28rem 0", cursor: "pointer", color: sortBy === val ? "var(--dark)" : "var(--warm)", fontWeight: sortBy === val ? 600 : 400, transition: "color .2s" }}>
-                {label}
+        {/* LEFT — Images */}
+        <div>
+          {/* Main Image */}
+          <div style={{ aspectRatio: "3/4", background: "#f0ece6", overflow: "hidden", marginBottom: "1rem", position: "relative" }}>
+            {allImages[selectedImg] ? (
+              <img src={getImageUrl(allImages[selectedImg])} alt={product.name}
+                style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                onError={e => e.target.style.display = "none"} />
+            ) : (
+              <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                <span style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: "3rem", color: "rgba(26,26,24,.1)" }}>{product.brand[0]}</span>
               </div>
-            ))}
+            )}
+            {discountPct && (
+              <div style={{ position: "absolute", top: "1rem", left: "1rem", background: "var(--red)", color: "#fff", fontSize: ".6rem", letterSpacing: ".1em", padding: ".3rem .7rem", fontWeight: 700 }}>SALE</div>
+            )}
           </div>
 
-          {/* Category */}
-          <FilterSection title="Category">
-            {[["all", "All"], ["boys", "Boys"], ["girls", "Girls"]].map(([val, label]) => (
-              <CheckRow key={val} label={label} active={selCategory === val} onClick={() => { setSelCategory(val); setPage(1); }} />
-            ))}
-          </FilterSection>
-
-          {/* Type */}
-          <FilterSection title="Type">
-            {[
-              ["tops", "Tops"],
-              ["bottoms", "Bottoms"],
-              ["jackets", "Jackets"],
-              ["t-shirt", "T-Shirt"],
-              ["hoodies", "Hoodies"],
-            ].map(([val, label]) => (
-              <CheckRow key={val} label={label} active={selType === val} onClick={() => toggleType(val)} />
-            ))}
-          </FilterSection>
-
-          {/* Size */}
-          <FilterSection title="Size">
-            <div style={{ display: "flex", flexWrap: "wrap", gap: ".32rem" }}>
-              {ALL_SIZES.map(s => (
-                <button key={s} onClick={() => toggleSize(s)}
-                  style={{ padding: ".26rem .52rem", fontSize: ".63rem", border: `1.5px solid ${selSizes === s ? "var(--dark)" : "var(--border)"}`, background: selSizes === s ? "var(--dark)" : "transparent", color: selSizes === s ? "#fff" : "var(--dark)", cursor: "pointer", fontFamily: "'DM Sans',sans-serif", transition: "all .2s", minWidth: 32, borderRadius: 3 }}>
-                  {s}
-                </button>
+          {/* Thumbnails */}
+          {allImages.length > 1 && (
+            <div style={{ display: "flex", gap: ".5rem", flexWrap: "wrap" }}>
+              {allImages.map((img, i) => (
+                <div key={i} onClick={() => setSelectedImg(i)}
+                  style={{ width: 70, height: 90, overflow: "hidden", cursor: "pointer", border: `2px solid ${selectedImg === i ? "var(--dark)" : "transparent"}`, background: "#f0ece6" }}>
+                  <img src={getImageUrl(img)} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} onError={e => e.target.style.display = "none"} />
+                </div>
               ))}
             </div>
-          </FilterSection>
-
-          {/* Color */}
-          <FilterSection title="Color">
-            <div style={{ display: "flex", flexWrap: "wrap", gap: ".4rem" }}>
-              {ALL_COLORS.map((c, i) => (
-                <div key={i} onClick={() => toggleColor(c)}
-                  style={{ width: 22, height: 22, borderRadius: "50%", background: c, cursor: "pointer", border: (c === "#ffffffff" || c === "#fff") ? "1.5px solid var(--border)" : "2px solid transparent", boxShadow: selColors === c ? "0 0 0 2.5px var(--dark)" : "none", transform: selColors === c ? "scale(1.2)" : "none", transition: "all .2s" }} />
-              ))}
-            </div>
-          </FilterSection>
-
-          {(selSizes || selColors || selCategory !== "all" || selType !== "all") && (
-            <button onClick={() => { setSelSizes(null); setSelColors(null); setSelCategory("all"); setSelType("all"); setPage(1); }}
-              style={{ fontSize: ".61rem", letterSpacing: ".1em", textTransform: "uppercase", background: "none", border: "1px solid var(--border)", padding: ".36rem .8rem", cursor: "pointer", color: "var(--warm)", fontFamily: "'DM Sans',sans-serif", width: "100%", borderRadius: 3 }}>
-              Clear Filters
-            </button>
           )}
         </div>
 
-        {/* GRID */}
-        <div id="ninos-grid" style={{ flex: 1 }}>
-          <div style={{ fontSize: ".7rem", color: "var(--warm)", marginBottom: "1rem", letterSpacing: ".04em" }}>
-            {filtered.length} product{filtered.length !== 1 ? "s" : ""}
-            {totalPages > 1 ? ` — page ${page} of ${totalPages}` : ""}
+        {/* RIGHT — Info */}
+        <div style={{ paddingTop: "1rem" }}>
+          {/* Brand */}
+          <div style={{ fontSize: ".65rem", letterSpacing: ".2em", textTransform: "uppercase", color: "var(--warm)", marginBottom: ".5rem", fontFamily: "'DM Sans',sans-serif" }}>
+            {product.brand}
           </div>
 
-          {filtered.length === 0
-            ? <div style={{ textAlign: "center", padding: "4rem 0", color: "var(--warm)", fontSize: ".85rem" }}>No products match your filters.</div>
-            : <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: "1.4rem" }}>
-              {paginated.map(p => <PCard key={p.id} p={p} wish={wish} toggleWish={toggleWish} />)}
-            </div>
-          }
+          {/* Name */}
+          <h1 style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: "2.2rem", fontWeight: 400, lineHeight: 1.2, marginBottom: "1rem", color: "var(--dark)" }}>
+            {product.name}
+          </h1>
 
-          {/* PAGINATION */}
-          {totalPages > 1 && (
-            <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: ".45rem", padding: "2.5rem 0" }}>
-              <PagBtn onClick={() => { setPage(p => Math.max(1, p - 1)); scrollGrid(); }} disabled={page === 1}>‹</PagBtn>
-              {Array.from({ length: totalPages }, (_, i) => i + 1).map(n => (
-                <PagBtn key={n} onClick={() => { setPage(n); scrollGrid(); }} active={page === n}>{n}</PagBtn>
-              ))}
-              <PagBtn onClick={() => { setPage(p => Math.min(totalPages, p + 1)); scrollGrid(); }} disabled={page === totalPages}>›</PagBtn>
+          {/* Rating */}
+          <div style={{ display: "flex", alignItems: "center", gap: ".5rem", marginBottom: "1.2rem" }}>
+            <div style={{ display: "flex", gap: ".1rem" }}>
+              {[1,2,3,4,5].map(i => <StarIcon key={i} filled={i <= Math.round(product.rating)} />)}
+            </div>
+            <span style={{ fontSize: ".72rem", color: "var(--warm)", fontFamily: "'DM Sans',sans-serif" }}>
+              {product.rating.toFixed(1)} · {product.reviewCount} review{product.reviewCount !== 1 ? "s" : ""}
+            </span>
+          </div>
+
+          {/* Price */}
+          <div style={{ display: "flex", alignItems: "center", gap: "1rem", marginBottom: "1.5rem" }}>
+            <span style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: "1.8rem", fontWeight: 600, color: product.salePrice ? "var(--red)" : "var(--dark)" }}>
+              LE {(product.salePrice || product.price)?.toLocaleString()}
+            </span>
+            {product.salePrice && (
+              <span style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: "1.3rem", color: "var(--warm)", textDecoration: "line-through" }}>
+                LE {product.price?.toLocaleString()}
+              </span>
+            )}
+            {discountPct && (
+              <span style={{ background: "var(--red)", color: "#fff", fontSize: ".6rem", padding: ".2rem .5rem", fontWeight: 700, fontFamily: "'DM Sans',sans-serif" }}>
+                -{discountPct}%
+              </span>
+            )}
+          </div>
+
+          {/* Divider */}
+          <div style={{ height: 1, background: "var(--border)", marginBottom: "1.5rem" }} />
+
+          {/* Size Selector */}
+          {product.sizes.length > 0 && (
+            <div style={{ marginBottom: "1.5rem" }}>
+              <div style={{ fontSize: ".65rem", letterSpacing: ".15em", textTransform: "uppercase", color: "var(--dark)", fontWeight: 600, marginBottom: ".7rem", fontFamily: "'DM Sans',sans-serif", display: "flex", gap: ".5rem", alignItems: "center" }}>
+                SIZE
+                {sizeError && <span style={{ color: "var(--red)", fontWeight: 400, letterSpacing: 0, textTransform: "none", fontSize: ".7rem" }}>— select a size</span>}
+              </div>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: ".5rem" }}>
+                {product.sizes.map(s => (
+                  <button key={s} onClick={() => { setSelectedSize(s); setSizeError(false); }}
+                    style={{ padding: ".45rem 1.1rem", border: `1.5px solid ${selectedSize === s ? "var(--dark)" : "var(--border)"}`, background: selectedSize === s ? "var(--dark)" : "transparent", color: selectedSize === s ? "#fff" : "var(--dark)", cursor: "pointer", fontFamily: "'DM Sans',sans-serif", fontSize: ".75rem", transition: "all .2s", borderRadius: 3 }}>
+                    {s}
+                  </button>
+                ))}
+              </div>
             </div>
           )}
+
+          {/* Colors */}
+          {product.colors.length > 0 && (
+            <div style={{ marginBottom: "1.5rem" }}>
+              <div style={{ fontSize: ".65rem", letterSpacing: ".15em", textTransform: "uppercase", color: "var(--dark)", fontWeight: 600, marginBottom: ".7rem", fontFamily: "'DM Sans',sans-serif" }}>COLOR</div>
+              <div style={{ display: "flex", gap: ".5rem" }}>
+                {product.colors.map((c, i) => (
+                  <div key={i} style={{ width: 24, height: 24, borderRadius: "50%", background: c, border: "2px solid var(--border)", cursor: "pointer" }} />
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Add to Cart */}
+          <button onClick={handleAddToCart}
+            style={{ width: "100%", background: addedToCart ? "var(--sage)" : "var(--dark)", color: "#fff", border: "none", padding: "1rem", fontSize: ".72rem", letterSpacing: ".15em", textTransform: "uppercase", cursor: "pointer", fontFamily: "'DM Sans',sans-serif", marginBottom: ".8rem", transition: "background .3s" }}>
+            {addedToCart ? "✓ ADDED TO BAG" : "ADD TO BAG"}
+          </button>
+
+          {/* Wishlist */}
+          <button onClick={toggleWish}
+            style={{ width: "100%", background: "transparent", color: "var(--dark)", border: "1.5px solid var(--dark)", padding: "1rem", fontSize: ".72rem", letterSpacing: ".15em", textTransform: "uppercase", cursor: "pointer", fontFamily: "'DM Sans',sans-serif", display: "flex", alignItems: "center", justifyContent: "center", gap: ".5rem", transition: "all .2s" }}>
+            <Heart on={isWished} />
+            {isWished ? "SAVED TO WISHLIST" : "SAVE TO WISHLIST"}
+          </button>
+
+          {/* Stock */}
+          {product.stock < 5 && product.stock > 0 && (
+            <div style={{ marginTop: ".8rem", fontSize: ".7rem", color: "var(--red)", fontFamily: "'DM Sans',sans-serif" }}>
+              Only {product.stock} left in stock
+            </div>
+          )}
+
+          {/* Divider */}
+          <div style={{ height: 1, background: "var(--border)", margin: "1.5rem 0" }} />
+
+          {/* Accordion */}
+          {[
+            { title: "Product Details", content: product.description || "No description available." },
+            { title: "Shipping & Returns", content: "Free shipping on orders above LE 500. Returns accepted within 14 days." },
+            { title: "Size Guide", content: "XS: 0-2 | S: 4-6 | M: 8-10 | L: 12-14 | XL: 16-18" },
+            { title: "Brand Info", content: `${product.brand} — available exclusively on StyleHub.` },
+          ].map(({ title, content }) => (
+            <AccordionItem key={title} title={title} content={content} />
+          ))}
         </div>
       </div>
 
-      <SHFooter addRef={addRef} />
+      {/* Reviews */}
+      {reviews.length > 0 && (
+        <div style={{ padding: "3rem 5%", borderTop: "1px solid var(--border)", background: "#fff" }}>
+          <h2 style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: "1.8rem", fontWeight: 400, marginBottom: "2rem" }}>Customer Reviews</h2>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: "1.5rem" }}>
+            {reviews.map(r => (
+              <div key={r._id} style={{ padding: "1.2rem", border: "1px solid var(--border)", background: "var(--cream)" }}>
+                <div style={{ display: "flex", gap: ".1rem", marginBottom: ".5rem" }}>
+                  {[1,2,3,4,5].map(i => <StarIcon key={i} filled={i <= r.rating} />)}
+                </div>
+                <p style={{ fontSize: ".8rem", color: "#555", lineHeight: 1.6, marginBottom: ".5rem" }}>{r.comment}</p>
+                <div style={{ fontSize: ".65rem", color: "var(--warm)", fontFamily: "'DM Sans',sans-serif" }}>
+                  {r.customer?.firstName} {r.customer?.lastName}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      <SHFooter />
     </div>
   );
 }
 
-// ─── SMALL HELPERS ───
-const FilterSection = ({ title, children }) => (
-  <div style={{ borderTop: "1px solid var(--border)", paddingTop: "1.3rem", marginBottom: "1.6rem" }}>
-    <div className="filter-label">{title}</div>
-    {children}
-  </div>
-);
-
-const CheckRow = ({ label, active, onClick }) => (
-  <div onClick={onClick} style={{ display: "flex", alignItems: "center", gap: ".5rem", padding: ".26rem 0", cursor: "pointer" }}>
-    <div style={{ width: 13, height: 13, border: `1.5px solid ${active ? "var(--dark)" : "var(--border)"}`, background: active ? "var(--dark)" : "transparent", borderRadius: 2, flexShrink: 0, transition: "all .2s" }} />
-    <span style={{ fontSize: ".73rem", color: active ? "var(--dark)" : "var(--warm)", transition: "color .2s" }}>{label}</span>
-  </div>
-);
-
-const PagBtn = ({ children, onClick, disabled, active }) => (
-  <button onClick={onClick} disabled={disabled}
-    style={{ width: 34, height: 34, borderRadius: "50%", border: `1px solid ${active ? "var(--dark)" : "var(--border)"}`, background: active ? "var(--dark)" : "none", color: active ? "#fff" : "var(--dark)", cursor: disabled ? "not-allowed" : "pointer", opacity: disabled ? .4 : 1, fontSize: children === "‹" || children === "›" ? "1rem" : ".75rem", fontWeight: active ? 600 : 400, transition: "all .2s", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "'DM Sans',sans-serif" }}>
-    {children}
-  </button>
-);
-
-// ─── PAGE CSS ───
-const PAGE_CSS = `
-.filter-label {
-  font-size:.6rem;
-  letter-spacing:.2em;
-  text-transform:uppercase;
-  font-weight:600;
-  margin-bottom:.65rem;
-  color:var(--dark);
+function AccordionItem({ title, content }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div style={{ borderBottom: "1px solid var(--border)" }}>
+      <div onClick={() => setOpen(o => !o)}
+        style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: ".9rem 0", cursor: "pointer" }}>
+        <span style={{ fontSize: ".75rem", letterSpacing: ".1em", textTransform: "uppercase", fontWeight: 600, fontFamily: "'DM Sans',sans-serif", color: "var(--dark)" }}>{title}</span>
+        <span style={{ fontSize: "1.2rem", color: "var(--warm)", transition: "transform .2s", transform: open ? "rotate(45deg)" : "none" }}>+</span>
+      </div>
+      {open && (
+        <div style={{ paddingBottom: "1rem", fontSize: ".8rem", color: "#555", lineHeight: 1.7, fontFamily: "'DM Sans',sans-serif" }}>
+          {content}
+        </div>
+      )}
+    </div>
+  );
 }
-.ninos-cta-btn {
-  background:var(--dark);
-  color:#fff;
-  border:none;
-  padding:.65rem 1.8rem;
-  font-size:.68rem;
-  letter-spacing:.14em;
-  text-transform:uppercase;
-  font-weight:600;
-  cursor:pointer;
-  font-family:'DM Sans',sans-serif;
-  border-radius:3px;
-  transition:background .2s;
-}
-.ninos-cta-btn:hover { background:#92A079; }
-`;
