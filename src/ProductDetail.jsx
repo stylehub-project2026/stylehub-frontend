@@ -23,6 +23,7 @@ export default function ProductDetail({ cart, setCart, wish, setWish }) {
   const [loading, setLoading] = useState(true);
   const [selectedSize, setSelectedSize] = useState(null);
   const [selectedImg, setSelectedImg] = useState(0);
+  const [selectedColor, setSelectedColor] = useState(null);
   const [reviews, setReviews] = useState([]);
   const [addedToCart, setAddedToCart] = useState(false);
   const [sizeError, setSizeError] = useState(false);
@@ -236,7 +237,8 @@ export default function ProductDetail({ cart, setCart, wish, setWish }) {
               <div style={{ fontSize: ".65rem", letterSpacing: ".15em", textTransform: "uppercase", color: "var(--dark)", fontWeight: 600, marginBottom: ".7rem", fontFamily: "'DM Sans',sans-serif" }}>COLOR</div>
               <div style={{ display: "flex", gap: ".5rem" }}>
                 {product.colors.map((c, i) => (
-                  <div key={i} style={{ width: 24, height: 24, borderRadius: "50%", background: c, border: "2px solid var(--border)", cursor: "pointer" }} />
+                  <div key={i} onClick={() => { setSelectedColor(c); setSelectedImg(i); }}
+                    style={{ width: 28, height: 28, borderRadius: "50%", background: c, border: selectedColor === c ? "2px solid var(--dark)" : "2px solid var(--border)", cursor: "pointer", boxShadow: selectedColor === c ? "0 0 0 2px var(--dark)" : "none", transform: selectedColor === c ? "scale(1.15)" : "none", transition: "all .2s" }} />
                 ))}
               </div>
             </div>
