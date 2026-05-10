@@ -630,7 +630,7 @@ export default function Checkout({ cart = [], setCart, wish = [], setWish }) {
               price: `LE ${i.product.salePrice || i.product.price}`,
               rawPrice: i.product.salePrice || i.product.price,
               oldPrice: i.product.salePrice ? `LE ${i.product.price}` : null,
-              img: i.product.images?.[0] ? `https://stylehub-backend-tau.vercel.app${i.product.images[0]}` : null,
+              img: i.product.images?.[0] ? (i.product.images[0].startsWith('http') ? i.product.images[0] : `https://stylehub-backend-tau.vercel.app${i.product.images[0]}` ) : null,
               brand: "StyleHub",
             }
           }));

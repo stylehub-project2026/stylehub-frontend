@@ -969,8 +969,23 @@ function ProductsView() {
             <label style={labelStyle}>Description (optional)</label>
             <textarea style={{ ...inputStyle, minHeight: 70, resize: "vertical" }} value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))} placeholder="Describe your product..." />
 
-            <label style={labelStyle}>Sizes <span style={{ fontWeight: 400, color: "#aaa" }}>(comma separated e.g. S, M, L, XL)</span></label>
-            <input style={inputStyle} value={form.sizes} onChange={e => setForm(f => ({ ...f, sizes: e.target.value }))} placeholder="S, M, L, XL" />
+            <label style={labelStyle}>Sizes</label>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: ".5rem", marginBottom: "1rem" }}>
+              {["XS", "S", "M", "L", "XL", "XXL", "One Size"].map(size => {
+                const selected = (form.sizes || "").split(",").map(s => s.trim()).filter(Boolean).includes(size);
+                return (
+                  <button key={size} type="button"
+                    onClick={() => {
+                      const current = (form.sizes || "").split(",").map(s => s.trim()).filter(Boolean);
+                      const updated = selected ? current.filter(s => s !== size) : [...current, size];
+                      setForm(f => ({ ...f, sizes: updated.join(", ") }));
+                    }}
+                    style={{ padding: ".4rem .9rem", border: `1.5px solid ${selected ? "var(--green-dark)" : "var(--border)"}`, borderRadius: 8, background: selected ? "var(--green)" : "#fff", color: selected ? "#fff" : "#333", fontFamily: "var(--font)", fontSize: ".82rem", fontWeight: selected ? 700 : 400, cursor: "pointer", transition: "all .15s" }}>
+                    {size}
+                  </button>
+                );
+              })}
+            </div>
 
             <label style={labelStyle}>Product Images <span style={{ fontWeight: 400, color: "#aaa" }}>(upload 1 or more)</span></label>
             <div style={{ marginBottom: "1rem" }}>

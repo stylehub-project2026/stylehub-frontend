@@ -153,7 +153,7 @@ function BackendCart({ cart, setCart, wish }) {
               {items.map(item => {
                 const p = item.product;
                 if (!p) return null;
-                const img = p.images?.[0] ? `https://stylehub-backend-tau.vercel.app${p.images[0]}` : null;
+                const img = p.images?.[0] ? (p.images[0].startsWith('http') ? p.images[0] : `https://stylehub-backend-tau.vercel.app${p.images[0]}`) : null;
                 const price = p.salePrice || p.price;
 
                 return (

@@ -101,7 +101,7 @@ export default function NinosBrand({ cart, wish = [], setWish }) {
           brand: "Ninos",
           price: `LE ${p.price?.toLocaleString()}`,
           oldPrice: p.salePrice ? `LE ${p.salePrice?.toLocaleString()}` : null,
-          img: (p.images && p.images[0]) ? `https://stylehub-backend-tau.vercel.app${p.images[0]}` : null,
+          img: (p.images && p.images[0]) ? p.images[0] : null,
           imgs: p.images?.slice(1) || [],
           colors: p.colors || [],
           sizes: p.sizes || [],

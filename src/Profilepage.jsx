@@ -232,7 +232,7 @@ export default function ProfilePage({ cart, wish = [], setWish }) {
                                 <div className="order-products">
                                     {order.items.map((item, i) => (
                                         item.product?.images?.[0]
-                                            ? <img key={i} className="order-img" src={`https://stylehub-backend-tau.vercel.app${item.product.images[0]}`} alt={item.name} onError={e => e.target.style.display = "none"} />
+                                            ? <img key={i} className="order-img" src={(item.product.images[0].startsWith('http') ? item.product.images[0] : `https://stylehub-backend-tau.vercel.app${item.product.images[0]}` )} alt={item.name} onError={e => e.target.style.display = "none"} />
                                             : <div key={i} className="order-img" style={{ display: "flex", alignItems: "center", justifyContent: "center", fontSize: ".58rem", color: "var(--warm)" }}>{item.name?.slice(0, 6)}</div>
                                     ))}
                                 </div>
@@ -258,7 +258,7 @@ export default function ProfilePage({ cart, wish = [], setWish }) {
                             {wishProducts.map(p => (
                                 <div key={p._id} className="wish-card" onClick={() => navigate(`/product/${p._id}`)}>
                                     {p.images?.[0]
-                                        ? <img className="wish-img" src={`https://stylehub-backend-tau.vercel.app${p.images[0]}`} alt={p.name} onError={e => e.target.style.display = "none"} />
+                                        ? <img className="wish-img" src={(p.images[0].startsWith('http') ? p.images[0] : `https://stylehub-backend-tau.vercel.app${p.images[0]}` )} alt={p.name} onError={e => e.target.style.display = "none"} />
                                         : <div className="wish-img" style={{ display: "flex", alignItems: "center", justifyContent: "center", color: "var(--warm)", fontSize: ".75rem" }}>No image</div>
                                     }
                                     <div className="wish-info">

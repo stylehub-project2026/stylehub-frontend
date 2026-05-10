@@ -581,7 +581,7 @@ export default function MenPage({ cart = [], setCart, wish = [], setWish }) {
           price: p.price,
           old: p.salePrice || null,
           brand: p.seller?.brandName || "StyleHub",
-          img: p.images?.[0] ? `https://stylehub-backend-tau.vercel.app${p.images[0]}` : null,
+          img: p.images?.[0] ? (p.images[0].startsWith('http') ? p.images[0] : `https://stylehub-backend-tau.vercel.app${p.images[0]}`) : null,
           sizes: p.sizes || [],
           colors: p.colors || [],
           rating: p.avgRating || 0,

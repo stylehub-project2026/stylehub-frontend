@@ -69,7 +69,7 @@ export default function Kids({ cart, setCart, wish, setWish }) {
           price: `LE ${p.price?.toLocaleString()}`,
           oldPrice: p.salePrice ? `LE ${p.salePrice?.toLocaleString()}` : null,
           brand: p.seller?.brandName || "StyleHub",
-          img: p.images?.[0] ? `https://stylehub-backend-tau.vercel.app${p.images[0]}` : null,
+          img: p.images?.[0] ? (p.images[0].startsWith('http') ? p.images[0] : `https://stylehub-backend-tau.vercel.app${p.images[0]}`) : null,
           sizes: p.sizes || [],
           colors: p.colors || [],
           type: p.tags?.[0] || "",
