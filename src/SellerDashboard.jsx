@@ -758,7 +758,7 @@ function ProductsView() {
   const [msg, setMsg] = useState(null);
 
   // Empty form state
-  const emptyForm = { name: "", price: "", salePrice: "", stock: "", category: "", type: "", description: "", sizes: "", variants: [], mainImages: [] };
+  const emptyForm = { name: "", price: "", salePrice: "", stock: "", category: "", type: "", description: "", sizes: "", images: [] };
   const [form, setForm] = useState(emptyForm);
 
   const loadProducts = () => {
@@ -782,9 +782,11 @@ function ProductsView() {
       type: (product.tags?.[0]?.toLowerCase() || ""),
       description: product.description || "",
       sizes: (product.sizes || []).join(", "),
-      variants: (product.colors || []).length > 0
-        ? (product.colors || []).map((color, i) => ({ color, imageFile: null, existingImage: product.images?.[i] || null }))
-        : [],
+      images: (product.images || []).map((img, i) => ({
+        imageFile: null,
+        existingImage: img,
+        color: product.colors?.[i] || "",
+      })),
     });
   };
 
@@ -804,13 +806,10 @@ function ProductsView() {
       if (form.type) formData.append("tags", form.type);
       formData.append("description", form.description);
       formData.append("sizes", form.sizes);
-      const validVariants = form.variants.filter(v => v.color.trim());
-      if (validVariants.length > 0) {
-        formData.append("colors", validVariants.map(v => v.color.trim()).join(","));
-        validVariants.forEach(v => { if (v.imageFile) formData.append("images", v.imageFile); });
-      }
-      // main images (no color)
-      (form.mainImages || []).forEach(f => formData.append("images", f));
+      const imgs = form.images || [];
+      const colors = imgs.map(i => i.color?.trim() || "").filter(Boolean);
+      if (colors.length > 0) formData.append("colors", colors.join(","));
+      imgs.forEach(img => { if (img.imageFile) formData.append("images", img.imageFile); });
 
       const url = editProduct
         ? `https://stylehub-backend-tau.vercel.app/api/products/${editProduct._id}`
@@ -987,69 +986,52 @@ function ProductsView() {
               })}
             </div>
 
-            <label style={labelStyle}>Product Images <span style={{ fontWeight: 400, color: "#aaa" }}>(upload 1 or more)</span></label>
+            <label style={labelStyle}>Product Images <span style={{ fontWeight: 400, color: "#aaa" }}>(each image can have an optional color)</span></label>
             <div style={{ marginBottom: "1rem" }}>
-              <label style={{ display: "inline-block", padding: ".5rem 1rem", border: "1px dashed var(--green)", borderRadius: 8, cursor: "pointer", fontSize: ".75rem", color: "var(--green-dark)", fontWeight: 600 }}>
-                + Upload Images
-                <input type="file" accept="image/*" multiple style={{ display: "none" }}
-                  onChange={e => {
-                    const files = Array.from(e.target.files);
-                    setForm(f => ({ ...f, mainImages: [...(f.mainImages || []), ...files] }));
-                  }} />
-              </label>
-              {(form.mainImages || []).length > 0 && (
-                <div style={{ display: "flex", gap: ".5rem", flexWrap: "wrap", marginTop: ".5rem" }}>
-                  {(form.mainImages || []).map((file, i) => (
-                    <div key={i} style={{ position: "relative" }}>
-                      <img src={URL.createObjectURL(file)} alt="" style={{ width: 50, height: 50, objectFit: "cover", borderRadius: 6, border: "1.5px solid var(--border)" }} />
-                      <button type="button" onClick={() => setForm(f => ({ ...f, mainImages: f.mainImages.filter((_, j) => j !== i) }))}
-                        style={{ position: "absolute", top: -6, right: -6, width: 18, height: 18, borderRadius: "50%", background: "#e74c3c", color: "#fff", border: "none", cursor: "pointer", fontSize: ".6rem", display: "flex", alignItems: "center", justifyContent: "center" }}>✕</button>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            <label style={labelStyle}>Color Variants <span style={{ fontWeight: 400, color: "#aaa" }}>(each color with its own image)</span></label>
-            {form.variants.map((v, i) => (
-              <div key={i} style={{ display: "flex", gap: ".6rem", alignItems: "center", marginBottom: ".6rem", background: "var(--green-light)", borderRadius: 10, padding: ".6rem .8rem" }}>
-                {/* Color swatch preview */}
-                <div style={{ width: 32, height: 32, borderRadius: "50%", background: v.color || "#e0e0e0", border: "2px solid #ccc", flexShrink: 0 }} />
-                {/* Hex input */}
-                <input
-                  style={{ flex: 1, padding: "7px 10px", border: "1.5px solid var(--border)", borderRadius: 8, fontFamily: "var(--font)", fontSize: ".82rem", outline: "none", background: "#fff" }}
-                  placeholder="#000000"
-                  value={v.color}
-                  onChange={e => setForm(f => ({ ...f, variants: f.variants.map((x, j) => j === i ? { ...x, color: e.target.value } : x) }))}
-                />
-                {/* Image upload */}
-                <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: ".3rem" }}>
-                  {(v.imageFile || v.existingImage) && (
-                    <img
-                      src={v.imageFile ? URL.createObjectURL(v.imageFile) : v.existingImage}
-                      alt=""
-                      style={{ width: 40, height: 40, objectFit: "cover", borderRadius: 6, border: "1.5px solid var(--border)" }}
-                    />
-                  )}
-                  <label style={{ fontSize: ".68rem", color: "var(--green-dark)", cursor: "pointer", fontWeight: 600 }}>
-                    {v.imageFile || v.existingImage ? "Change" : "+ Image"}
+              {/* Existing + new images */}
+              {(form.images || []).map((img, i) => (
+                <div key={i} style={{ display: "flex", gap: ".6rem", alignItems: "center", marginBottom: ".6rem", background: "var(--green-light)", borderRadius: 10, padding: ".6rem .8rem" }}>
+                  {/* Image preview */}
+                  <div style={{ width: 50, height: 50, flexShrink: 0, borderRadius: 8, overflow: "hidden", background: "#fff", border: "1.5px solid var(--border)" }}>
+                    {(img.imageFile || img.existingImage) && (
+                      <img src={img.imageFile ? URL.createObjectURL(img.imageFile) : img.existingImage} alt=""
+                        style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                    )}
+                  </div>
+                  {/* Change image */}
+                  <label style={{ fontSize: ".7rem", color: "var(--green-dark)", cursor: "pointer", fontWeight: 600, flexShrink: 0 }}>
+                    {img.imageFile || img.existingImage ? "Change" : "+ Image"}
                     <input type="file" accept="image/*" style={{ display: "none" }}
                       onChange={e => {
                         const file = e.target.files[0];
-                        if (file) setForm(f => ({ ...f, variants: f.variants.map((x, j) => j === i ? { ...x, imageFile: file } : x) }));
+                        if (file) setForm(f => ({ ...f, images: f.images.map((x, j) => j === i ? { ...x, imageFile: file } : x) }));
                       }} />
                   </label>
+                  {/* Optional color */}
+                  <div style={{ display: "flex", alignItems: "center", gap: ".4rem", flex: 1 }}>
+                    <div style={{ width: 24, height: 24, borderRadius: "50%", background: img.color || "#e0e0e0", border: "1.5px solid #ccc", flexShrink: 0 }} />
+                    <input
+                      style={{ flex: 1, padding: "6px 10px", border: "1.5px solid var(--border)", borderRadius: 8, fontFamily: "var(--font)", fontSize: ".8rem", outline: "none", background: "#fff" }}
+                      placeholder="Color (optional) e.g. #FF0000"
+                      value={img.color || ""}
+                      onChange={e => setForm(f => ({ ...f, images: f.images.map((x, j) => j === i ? { ...x, color: e.target.value } : x) }))}
+                    />
+                  </div>
+                  {/* Remove */}
+                  <button type="button" onClick={() => setForm(f => ({ ...f, images: f.images.filter((_, j) => j !== i) }))}
+                    style={{ background: "none", border: "none", cursor: "pointer", color: "#e74c3c", fontSize: "1rem", flexShrink: 0 }}>✕</button>
                 </div>
-                {/* Remove button */}
-                <button type="button" onClick={() => setForm(f => ({ ...f, variants: f.variants.filter((_, j) => j !== i) }))}
-                  style={{ background: "none", border: "none", cursor: "pointer", color: "#e74c3c", fontSize: "1rem", flexShrink: 0 }}>✕</button>
-              </div>
-            ))}
-            <button type="button"
-              onClick={() => setForm(f => ({ ...f, variants: [...f.variants, { color: "", imageFile: null }] }))}
-              style={{ fontSize: ".72rem", color: "var(--green-dark)", background: "none", border: "1px dashed var(--green)", borderRadius: 8, padding: ".4rem 1rem", cursor: "pointer", fontFamily: "var(--font)", fontWeight: 600, marginBottom: "1rem", width: "100%" }}>
-              + Add Color Variant
-            </button>
+              ))}
+              {/* Add new image button */}
+              <label style={{ display: "inline-block", padding: ".5rem 1rem", border: "1px dashed var(--green)", borderRadius: 8, cursor: "pointer", fontSize: ".75rem", color: "var(--green-dark)", fontWeight: 600, marginTop: ".3rem" }}>
+                + Add Image
+                <input type="file" accept="image/*" multiple style={{ display: "none" }}
+                  onChange={e => {
+                    const files = Array.from(e.target.files);
+                    setForm(f => ({ ...f, images: [...(f.images || []), ...files.map(file => ({ imageFile: file, existingImage: null, color: "" }))] }));
+                  }} />
+              </label>
+            </div>
 
             <div style={{ display: "flex", gap: "1rem", marginTop: ".5rem" }}>
               <button onClick={closeModal} style={{ flex: 1, padding: "11px", border: "1.5px solid var(--border)", borderRadius: 25, background: "#fff", fontFamily: "var(--font)", fontSize: ".85rem", fontWeight: 600, cursor: "pointer" }}>
