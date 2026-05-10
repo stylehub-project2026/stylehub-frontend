@@ -8,7 +8,7 @@ import BlackCloset from "./blackcloset";
 import Ninos from "./ninos";
 import TwentySeven from "./27";
 import SellerBrandPage from "./SellerBrandPage";
-import ProfilePage from "./ProfilePage";
+import ProfilePage from "./Profilepage";
 import Wishlist from "./wishlist";
 import Women from "./women";
 import MenPage from "./MenPage";
