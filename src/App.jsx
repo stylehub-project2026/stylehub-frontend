@@ -466,6 +466,34 @@ export default function App() {
 
 
   const [toast, setToast] = useState("");
+  const [backendProducts, setBackendProducts] = useState([]);
+
+  // Fetch backend products for home page
+  useEffect(() => {
+    const API = "https://stylehub-backend-tau.vercel.app/api";
+    Promise.all([
+      fetch(`${API}/products?category=women&limit=20`).then(r => r.json()),
+      fetch(`${API}/products?category=men&limit=20`).then(r => r.json()),
+      fetch(`${API}/products?category=kids&limit=20`).then(r => r.json()),
+    ]).then(([w, m, k]) => {
+      const mapP = p => ({
+        id: p._id, _id: p._id, name: p.name,
+        brand: p.seller?.brandName || "StyleHub",
+        price: `LE ${p.price?.toLocaleString()}`,
+        oldPrice: p.salePrice ? `LE ${p.salePrice?.toLocaleString()}` : null,
+        img: p.images?.[0] ? (p.images[0].startsWith("http") ? p.images[0] : `https://stylehub-backend-tau.vercel.app${p.images[0]}`) : null,
+        sizes: p.sizes || [], colors: p.colors || [],
+        rating: p.avgRating || 0, reviews: p.reviewCount || 0,
+        tab: "best", category: p.category,
+      });
+      const all = [
+        ...(w.data?.products || []).map(mapP),
+        ...(m.data?.products || []).map(mapP),
+        ...(k.data?.products || []).map(mapP),
+      ];
+      setBackendProducts(all);
+    }).catch(() => {});
+  }, []);
   const addRef = useScrollReveal();
   const location = useLocation();
 
@@ -524,7 +552,7 @@ export default function App() {
               ))}
             </div>
             <div className="row row-cols-2 row-cols-md-3 g-3">
-              {PRODUCTS.filter(p => p.tab === tab).slice(0, 6).map((p, i) => (
+              {(backendProducts.length > 0 ? backendProducts : PRODUCTS.filter(p => p.tab === tab)).slice(0, 6).map((p, i) => (
                 <div className="col" key={p.id}>
                   <PCard p={p} onOpen={setModal} addRef={addRef} d={(i % 3) + 1} wish={wish} toggleWish={toggleWish} />
                 </div>
@@ -569,14 +597,14 @@ export default function App() {
           {/* TRENDING */}
           <section className="px-4 py-4 " style={{ marginTop: "6rem" }}>
             <div className="sec-title reveal" ref={addRef}>Trending Now</div>
-            <TrendingCarousel products={PRODUCTS.filter(p => p.tab === "trend")} onOpen={setModal} wish={wish} toggleWish={toggleWish} onAdd={addToCart} />
+            <TrendingCarousel products={backendProducts.length > 0 ? backendProducts.slice(6, 12) : PRODUCTS.filter(p => p.tab === "trend")} onOpen={setModal} wish={wish} toggleWish={toggleWish} onAdd={addToCart} />
           </section>
 
           {/* TOP PICKS */}
           <section className="px-4 py-4 " style={{ marginTop: "6rem" }}  >
             <div className="sec-title reveal" ref={addRef}>Top Picks</div>
             <div className="row row-cols-2 row-cols-md-4 g-3">
-              {PRODUCTS.filter(p => p.tab === "picks").map((p, i) => (
+              {backendProducts.length > 0 ? backendProducts.slice(12, 16) : PRODUCTS.filter(p => p.tab === "picks").map((p, i) => (
                 <div className="col" key={p.id}>
                   <TCard p={p} onOpen={setModal} addRef={addRef} d={(i % 4) + 1} wish={wish} toggleWish={toggleWish} onAdd={addToCart} />
                 </div>
