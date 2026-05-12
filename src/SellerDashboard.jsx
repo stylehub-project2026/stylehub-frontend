@@ -888,7 +888,9 @@ function ProductsView() {
                 EGP {product.price?.toLocaleString()}
                 {product.salePrice && <span style={{ fontSize: ".72rem", color: "var(--gray-text)", marginLeft: 6, textDecoration: "line-through" }}>EGP {product.salePrice?.toLocaleString()}</span>}
               </div>
-              <div className="product-card-stock">{product.stock} in stock · {product.category}</div>
+              <div className="product-card-stock">
+                {product.stock} in stock · {typeof product.category === "object" ? product.category?.name || "" : product.category}
+              </div>
               <div className="product-card-actions">
                 <button className="product-card-btn" onClick={() => openEdit(product)}>
                   <i className="fas fa-edit" style={{ marginRight: 4 }} /> Edit
