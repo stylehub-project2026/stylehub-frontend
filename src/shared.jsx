@@ -116,7 +116,7 @@ export const PRODUCTS = [
 ];
 
 export const CATS = [
-  { name: "MEN", img: "/boy2.png", link: "#", gradient: "145deg,#8a9e7a,#4a6040" },
+  { name: "MEN", img: "/man.jpg", link: "/men", gradient: "145deg,#8a9a7a,#4a5c40" },
   { name: "WOMEN", img: "/girl.png", link: "/women", gradient: "145deg,#c4b8a8,#8a7868" },
   { name: "KIDS", img: "/baby.jpg", link: "/kids", gradient: "145deg,#6b8aad,#3a5878" },
 ];
@@ -189,7 +189,7 @@ export function SHNav({ cart = [], wish = [] }) {
                 onMouseEnter={e => e.currentTarget.style.background = "var(--cream)"}
                 onMouseLeave={e => e.currentTarget.style.background = "#fff"}>
                 <div style={{ width: 42, height: 52, background: "#f0ece6", flexShrink: 0, overflow: "hidden", borderRadius: 4 }}>
-                  {p.images?.[0] && <img src={(p.images[0].startsWith('http') ? p.images[0] : `https://stylehub-backend-tau.vercel.app${p.images[0]}` )} alt={p.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} onError={e => e.target.style.display = "none"} />}
+                  {p.images?.[0] && <img src={(p.images[0].startsWith('http') ? p.images[0] : `https://stylehub-backend-tau.vercel.app${p.images[0]}`)} alt={p.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} onError={e => e.target.style.display = "none"} />}
                 </div>
                 <div style={{ flex: 1 }}>
                   <div style={{ fontSize: ".78rem", fontWeight: 500, color: "var(--dark)" }}>{p.name}</div>
