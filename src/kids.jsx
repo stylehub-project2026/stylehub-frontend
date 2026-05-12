@@ -34,7 +34,7 @@ function KidCard({ p, wish, toggleWish }) {
         </button>
       </div>
       <div style={{ padding: ".6rem .7rem" }}>
-        <div style={{ fontSize: ".55rem", letterSpacing: ".15em", textTransform: "uppercase", color: "var(--warm)", marginBottom: ".2rem" }}>{p.brand}</div>
+        <div style={{ fontSize: ".55rem", letterSpacing: ".15em", textTransform: "uppercase", color: "var(--warm)", marginBottom: ".2rem", cursor: "pointer" }} onClick={e => { e.stopPropagation(); navigate(`/brand/${encodeURIComponent(p.brand)}`); }}>{p.brand}</div>
         <div style={{ fontSize: ".78rem", fontWeight: 500, marginBottom: ".3rem", lineHeight: 1.3 }}>{p.name}</div>
         <div style={{ display: "flex", gap: ".5rem", alignItems: "center" }}>
           {p.oldPrice && <span style={{ fontSize: ".7rem", color: "var(--warm)", textDecoration: "line-through" }}>{p.oldPrice}</span>}
@@ -44,7 +44,6 @@ function KidCard({ p, wish, toggleWish }) {
     </div>
   );
 }
-
 // ── MAIN PAGE ──
 export default function Kids({ cart, setCart, wish, setWish }) {
   const [allProducts, setAllProducts] = useState([]);

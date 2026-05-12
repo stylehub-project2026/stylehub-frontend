@@ -414,7 +414,7 @@ function ProdCard({ p, onQuickView, onWish, wishlisted, addRef, d = 1 }) {
         </button>
       </div>
       <div className="prod-info">
-        {p.brand && <div className="prod-brand-lbl">{p.brand}</div>}
+        {p.brand && <div className="prod-brand-lbl" style={{ cursor: "pointer" }} onClick={e => { e.stopPropagation(); navigate(`/brand/${encodeURIComponent(p.brand)}`); }}>{p.brand}</div>}
         <div className="prod-name">{p.name}</div>
         {p.rating && (
           <div className="prod-stars-row">

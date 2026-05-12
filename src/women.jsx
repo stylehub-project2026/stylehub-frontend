@@ -265,6 +265,7 @@ function QuickViewModal({ p, onClose, onAddToCart }) {
 
 /* ══════════════════════════════════════════ PROD CARD ══════════════════════════════════════════ */
 function ProdCard({ p, d, addRef, onQuickView, onWish, wishlisted }) {
+  const navigate = useNavigate();
   return (
     <div className={`w-pc reveal d${d}`} ref={addRef} style={{ scrollSnapAlign: "start" }}>
       <div className="w-pc-img-wrap">
@@ -287,7 +288,7 @@ function ProdCard({ p, d, addRef, onQuickView, onWish, wishlisted }) {
         </button>
       </div>
       <div className="w-prod-info">
-        <div className="w-prod-brand">{p.brand}</div>
+        <div className="w-prod-brand" style={{ cursor: "pointer" }} onClick={() => navigate(`/brand/${encodeURIComponent(p.brand)}`)}>{p.brand}</div>
         <div className="w-prod-name">{p.name}</div>
         <div className="d-flex align-items-center mb-1">
           <span className="w-prod-price"> {p.price.toLocaleString()}</span>
@@ -426,7 +427,7 @@ export default function WomenPage() {
           price: p.price,
           old: p.salePrice || null,
           brand: p.seller?.brandName || "StyleHub",
-          img: p.images?.[0] ? (p.images[0].startsWith('http') ? p.images[0] : `https://stylehub-backend-tau.vercel.app${p.images[0]}` ) : null,
+          img: p.images?.[0] ? (p.images[0].startsWith('http') ? p.images[0] : `https://stylehub-backend-tau.vercel.app${p.images[0]}`) : null,
           sizes: p.sizes || [],
           colors: p.colors || [],
           rating: p.avgRating || 0,

@@ -277,7 +277,7 @@ function PCard({ p, onOpen, addRef, d = 1, wish, toggleWish }) {
         <button className="pc-qv" onClick={e => { e.stopPropagation(); onOpen(p) }}>Quick View</button>
       </div>
       <div className="p-2">
-        <div className="pc-brand mb-1">{p.brand}</div>
+        <div className="pc-brand mb-1" style={{ cursor: "pointer" }} onClick={e => { e.stopPropagation(); navigate(`/brand/${encodeURIComponent(p.brand)}`); }}>{p.brand}</div>
         <div className="pc-name mb-1">{p.name}</div>
         <div className="d-flex gap-2 align-items-center">
           {p.oldPrice && <span className="p-old">{p.oldPrice}</span>}
@@ -287,7 +287,6 @@ function PCard({ p, onOpen, addRef, d = 1, wish, toggleWish }) {
     </div>
   );
 }
-
 // ─── TRENDING CARD ───
 function TCard({ p, onOpen, addRef, d = 1, wish, toggleWish, onAdd }) {
   const [qty, setQty] = useState(0);
@@ -299,7 +298,7 @@ function TCard({ p, onOpen, addRef, d = 1, wish, toggleWish, onAdd }) {
         <button className={`tc-w${wish.includes(p.id) ? " on" : ""}`} onClick={e => { e.stopPropagation(); toggleWish(p.id) }}><Heart on={wish.includes(p.id)} /></button>
       </div>
       <div className="p-2">
-        <div className="tc-brand">{p.brand}</div>
+        <div className="tc-brand" style={{ cursor: "pointer" }} onClick={e => { e.stopPropagation(); navigate(`/brand/${encodeURIComponent(p.brand)}`); }}>{p.brand}</div>
         <div className="tc-name my-1">{p.name}</div>
         <div className="d-flex align-items-center gap-1 mb-1">
           {p.oldPrice && <span className="tc-old">{p.oldPrice}</span>}
@@ -492,7 +491,7 @@ export default function App() {
         ...(k.data?.products || []).map(mapP),
       ];
       setBackendProducts(all);
-    }).catch(() => {});
+    }).catch(() => { });
   }, []);
   const addRef = useScrollReveal();
   const location = useLocation();
