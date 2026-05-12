@@ -127,7 +127,7 @@ export default function ProfilePage({ cart, wish = [], setWish }) {
             .catch(() => { })
             .finally(() => setLoading(false));
 
-        fetch(`${API}/users/points`, { headers: { Authorization: `Bearer ${token}` } })
+        fetch(`${API}/customer/auth/points`, { headers: { Authorization: `Bearer ${token}` } })
             .then(r => r.json())
             .then(data => { if (data.success) setPoints(data.data?.points || 0); })
             .catch(() => { });
