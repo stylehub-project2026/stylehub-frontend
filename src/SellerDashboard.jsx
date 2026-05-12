@@ -1037,7 +1037,7 @@ function ProductsView() {
               <button onClick={closeModal} style={{ flex: 1, padding: "11px", border: "1.5px solid var(--border)", borderRadius: 25, background: "#fff", fontFamily: "var(--font)", fontSize: ".85rem", fontWeight: 600, cursor: "pointer" }}>
                 Cancel
               </button>
-              <button onClick={handleSave} disabled={saving || !form.name || !form.price} style={{ flex: 2, padding: "11px", border: "none", borderRadius: 25, background: "var(--green)", color: "#fff", fontFamily: "var(--font)", fontSize: ".85rem", fontWeight: 700, cursor: "pointer", opacity: saving ? .6 : 1 }}>
+              <button onClick={handleSave} disabled={saving || !form.name || !form.price || !form.category} style={{ flex: 2, padding: "11px", border: "none", borderRadius: 25, background: "var(--green)", color: "#fff", fontFamily: "var(--font)", fontSize: ".85rem", fontWeight: 700, cursor: "pointer", opacity: saving ? .6 : 1 }}>
                 {saving ? <><i className="fas fa-circle-notch fa-spin" /> Saving…</> : editProduct ? "Save Changes" : "Add Product"}
               </button>
             </div>
