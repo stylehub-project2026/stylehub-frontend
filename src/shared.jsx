@@ -116,7 +116,7 @@ export const PRODUCTS = [
 ];
 
 export const CATS = [
-  { name: "MEN", img: "/man.jpg", link: "/men", gradient: "145deg,#8a9a7a,#4a5c40" },
+  { name: "MEN", img: "/boy2.jpg", link: "/men", gradient: "145deg,#8a9a7a,#4a5c40" },
   { name: "WOMEN", img: "/girl.png", link: "/women", gradient: "145deg,#c4b8a8,#8a7868" },
   { name: "KIDS", img: "/baby.jpg", link: "/kids", gradient: "145deg,#6b8aad,#3a5878" },
 ];
