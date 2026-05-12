@@ -267,7 +267,7 @@ function QuickViewModal({ p, onClose, onAddToCart }) {
 function ProdCard({ p, d, addRef, onQuickView, onWish, wishlisted }) {
   const navigate = useNavigate();
   return (
-    <div className={`w-pc reveal d${d}`} ref={addRef} style={{ scrollSnapAlign: "start" }}>
+    <div className={`w-pc revealed d${d}`} ref={addRef} style={{ scrollSnapAlign: "start" }}>
       <div className="w-pc-img-wrap">
         <img
           src={p.img}
