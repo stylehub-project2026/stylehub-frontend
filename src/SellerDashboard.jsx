@@ -790,9 +790,27 @@ function ProductsView() {
     });
   };
 
-  const closeModal = () => { setEditProduct(null); setShowAdd(false); setForm(emptyForm); setMsg(null); };
+  const closeModal = () => { setEditProduct(null); setShowAdd(false); setForm(emptyForm); setMsg(null); setFormErrors({}); };
+
+  const [formErrors, setFormErrors] = useState({});
 
   const handleSave = async () => {
+    // ── Validate all required fields
+    const errors = {};
+    if (!form.name?.trim()) errors.name = true;
+    if (!form.price) errors.price = true;
+    if (!form.stock) errors.stock = true;
+    if (!form.category) errors.category = true;
+    if (!form.type) errors.type = true;
+    if (!form.sizes?.trim()) errors.sizes = true;
+    if (!form.images?.length || !form.images.some(img => img.imageFile || img.existingImage)) errors.images = true;
+
+    if (Object.keys(errors).length > 0) {
+      setFormErrors(errors);
+      setMsg({ type: "error", text: "Please fill in all required fields." });
+      return;
+    }
+    setFormErrors({});
     setSaving(true);
     setMsg(null);
     try {
@@ -921,28 +939,28 @@ function ProductsView() {
               </div>
             )}
 
-            <label style={labelStyle}>Product Name</label>
-            <input style={inputStyle} value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} placeholder="e.g. Studio Zip-up" />
+            <label style={labelStyle}>Product Name <span style={{ color: "#e74c3c" }}>*</span></label>
+            <input style={{ ...inputStyle, borderColor: formErrors.name ? "#e74c3c" : undefined }} value={form.name} onChange={e => { setForm(f => ({ ...f, name: e.target.value })); setFormErrors(f => ({ ...f, name: false })); }} placeholder="e.g. Studio Zip-up" />
 
             <div style={rowStyle}>
               <div>
-                <label style={labelStyle}>Price (EGP)</label>
-                <input style={inputStyle} type="number" value={form.price} onChange={e => setForm(f => ({ ...f, price: e.target.value }))} placeholder="600" />
+                <label style={labelStyle}>Price (EGP) <span style={{ color: "#e74c3c" }}>*</span></label>
+                <input style={{ ...inputStyle, borderColor: formErrors.price ? "#e74c3c" : undefined }} type="number" value={form.price} onChange={e => { setForm(f => ({ ...f, price: e.target.value })); setFormErrors(f => ({ ...f, price: false })); }} placeholder="600" />
               </div>
               <div>
-                <label style={labelStyle}>Sale Price (optional)</label>
+                <label style={labelStyle}>Sale Price <span style={{ fontWeight: 400, color: "#aaa" }}>(optional)</span></label>
                 <input style={inputStyle} type="number" value={form.salePrice} onChange={e => setForm(f => ({ ...f, salePrice: e.target.value }))} placeholder="500" />
               </div>
             </div>
 
             <div style={rowStyle}>
               <div>
-                <label style={labelStyle}>Stock</label>
-                <input style={inputStyle} type="number" value={form.stock} onChange={e => setForm(f => ({ ...f, stock: e.target.value }))} placeholder="10" />
+                <label style={labelStyle}>Stock <span style={{ color: "#e74c3c" }}>*</span></label>
+                <input style={{ ...inputStyle, borderColor: formErrors.stock ? "#e74c3c" : undefined }} type="number" value={form.stock} onChange={e => { setForm(f => ({ ...f, stock: e.target.value })); setFormErrors(f => ({ ...f, stock: false })); }} placeholder="10" />
               </div>
               <div>
-                <label style={labelStyle}>Category</label>
-                <select style={{ ...inputStyle, appearance: "none" }} value={form.category} onChange={e => setForm(f => ({ ...f, category: e.target.value }))}>
+                <label style={labelStyle}>Category <span style={{ color: "#e74c3c" }}>*</span></label>
+                <select style={{ ...inputStyle, appearance: "none", borderColor: formErrors.category ? "#e74c3c" : undefined }} value={form.category} onChange={e => { setForm(f => ({ ...f, category: e.target.value })); setFormErrors(f => ({ ...f, category: false })); }}>
                   <option value="">Select…</option>
                   <option value="women">Women</option>
                   <option value="men">Men</option>
@@ -953,8 +971,8 @@ function ProductsView() {
 
             <div style={rowStyle}>
               <div>
-                <label style={labelStyle}>Type</label>
-                <select style={{ ...inputStyle, appearance: "none" }} value={form.type} onChange={e => setForm(f => ({ ...f, type: e.target.value }))}>
+                <label style={labelStyle}>Type <span style={{ color: "#e74c3c" }}>*</span></label>
+                <select style={{ ...inputStyle, appearance: "none", borderColor: formErrors.type ? "#e74c3c" : undefined }} value={form.type} onChange={e => { setForm(f => ({ ...f, type: e.target.value })); setFormErrors(f => ({ ...f, type: false })); }}>
                   <option value="">Select…</option>
                   <option value="tops">Tops</option>
                   <option value="bottoms">Bottoms</option>
@@ -970,8 +988,9 @@ function ProductsView() {
             <label style={labelStyle}>Description (optional)</label>
             <textarea style={{ ...inputStyle, minHeight: 70, resize: "vertical" }} value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))} placeholder="Describe your product..." />
 
-            <label style={labelStyle}>Sizes</label>
-            <div style={{ display: "flex", flexWrap: "wrap", gap: ".5rem", marginBottom: "1rem" }}>
+            <label style={labelStyle}>Sizes <span style={{ color: "#e74c3c" }}>*</span></label>
+            {formErrors.sizes && <div style={{ fontSize: ".72rem", color: "#e74c3c", marginBottom: ".4rem" }}>Please select at least one size.</div>}
+            <div style={{ display: "flex", flexWrap: "wrap", gap: ".5rem", marginBottom: "1rem", padding: formErrors.sizes ? "8px" : 0, border: formErrors.sizes ? "1.5px solid #e74c3c" : "none", borderRadius: formErrors.sizes ? 8 : 0 }}>
               {["XS", "S", "M", "L", "XL", "XXL", "One Size"].map(size => {
                 const selected = (form.sizes || "").split(",").map(s => s.trim()).filter(Boolean).includes(size);
                 return (
@@ -980,6 +999,7 @@ function ProductsView() {
                       const current = (form.sizes || "").split(",").map(s => s.trim()).filter(Boolean);
                       const updated = selected ? current.filter(s => s !== size) : [...current, size];
                       setForm(f => ({ ...f, sizes: updated.join(", ") }));
+                      setFormErrors(f => ({ ...f, sizes: false }));
                     }}
                     style={{ padding: ".4rem .9rem", border: `1.5px solid ${selected ? "var(--green-dark)" : "var(--border)"}`, borderRadius: 8, background: selected ? "var(--green)" : "#fff", color: selected ? "#fff" : "#333", fontFamily: "var(--font)", fontSize: ".82rem", fontWeight: selected ? 700 : 400, cursor: "pointer", transition: "all .15s" }}>
                     {size}
@@ -988,7 +1008,8 @@ function ProductsView() {
               })}
             </div>
 
-            <label style={labelStyle}>Product Images <span style={{ fontWeight: 400, color: "#aaa" }}>(each image can have an optional color)</span></label>
+            <label style={labelStyle}>Product Images <span style={{ color: "#e74c3c" }}>*</span> <span style={{ fontWeight: 400, color: "#aaa" }}>(upload 1 or more)</span></label>
+            {formErrors.images && <div style={{ fontSize: ".72rem", color: "#e74c3c", marginBottom: ".4rem" }}>Please upload at least one image.</div>}
             <div style={{ marginBottom: "1rem" }}>
               {/* Existing + new images */}
               {(form.images || []).map((img, i) => (
@@ -1031,6 +1052,7 @@ function ProductsView() {
                   onChange={e => {
                     const files = Array.from(e.target.files);
                     setForm(f => ({ ...f, images: [...(f.images || []), ...files.map(file => ({ imageFile: file, existingImage: null, color: "" }))] }));
+                    setFormErrors(f => ({ ...f, images: false }));
                   }} />
               </label>
             </div>
@@ -1039,7 +1061,7 @@ function ProductsView() {
               <button onClick={closeModal} style={{ flex: 1, padding: "11px", border: "1.5px solid var(--border)", borderRadius: 25, background: "#fff", fontFamily: "var(--font)", fontSize: ".85rem", fontWeight: 600, cursor: "pointer" }}>
                 Cancel
               </button>
-              <button onClick={handleSave} disabled={saving || !form.name || !form.price || !form.category} style={{ flex: 2, padding: "11px", border: "none", borderRadius: 25, background: "var(--green)", color: "#fff", fontFamily: "var(--font)", fontSize: ".85rem", fontWeight: 700, cursor: "pointer", opacity: saving ? .6 : 1 }}>
+              <button onClick={handleSave} disabled={saving} style={{ flex: 2, padding: "11px", border: "none", borderRadius: 25, background: "var(--green)", color: "#fff", fontFamily: "var(--font)", fontSize: ".85rem", fontWeight: 700, cursor: "pointer", opacity: saving ? .6 : 1 }}>
                 {saving ? <><i className="fas fa-circle-notch fa-spin" /> Saving…</> : editProduct ? "Save Changes" : "Add Product"}
               </button>
             </div>
