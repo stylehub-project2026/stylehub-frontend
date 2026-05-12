@@ -471,9 +471,9 @@ export default function App() {
   useEffect(() => {
     const API = "https://stylehub-backend-tau.vercel.app/api";
     Promise.all([
-      fetch(`${API}/products?category=women&limit=20`).then(r => r.json()),
-      fetch(`${API}/products?category=men&limit=20`).then(r => r.json()),
-      fetch(`${API}/products?category=kids&limit=20`).then(r => r.json()),
+      fetch(`${API}/products?category=women&limit=20&t=${Date.now()}`).then(r => r.json()),
+      fetch(`${API}/products?category=men&limit=20&t=${Date.now()}`).then(r => r.json()),
+      fetch(`${API}/products?category=kids&limit=20&t=${Date.now()}`).then(r => r.json()),
     ]).then(([w, m, k]) => {
       const mapP = p => ({
         id: p._id, _id: p._id, name: p.name,
