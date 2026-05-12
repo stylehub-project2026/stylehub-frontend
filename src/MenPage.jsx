@@ -5,466 +5,466 @@ import { SHNav, SHFooter, SHARED_CSS } from "./shared";
 
 /* ══════════════════════════════════════════ DATA ══════════════════════════════════════════ */
 const HERO_SLIDES = [
-  {
-    ey: "New Collection 2026",
-    h1: "Find Your Favorite\nTrendy Outfits!",
-    sub: "Discover the latest looks from Egypt's top local brands.",
-    btn: "Shop Now",
-    img: "/images/men-slider.avif",
-    bg: "#eaeaea",
-    fullBg: true,
-  },
-  {
-    ey: "End of Season Deals",
-    h1: "Men",
-    sub: "Up to 50% off selected items from local designers.",
-    btn: "Explore Sale",
-    img: "/images/men-slider3.webp",
-    bg: "#ede9e0",
-    fullBg: true,
-  },
-  {
-    ey: "Local Brands Spotlight",
-    h1: "Wear What\nMakes You Bold",
-    sub: "Support Egyptian creators — every purchase matters.",
-    btn: "Meet the Brands",
-    img: "/images/men-slider_photo.jpg",
-    bg: "#f0ece8",
-    fullBg: true,
-  },
+    {
+        ey: "New Collection 2026",
+        h1: "Find Your Favorite\nTrendy Outfits!",
+        sub: "Discover the latest looks from Egypt's top local brands.",
+        btn: "Shop Now",
+        img: "/images/men-slider.avif",
+        bg: "#eaeaea",
+        fullBg: true,
+    },
+    {
+        ey: "End of Season Deals",
+        h1: "Men",
+        sub: "Up to 50% off selected items from local designers.",
+        btn: "Explore Sale",
+        img: "/images/men-slider3.webp",
+        bg: "#ede9e0",
+        fullBg: true,
+    },
+    {
+        ey: "Local Brands Spotlight",
+        h1: "Wear What\nMakes You Bold",
+        sub: "Support Egyptian creators — every purchase matters.",
+        btn: "Meet the Brands",
+        img: "/images/men-slider_photo.jpg",
+        bg: "#f0ece8",
+        fullBg: true,
+    },
 ];
 
 const CATEGORIES = [
-  { name: "Pants", img: "/images/men_cat1.webp", count: "24 styles" },
-  { name: "Hoodies", img: "/images/men_cat2.webp", count: "18 styles" },
-  { name: "Jackets", img: "/images/men-jacket.png", count: "12 styles" },
+    { name: "Pants", img: "/images/men_cat1.webp", count: "24 styles" },
+    { name: "Hoodies", img: "/images/men_cat2.webp", count: "18 styles" },
+    { name: "Jackets", img: "/images/men-jacket.png", count: "12 styles" },
 ];
 
 /* ══════════════════════════════════════════ HELPERS ══════════════════════════════════════════ */
 function Stars({ n }) {
-  return (
-    <span className="stars-row">
-      {[1, 2, 3, 4, 5].map((i) => (
-        <i
-          key={i}
-          className={`bi bi-star${i <= Math.round(n) ? "-fill" : ""}`}
-        />
-      ))}
-    </span>
-  );
+    return (
+        <span className="stars-row">
+            {[1, 2, 3, 4, 5].map((i) => (
+                <i
+                    key={i}
+                    className={`bi bi-star${i <= Math.round(n) ? "-fill" : ""}`}
+                />
+            ))}
+        </span>
+    );
 }
 
 function useReveal() {
-  const refs = useRef([]);
-  useEffect(() => {
-    const obs = new IntersectionObserver(
-      (entries) =>
-        entries.forEach(
-          (e) => e.isIntersecting && e.target.classList.add("revealed"),
-        ),
-      { threshold: 0.08 },
-    );
-    refs.current.forEach((r) => r && obs.observe(r));
-    return () => obs.disconnect();
-  }, []);
-  return useCallback((el) => {
-    if (el && !refs.current.includes(el)) refs.current.push(el);
-  }, []);
+    const refs = useRef([]);
+    useEffect(() => {
+        const obs = new IntersectionObserver(
+            (entries) =>
+                entries.forEach(
+                    (e) => e.isIntersecting && e.target.classList.add("revealed"),
+                ),
+            { threshold: 0.08 },
+        );
+        refs.current.forEach((r) => r && obs.observe(r));
+        return () => obs.disconnect();
+    }, []);
+    return useCallback((el) => {
+        if (el && !refs.current.includes(el)) refs.current.push(el);
+    }, []);
 }
 
 /* ══════════════════════════════════════════ QUICK VIEW MODAL ══════════════════════════════════════════ */
 function QuickViewModal({ p, onClose, onAddToCart }) {
-  const navigate = useNavigate();
-  const [selSize, setSelSize] = useState(null);
-  const [selColor, setSelColor] = useState(0);
-  const [qty, setQty] = useState(1);
-  const [sizeErr, setSizeErr] = useState(false);
-  const [added, setAdded] = useState(false);
+    const navigate = useNavigate();
+    const [selSize, setSelSize] = useState(null);
+    const [selColor, setSelColor] = useState(0);
+    const [qty, setQty] = useState(1);
+    const [sizeErr, setSizeErr] = useState(false);
+    const [added, setAdded] = useState(false);
 
-  useEffect(() => {
-    document.body.style.overflow = "hidden";
-    return () => {
-      document.body.style.overflow = "";
+    useEffect(() => {
+        document.body.style.overflow = "hidden";
+        return () => {
+            document.body.style.overflow = "";
+        };
+    }, []);
+
+    const handleAdd = () => {
+        if (!selSize) {
+            setSizeErr(true);
+            return;
+        }
+        setSizeErr(false);
+        setAdded(true);
+        onAddToCart();
+        setTimeout(() => setAdded(false), 1800);
     };
-  }, []);
 
-  const handleAdd = () => {
-    if (!selSize) {
-      setSizeErr(true);
-      return;
-    }
-    setSizeErr(false);
-    setAdded(true);
-    onAddToCart();
-    setTimeout(() => setAdded(false), 1800);
-  };
-
-  return (
-    <div
-      className="qv-backdrop"
-      onClick={(e) => e.target === e.currentTarget && onClose()}
-    >
-      <div className="qv-modal">
-        <button className="qv-close" onClick={onClose}>
-          <i className="bi bi-x-lg" />
-        </button>
-        <div className="qv-img-col">
-          <img src={p.img} alt={p.name} className="qv-img" />
-          {p.tag && (
-            <span className={`qv-tag ${p.tag === "Sale" ? "sale" : "new"}`}>
-              {p.tag}
-            </span>
-          )}
+    return (
+        <div
+            className="qv-backdrop"
+            onClick={(e) => e.target === e.currentTarget && onClose()}
+        >
+            <div className="qv-modal">
+                <button className="qv-close" onClick={onClose}>
+                    <i className="bi bi-x-lg" />
+                </button>
+                <div className="qv-img-col">
+                    <img src={p.img} alt={p.name} className="qv-img" />
+                    {p.tag && (
+                        <span className={`qv-tag ${p.tag === "Sale" ? "sale" : "new"}`}>
+                            {p.tag}
+                        </span>
+                    )}
+                </div>
+                <div className="qv-info-col">
+                    <div className="qv-brand">{p.brand}</div>
+                    <h2 className="qv-name">{p.name}</h2>
+                    <div className="qv-rating">
+                        <Stars n={p.rating} />
+                        <span className="qv-rating-txt">
+                            {p.rating} · {p.reviews} reviews
+                        </span>
+                    </div>
+                    <div className="qv-prices">
+                        {p.old && (
+                            <span className="qv-old">LE {p.old.toLocaleString()}</span>
+                        )}
+                        <span className="qv-price">LE {p.price.toLocaleString()}</span>
+                        {p.old && (
+                            <span className="qv-off">
+                                {Math.round((1 - p.price / p.old) * 100)}% OFF
+                            </span>
+                        )}
+                    </div>
+                    <div className="qv-divider" />
+                    {p.colors?.length > 0 && (
+                        <div className="qv-row">
+                            <span className="qv-lbl">Color</span>
+                            <div className="qv-colors">
+                                {p.colors.map((c, i) => (
+                                    <button
+                                        key={i}
+                                        className={`qv-color ${selColor === i ? "on" : ""}`}
+                                        style={{ background: c }}
+                                        onClick={() => setSelColor(i)}
+                                    />
+                                ))}
+                            </div>
+                        </div>
+                    )}
+                    <div className="qv-row align-items-start">
+                        <span className="qv-lbl">Size</span>
+                        <div>
+                            <div className="qv-sizes">
+                                {p.sizes?.map((s) => (
+                                    <button
+                                        key={s}
+                                        className={`qv-sz ${selSize === s ? "on" : ""}`}
+                                        onClick={() => {
+                                            setSelSize(s);
+                                            setSizeErr(false);
+                                        }}
+                                    >
+                                        {s}
+                                    </button>
+                                ))}
+                            </div>
+                            {sizeErr && <p className="qv-sz-err">Please select a size</p>}
+                        </div>
+                    </div>
+                    <div className="qv-row">
+                        <span className="qv-lbl">Qty</span>
+                        <div className="qv-qty">
+                            <button onClick={() => setQty((q) => Math.max(1, q - 1))}>
+                                −
+                            </button>
+                            <span>{qty}</span>
+                            <button onClick={() => setQty((q) => q + 1)}>+</button>
+                        </div>
+                    </div>
+                    <div className="qv-divider" />
+                    <div className="qv-btns">
+                        <button
+                            className={`qv-add ${added ? "added" : ""}`}
+                            onClick={handleAdd}
+                        >
+                            <i className={`bi ${added ? "bi-check-lg" : "bi-bag"} me-2`} />
+                            {added ? "Added!" : "Add to Cart"}
+                        </button>
+                        <button
+                            className="qv-full"
+                            onClick={() => {
+                                onClose();
+                                navigate(`/product/${p.id}`, { state: { product: p } });
+                            }}
+                        >
+                            Full Details <i className="bi bi-arrow-right ms-1" />
+                        </button>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div className="qv-info-col">
-          <div className="qv-brand">{p.brand}</div>
-          <h2 className="qv-name">{p.name}</h2>
-          <div className="qv-rating">
-            <Stars n={p.rating} />
-            <span className="qv-rating-txt">
-              {p.rating} · {p.reviews} reviews
-            </span>
-          </div>
-          <div className="qv-prices">
-            {p.old && (
-              <span className="qv-old">LE {p.old.toLocaleString()}</span>
-            )}
-            <span className="qv-price">LE {p.price.toLocaleString()}</span>
-            {p.old && (
-              <span className="qv-off">
-                {Math.round((1 - p.price / p.old) * 100)}% OFF
-              </span>
-            )}
-          </div>
-          <div className="qv-divider" />
-          {p.colors?.length > 0 && (
-            <div className="qv-row">
-              <span className="qv-lbl">Color</span>
-              <div className="qv-colors">
-                {p.colors.map((c, i) => (
-                  <button
-                    key={i}
-                    className={`qv-color ${selColor === i ? "on" : ""}`}
-                    style={{ background: c }}
-                    onClick={() => setSelColor(i)}
-                  />
-                ))}
-              </div>
-            </div>
-          )}
-          <div className="qv-row align-items-start">
-            <span className="qv-lbl">Size</span>
-            <div>
-              <div className="qv-sizes">
-                {p.sizes?.map((s) => (
-                  <button
-                    key={s}
-                    className={`qv-sz ${selSize === s ? "on" : ""}`}
-                    onClick={() => {
-                      setSelSize(s);
-                      setSizeErr(false);
-                    }}
-                  >
-                    {s}
-                  </button>
-                ))}
-              </div>
-              {sizeErr && <p className="qv-sz-err">Please select a size</p>}
-            </div>
-          </div>
-          <div className="qv-row">
-            <span className="qv-lbl">Qty</span>
-            <div className="qv-qty">
-              <button onClick={() => setQty((q) => Math.max(1, q - 1))}>
-                −
-              </button>
-              <span>{qty}</span>
-              <button onClick={() => setQty((q) => q + 1)}>+</button>
-            </div>
-          </div>
-          <div className="qv-divider" />
-          <div className="qv-btns">
-            <button
-              className={`qv-add ${added ? "added" : ""}`}
-              onClick={handleAdd}
-            >
-              <i className={`bi ${added ? "bi-check-lg" : "bi-bag"} me-2`} />
-              {added ? "Added!" : "Add to Cart"}
-            </button>
-            <button
-              className="qv-full"
-              onClick={() => {
-                onClose();
-                navigate(`/product/${p.id}`, { state: { product: p } });
-              }}
-            >
-              Full Details <i className="bi bi-arrow-right ms-1" />
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
+    );
 }
 
 /* ══════════════════════════════════════════ PRODUCT CARD ══════════════════════════════════════════ */
 function ProdCard({ p, onQuickView, onWish, wishlisted, addRef, d = 1 }) {
-  const navigate = useNavigate();
-  return (
-    <div
-      className={`prod-card reveal d${d}`}
-      ref={addRef}
-      onClick={() => navigate(`/product/${p.id}`, { state: { product: p } })}
-    >
-      <div className="ib">
-        {p.tag && (
-          <span className={`tag-b ${p.tag === "Sale" ? "sale" : ""}`}>
-            {p.tag}
-          </span>
-        )}
-        <img src={p.img} alt={p.name} loading="lazy" />
-        <div className="pc-hover-ov">
-          <button
-            className="pc-qv-btn"
-            onClick={(e) => {
-              e.stopPropagation();
-              onQuickView(p);
-            }}
-          >
-            <i className="bi bi-eye me-1" /> Quick View
-          </button>
-        </div>
-        <button
-          className={`wish-btn ${wishlisted ? "liked" : ""}`}
-          onClick={(e) => {
-            e.stopPropagation();
-            onWish(p.id);
-          }}
+    const navigate = useNavigate();
+    return (
+        <div
+            className={`prod-card reveal d${d}`}
+            ref={addRef}
+            onClick={() => navigate(`/product/${p.id}`, { state: { product: p } })}
         >
-          <i className={`bi ${wishlisted ? "bi-heart-fill" : "bi-heart"}`} />
-        </button>
-      </div>
-      <div className="prod-info">
-        {p.brand && <div className="prod-brand-lbl" style={{ cursor: "pointer" }} onClick={e => { e.stopPropagation(); navigate(`/brand/${encodeURIComponent(p.brand)}`); }}>{p.brand}</div>}
-        <div className="prod-name">{p.name}</div>
-        {p.rating && (
-          <div className="prod-stars-row">
-            <Stars n={p.rating} />
-            <span className="prod-rev-cnt">({p.reviews})</span>
-          </div>
-        )}
-        <div className="prod-price-row">
-          {p.old && (
-            <span className="prod-old">LE {p.old.toLocaleString()}</span>
-          )}
-          <span className="prod-price">LE {p.price.toLocaleString()}</span>
+            <div className="ib">
+                {p.tag && (
+                    <span className={`tag-b ${p.tag === "Sale" ? "sale" : ""}`}>
+                        {p.tag}
+                    </span>
+                )}
+                <img src={p.img} alt={p.name} loading="lazy" />
+                <div className="pc-hover-ov">
+                    <button
+                        className="pc-qv-btn"
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            onQuickView(p);
+                        }}
+                    >
+                        <i className="bi bi-eye me-1" /> Quick View
+                    </button>
+                </div>
+                <button
+                    className={`wish-btn ${wishlisted ? "liked" : ""}`}
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        onWish(p.id);
+                    }}
+                >
+                    <i className={`bi ${wishlisted ? "bi-heart-fill" : "bi-heart"}`} />
+                </button>
+            </div>
+            <div className="prod-info">
+                {p.brand && <div className="prod-brand-lbl" style={{ cursor: "pointer" }} onClick={e => { e.stopPropagation(); navigate(`/brand/${encodeURIComponent(p.brand)}`); }}>{p.brand}</div>}
+                <div className="prod-name">{p.name}</div>
+                {p.rating && (
+                    <div className="prod-stars-row">
+                        <Stars n={p.rating} />
+                        <span className="prod-rev-cnt">({p.reviews})</span>
+                    </div>
+                )}
+                <div className="prod-price-row">
+                    {p.old && (
+                        <span className="prod-old">LE {p.old.toLocaleString()}</span>
+                    )}
+                    <span className="prod-price">LE {p.price.toLocaleString()}</span>
+                </div>
+            </div>
         </div>
-      </div>
-    </div>
-  );
+    );
 }
 
 /* ══════════════════════════════════════════ PICK CARD ══════════════════════════════════════════ */
 function PickCard({ p, onQuickView, onWish, wishlisted, addRef, d = 1 }) {
-  const navigate = useNavigate();
-  return (
-    <div
-      className={`pick-card reveal d${d}`}
-      ref={addRef}
-      onClick={() => navigate(`/product/${p.id}`, { state: { product: p } })}
-    >
-      <div className="ib">
-        <img src={p.img} alt={p.name} />
-        <button
-          className="pick-add-btn"
-          onClick={(e) => {
-            e.stopPropagation();
-            onQuickView(p);
-          }}
+    const navigate = useNavigate();
+    return (
+        <div
+            className={`pick-card reveal d${d}`}
+            ref={addRef}
+            onClick={() => navigate(`/product/${p.id}`, { state: { product: p } })}
         >
-          Quick View
-        </button>
-        <button
-          className={`wish-btn ${wishlisted ? "liked" : ""}`}
-          onClick={(e) => {
-            e.stopPropagation();
-            onWish(p.id);
-          }}
-        >
-          <i className={`bi ${wishlisted ? "bi-heart-fill" : "bi-heart"}`} />
-        </button>
-      </div>
-      <div className="pick-info">
-        <div className="pick-text">
-          <div className="prod-name">{p.name}</div>
-          <div className="prod-price">LE {p.price.toLocaleString()}</div>
-          {p.rating && <Stars n={p.rating} />}
+            <div className="ib">
+                <img src={p.img} alt={p.name} />
+                <button
+                    className="pick-add-btn"
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        onQuickView(p);
+                    }}
+                >
+                    Quick View
+                </button>
+                <button
+                    className={`wish-btn ${wishlisted ? "liked" : ""}`}
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        onWish(p.id);
+                    }}
+                >
+                    <i className={`bi ${wishlisted ? "bi-heart-fill" : "bi-heart"}`} />
+                </button>
+            </div>
+            <div className="pick-info">
+                <div className="pick-text">
+                    <div className="prod-name">{p.name}</div>
+                    <div className="prod-price">LE {p.price.toLocaleString()}</div>
+                    {p.rating && <Stars n={p.rating} />}
+                </div>
+                <img
+                    src={p.brandLogo}
+                    alt="brand"
+                    className="pick-brand-logo"
+                    onError={(e) => {
+                        e.target.style.display = "none";
+                    }}
+                />
+            </div>
         </div>
-        <img
-          src={p.brandLogo}
-          alt="brand"
-          className="pick-brand-logo"
-          onError={(e) => {
-            e.target.style.display = "none";
-          }}
-        />
-      </div>
-    </div>
-  );
+    );
 }
 
 /* ══════════════════════════════════════════ HERO CAROUSEL ══════════════════════════════════════════ */
 function HeroCarousel() {
-  const [cur, setCur] = useState(0);
-  const [key, setKey] = useState(0);
+    const [cur, setCur] = useState(0);
+    const [key, setKey] = useState(0);
 
-  const go = useCallback((dir) => {
-    setCur((i) => (i + dir + HERO_SLIDES.length) % HERO_SLIDES.length);
-    setKey((k) => k + 1);
-  }, []);
+    const go = useCallback((dir) => {
+        setCur((i) => (i + dir + HERO_SLIDES.length) % HERO_SLIDES.length);
+        setKey((k) => k + 1);
+    }, []);
 
-  useEffect(() => {
-    const t = setInterval(() => go(1), 5000);
-    return () => clearInterval(t);
-  }, [go]);
+    useEffect(() => {
+        const t = setInterval(() => go(1), 5000);
+        return () => clearInterval(t);
+    }, [go]);
 
-  const s = HERO_SLIDES[cur];
+    const s = HERO_SLIDES[cur];
 
-  return (
-    <div
-      className="hero"
-      style={
-        s.fullBg
-          ? {
-            backgroundColor: s.bg,
-            backgroundImage: `url(${s.img})`,
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-            backgroundRepeat: "no-repeat",
-          }
-          : { backgroundColor: s.bg }
-      }
-    >
-      <div
-        className={`hero-slide active${s.fullBg ? " full-bg" : ""}`}
-        key={key}
-      >
-        <div className="hero-txt">
-          <div className="hero-ey">{s.ey}</div>
-          <h1 className="hero-h1">
-            {s.h1.split("\n").map((l, i) => (
-              <span key={i}>
-                {l}
-                <br />
-              </span>
-            ))}
-          </h1>
-          <p className="hero-sub">{s.sub}</p>
-          <div className="d-flex gap-3 flex-wrap">
-            <button className="btn-dk">{s.btn}</button>
-          </div>
+    return (
+        <div
+            className="hero"
+            style={
+                s.fullBg
+                    ? {
+                        backgroundColor: s.bg,
+                        backgroundImage: `url(${s.img})`,
+                        backgroundSize: "cover",
+                        backgroundPosition: "center",
+                        backgroundRepeat: "no-repeat",
+                    }
+                    : { backgroundColor: s.bg }
+            }
+        >
+            <div
+                className={`hero-slide active${s.fullBg ? " full-bg" : ""}`}
+                key={key}
+            >
+                <div className="hero-txt">
+                    <div className="hero-ey">{s.ey}</div>
+                    <h1 className="hero-h1">
+                        {s.h1.split("\n").map((l, i) => (
+                            <span key={i}>
+                                {l}
+                                <br />
+                            </span>
+                        ))}
+                    </h1>
+                    <p className="hero-sub">{s.sub}</p>
+                    <div className="d-flex gap-3 flex-wrap">
+                        <button className="btn-dk">{s.btn}</button>
+                    </div>
+                </div>
+                {!s.fullBg && (
+                    <div className="hero-img">
+                        <img src={s.img} alt={s.h1} />
+                    </div>
+                )}
+            </div>
+            <button className="hero-arrow p" onClick={() => go(-1)}>
+                <i className="bi bi-chevron-left" />
+            </button>
+            <button className="hero-arrow n" onClick={() => go(1)}>
+                <i className="bi bi-chevron-right" />
+            </button>
+            <div className="hero-dots">
+                {HERO_SLIDES.map((_, i) => (
+                    <button
+                        key={i}
+                        className={`hero-dot ${i === cur ? "on" : ""}`}
+                        onClick={() => {
+                            setCur(i);
+                            setKey((k) => k + 1);
+                        }}
+                    />
+                ))}
+            </div>
         </div>
-        {!s.fullBg && (
-          <div className="hero-img">
-            <img src={s.img} alt={s.h1} />
-          </div>
-        )}
-      </div>
-      <button className="hero-arrow p" onClick={() => go(-1)}>
-        <i className="bi bi-chevron-left" />
-      </button>
-      <button className="hero-arrow n" onClick={() => go(1)}>
-        <i className="bi bi-chevron-right" />
-      </button>
-      <div className="hero-dots">
-        {HERO_SLIDES.map((_, i) => (
-          <button
-            key={i}
-            className={`hero-dot ${i === cur ? "on" : ""}`}
-            onClick={() => {
-              setCur(i);
-              setKey((k) => k + 1);
-            }}
-          />
-        ))}
-      </div>
-    </div>
-  );
+    );
 }
 
 /* ══════════════════════════════════════════ MAIN ══════════════════════════════════════════ */
 export default function MenPage({ cart = [], setCart, wish = [], setWish }) {
-  const wishlist = wish;
-  const cartCount = cart.reduce((s, x) => s + (x.qty || 1), 0);
+    const wishlist = wish;
+    const cartCount = cart.reduce((s, x) => s + (x.qty || 1), 0);
 
-  const [toast, setToast] = useState("");
-  const [quickView, setQuickView] = useState(null);
-  const [menProducts, setMenProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
+    const [toast, setToast] = useState("");
+    const [quickView, setQuickView] = useState(null);
+    const [menProducts, setMenProducts] = useState([]);
+    const [loading, setLoading] = useState(true);
 
-  // ── Fetch men products from backend
-  useEffect(() => {
-    setLoading(true);
-    fetch(`https://stylehub-backend-tau.vercel.app/api/products?category=men&limit=100`)
-      .then(r => r.json())
-      .then(data => {
-        const list = (data.data?.products || []).map(p => ({
-          id: p._id,
-          name: p.name,
-          price: p.price,
-          old: p.salePrice || null,
-          brand: p.seller?.brandName || "StyleHub",
-          img: p.images?.[0] ? (p.images[0].startsWith('http') ? p.images[0] : `https://stylehub-backend-tau.vercel.app${p.images[0]}`) : null,
-          sizes: p.sizes || [],
-          colors: p.colors || [],
-          rating: p.avgRating || 0,
-          reviews: p.reviewCount || 0,
-          tag: p.salePrice ? "Sale" : null,
-          type: p.tags?.[0] || "",
-        }));
-        setMenProducts(list);
-      })
-      .catch(() => { })
-      .finally(() => setLoading(false));
-  }, []);
+    // ── Fetch men products from backend
+    useEffect(() => {
+        setLoading(true);
+        fetch(`https://stylehub-backend-tau.vercel.app/api/products?category=men&limit=100`)
+            .then(r => r.json())
+            .then(data => {
+                const list = (data.data?.products || []).map(p => ({
+                    id: p._id,
+                    name: p.name,
+                    price: p.price,
+                    old: p.salePrice || null,
+                    brand: p.seller?.brandName || "StyleHub",
+                    img: p.images?.[0] ? (p.images[0].startsWith('http') ? p.images[0] : `https://stylehub-backend-tau.vercel.app${p.images[0]}`) : null,
+                    sizes: p.sizes || [],
+                    colors: p.colors || [],
+                    rating: p.avgRating || 0,
+                    reviews: p.reviewCount || 0,
+                    tag: p.salePrice ? "Sale" : null,
+                    type: p.tags?.[0] || "",
+                }));
+                setMenProducts(list);
+            })
+            .catch(() => { })
+            .finally(() => setLoading(false));
+    }, []);
 
-  const showToast = (msg) => {
-    setToast(msg);
-    setTimeout(() => setToast(""), 2200);
-  };
+    const showToast = (msg) => {
+        setToast(msg);
+        setTimeout(() => setToast(""), 2200);
+    };
 
-  const toggleWish = (id) => {
-    setWish((prev) => {
-      const isIn = prev.includes(id);
-      showToast(isIn ? "Removed from wishlist" : "♥  Added to wishlist");
-      return isIn ? prev.filter((x) => x !== id) : [...prev, id];
-    });
-  };
+    const toggleWish = (id) => {
+        setWish((prev) => {
+            const isIn = prev.includes(id);
+            showToast(isIn ? "Removed from wishlist" : "♥  Added to wishlist");
+            return isIn ? prev.filter((x) => x !== id) : [...prev, id];
+        });
+    };
 
-  const addToCart = () => {
-    setCart((prev) => {
-      const g = prev.find((x) => x.id === "__generic__");
-      if (g)
-        return prev.map((x) =>
-          x.id === "__generic__" ? { ...x, qty: x.qty + 1 } : x,
-        );
-      return [...prev, { id: "__generic__", size: "M", qty: 1 }];
-    });
-    showToast("✓  Added to cart");
-  };
+    const addToCart = () => {
+        setCart((prev) => {
+            const g = prev.find((x) => x.id === "__generic__");
+            if (g)
+                return prev.map((x) =>
+                    x.id === "__generic__" ? { ...x, qty: x.qty + 1 } : x,
+                );
+            return [...prev, { id: "__generic__", size: "M", qty: 1 }];
+        });
+        showToast("✓  Added to cart");
+    };
 
-  const addRef = useReveal();
-  const newArrRef = useRef(null);
-  const scroll = (ref, dir) =>
-    ref.current?.scrollBy({ left: dir * 250, behavior: "smooth" });
+    const addRef = useReveal();
+    const newArrRef = useRef(null);
+    const scroll = (ref, dir) =>
+        ref.current?.scrollBy({ left: dir * 250, behavior: "smooth" });
 
-  useEffect(() => {
-    document.title = `StyleHub — Men${cartCount > 0 ? ` (${cartCount})` : ""}`;
-  }, [cartCount]);
+    useEffect(() => {
+        document.title = `StyleHub — Men${cartCount > 0 ? ` (${cartCount})` : ""}`;
+    }, [cartCount]);
 
-  return (
-    <div>
-      <style>{`
+    return (
+        <div>
+            <style>{`
         :root {
           --c-dark:     #1a1a1a;
           --c-darker:   #0f0f0f;
@@ -664,158 +664,158 @@ export default function MenPage({ cart = [], setCart, wish = [], setWish }) {
 
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
       `}</style>
-      <style>{SHARED_CSS}</style>
-      <SHNav cart={cart} wish={wish} />
+            <style>{SHARED_CSS}</style>
+            <SHNav cart={cart} wish={wish} />
 
-      <HeroCarousel />
+            <HeroCarousel />
 
-      {/* CATEGORIES */}
-      <section className="cat-sec">
-        <div className="container">
-          <h2 className="sec-title reveal" ref={addRef}>
-            Categories
-          </h2>
-          <div className="sec-line reveal" ref={addRef} />
-          <div className="row g-3">
-            {CATEGORIES.map((c, i) => (
-              <div className="col-12 col-md-4" key={i}>
-                <div className={`cat-card reveal d${i + 1}`} ref={addRef}>
-                  <img
-                    src={c.img}
-                    alt={c.name}
-                    style={{ objectPosition: "top" }}
-                  />
-                  <div className="cat-ov">
-                    <div className="cat-name">{c.name}</div>
-                    <div className="cat-count">{c.count}</div>
-                    <button className="cat-btn">Shop Now →</button>
-                  </div>
+            {/* CATEGORIES */}
+            <section className="cat-sec">
+                <div className="container">
+                    <h2 className="sec-title reveal" ref={addRef}>
+                        Categories
+                    </h2>
+                    <div className="sec-line reveal" ref={addRef} />
+                    <div className="row g-3">
+                        {CATEGORIES.map((c, i) => (
+                            <div className="col-12 col-md-4" key={i}>
+                                <div className={`cat-card reveal d${i + 1}`} ref={addRef}>
+                                    <img
+                                        src={c.img}
+                                        alt={c.name}
+                                        style={{ objectPosition: "top" }}
+                                    />
+                                    <div className="cat-ov">
+                                        <div className="cat-name">{c.name}</div>
+                                        <div className="cat-count">{c.count}</div>
+                                        <button className="cat-btn">Shop Now →</button>
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
                 </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+            </section>
 
-      {/* NEW ARRIVALS */}
-      <section className="sp bg-white">
-        <div className="container">
-          <h2 className="sec-title reveal" ref={addRef}>
-            New Arrivals
-          </h2>
-          <div className="sec-line reveal" ref={addRef} />
-          <div className="sc-wrap">
-            <button className="sc-btn l" onClick={() => scroll(newArrRef, -1)}>
-              <i className="bi bi-chevron-left" />
-            </button>
-            <div className="sc-track no-sb" ref={newArrRef}>
-              {loading ? (
-                <div style={{ padding: "3rem", color: "#888", fontSize: ".85rem" }}>Loading products...</div>
-              ) : menProducts.length === 0 ? (
-                <div style={{ padding: "3rem", color: "#888", fontSize: ".85rem" }}>No products available yet.</div>
-              ) : menProducts.map((p, i) => (
-                <ProdCard
-                  key={p.id}
-                  p={p}
-                  d={(i % 3) + 1}
-                  addRef={addRef}
-                  onQuickView={setQuickView}
-                  onWish={toggleWish}
-                  wishlisted={wishlist.includes(p.id)}
+            {/* NEW ARRIVALS */}
+            <section className="sp bg-white">
+                <div className="container">
+                    <h2 className="sec-title reveal" ref={addRef}>
+                        New Arrivals
+                    </h2>
+                    <div className="sec-line reveal" ref={addRef} />
+                    <div className="sc-wrap">
+                        <button className="sc-btn l" onClick={() => scroll(newArrRef, -1)}>
+                            <i className="bi bi-chevron-left" />
+                        </button>
+                        <div className="sc-track no-sb" ref={newArrRef}>
+                            {loading ? (
+                                <div style={{ padding: "3rem", color: "#888", fontSize: ".85rem" }}>Loading products...</div>
+                            ) : menProducts.length === 0 ? (
+                                <div style={{ padding: "3rem", color: "#888", fontSize: ".85rem" }}>No products available yet.</div>
+                            ) : menProducts.map((p, i) => (
+                                <ProdCard
+                                    key={p.id}
+                                    p={p}
+                                    d={(i % 3) + 1}
+                                    addRef={addRef}
+                                    onQuickView={setQuickView}
+                                    onWish={toggleWish}
+                                    wishlisted={wishlist.includes(p.id)}
+                                />
+                            ))}
+                        </div>
+                        <button className="sc-btn r" onClick={() => scroll(newArrRef, 1)}>
+                            <i className="bi bi-chevron-right" />
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            {/* SALE BANNER */}
+            <section className="sale-ban reveal" ref={addRef}>
+                <div className="sale-ban-inner">
+                    <img src="/images/men-section-page.png" alt="End of Season Sale" />
+                    <div className="sale-ban-text">
+                        <p className="sale-sub">Limited Time Only</p>
+                        <h2>END OF SEASON SALE</h2>
+                        <button className="sale-cta-btn">Shop the Sale →</button>
+                    </div>
+                </div>
+            </section>
+
+            {/* TRENDING NOW */}
+            <section className="sp">
+                <div className="container">
+                    <h2 className="sec-title reveal" ref={addRef}>
+                        Trending Now
+                    </h2>
+                    <div className="sec-line reveal" ref={addRef} />
+                    <div className="trend-g">
+                        {loading ? (
+                            <div style={{ padding: "2rem", color: "#888", fontSize: ".85rem", gridColumn: "1/-1" }}>Loading...</div>
+                        ) : menProducts.length === 0 ? (
+                            <div style={{ padding: "2rem", color: "#888", fontSize: ".85rem", gridColumn: "1/-1" }}>No products available yet.</div>
+                        ) : menProducts.slice(0, 6).map((p, i) => (
+                            <ProdCard
+                                key={p.id}
+                                p={p}
+                                d={(i % 3) + 1}
+                                addRef={addRef}
+                                onQuickView={setQuickView}
+                                onWish={toggleWish}
+                                wishlisted={wishlist.includes(p.id)}
+                            />
+                        ))}
+                    </div>
+                </div>
+            </section>
+
+            {/* TOP PICKS */}
+            <section className="sp bg-white">
+                <div className="container">
+                    <h2 className="sec-title reveal" ref={addRef}>
+                        Top Picks
+                    </h2>
+                    <p
+                        className="text-center mb-1 reveal"
+                        ref={addRef}
+                        style={{ fontSize: ".82rem", color: "var(--c-gray)" }}
+                    >
+                        Discover the most popular pieces from different brands.
+                    </p>
+                    <div className="sec-line reveal" ref={addRef} />
+                    <div className="picks-g">
+                        {loading ? (
+                            <div style={{ padding: "2rem", color: "#888", fontSize: ".85rem", gridColumn: "1/-1" }}>Loading...</div>
+                        ) : menProducts.length === 0 ? (
+                            <div style={{ padding: "2rem", color: "#888", fontSize: ".85rem", gridColumn: "1/-1" }}>No products available yet.</div>
+                        ) : menProducts.slice(0, 4).map((p, i) => (
+                            <PickCard
+                                key={p.id}
+                                p={p}
+                                d={(i % 4) + 1}
+                                addRef={addRef}
+                                onQuickView={setQuickView}
+                                onWish={toggleWish}
+                                wishlisted={wishlist.includes(p.id)}
+                            />
+                        ))}
+                    </div>
+                </div>
+            </section>
+
+            {quickView && (
+                <QuickViewModal
+                    p={quickView}
+                    onClose={() => setQuickView(null)}
+                    onAddToCart={addToCart}
                 />
-              ))}
-            </div>
-            <button className="sc-btn r" onClick={() => scroll(newArrRef, 1)}>
-              <i className="bi bi-chevron-right" />
-            </button>
-          </div>
+            )}
+
+            <div className={`sh-toast ${toast ? "on" : ""}`}>{toast}</div>
+
+            <SHFooter />
         </div>
-      </section>
-
-      {/* SALE BANNER */}
-      <section className="sale-ban reveal" ref={addRef}>
-        <div className="sale-ban-inner">
-          <img src="/images/men-section-page.png" alt="End of Season Sale" />
-          <div className="sale-ban-text">
-            <p className="sale-sub">Limited Time Only</p>
-            <h2>END OF SEASON SALE</h2>
-            <button className="sale-cta-btn">Shop the Sale →</button>
-          </div>
-        </div>
-      </section>
-
-      {/* TRENDING NOW */}
-      <section className="sp">
-        <div className="container">
-          <h2 className="sec-title reveal" ref={addRef}>
-            Trending Now
-          </h2>
-          <div className="sec-line reveal" ref={addRef} />
-          <div className="trend-g">
-            {loading ? (
-              <div style={{ padding: "2rem", color: "#888", fontSize: ".85rem", gridColumn: "1/-1" }}>Loading...</div>
-            ) : menProducts.length === 0 ? (
-              <div style={{ padding: "2rem", color: "#888", fontSize: ".85rem", gridColumn: "1/-1" }}>No products available yet.</div>
-            ) : menProducts.slice(0, 6).map((p, i) => (
-              <ProdCard
-                key={p.id}
-                p={p}
-                d={(i % 3) + 1}
-                addRef={addRef}
-                onQuickView={setQuickView}
-                onWish={toggleWish}
-                wishlisted={wishlist.includes(p.id)}
-              />
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* TOP PICKS */}
-      <section className="sp bg-white">
-        <div className="container">
-          <h2 className="sec-title reveal" ref={addRef}>
-            Top Picks
-          </h2>
-          <p
-            className="text-center mb-1 reveal"
-            ref={addRef}
-            style={{ fontSize: ".82rem", color: "var(--c-gray)" }}
-          >
-            Discover the most popular pieces from different brands.
-          </p>
-          <div className="sec-line reveal" ref={addRef} />
-          <div className="picks-g">
-            {loading ? (
-              <div style={{ padding: "2rem", color: "#888", fontSize: ".85rem", gridColumn: "1/-1" }}>Loading...</div>
-            ) : menProducts.length === 0 ? (
-              <div style={{ padding: "2rem", color: "#888", fontSize: ".85rem", gridColumn: "1/-1" }}>No products available yet.</div>
-            ) : menProducts.slice(0, 4).map((p, i) => (
-              <PickCard
-                key={p.id}
-                p={p}
-                d={(i % 4) + 1}
-                addRef={addRef}
-                onQuickView={setQuickView}
-                onWish={toggleWish}
-                wishlisted={wishlist.includes(p.id)}
-              />
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {quickView && (
-        <QuickViewModal
-          p={quickView}
-          onClose={() => setQuickView(null)}
-          onAddToCart={addToCart}
-        />
-      )}
-
-      <div className={`sh-toast ${toast ? "on" : ""}`}>{toast}</div>
-
-      <SHFooter />
-    </div>
-  );
+    );
 }
