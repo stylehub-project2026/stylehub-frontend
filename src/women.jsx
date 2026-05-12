@@ -214,8 +214,8 @@ function QuickViewModal({ p, onClose, onAddToCart }) {
             {p.old && <span className="w-qv-old">LE {p.old.toLocaleString()}</span>}
           </div>
           <div className="d-flex align-items-center gap-2 mb-3">
-            <Stars n={p.rating} />
-            <span style={{ fontSize: ".7rem", color: "var(--warm)" }}>({p.reviews})</span>
+            {p.rating > 0 && <><Stars n={p.rating} />
+              <span style={{ fontSize: ".7rem", color: "var(--warm)" }}>({p.reviews})</span></>}
           </div>
           {/* Colors */}
           <div className="mb-3">
@@ -294,7 +294,7 @@ function ProdCard({ p, d, addRef, onQuickView, onWish, wishlisted }) {
           <span className="w-prod-price"> {p.price.toLocaleString()}</span>
           {p.old && <span className="w-prod-old">LE {p.old.toLocaleString()}</span>}
         </div>
-        {p.rating && <Stars n={p.rating} />}
+        {p.rating > 0 && <Stars n={p.rating} />}
       </div>
     </div>
   );
@@ -329,14 +329,15 @@ function PickCard({ p, d, addRef, onQuickView, onWish, wishlisted }) {
         <div className="w-pick-text">
           <div className="w-prod-name">{p.name}</div>
           <div className="w-prod-price"> {p.price.toLocaleString()}</div>
-          {p.rating && <Stars n={p.rating} />}
         </div>
-        <img
-          src={p.brandLogo}
-          alt="brand"
-          className="w-pick-brand-logo"
-          onError={(e) => { e.target.style.display = "none"; }}
-        />
+        {p.brandLogo && (
+          <img
+            src={p.brandLogo}
+            alt={p.brand}
+            className="w-pick-brand-logo"
+            onError={(e) => { e.target.style.display = "none"; }}
+          />
+        )}
       </div>
     </div>
   );
@@ -441,6 +442,7 @@ export default function WomenPage() {
           reviews: p.reviewCount || 0,
           tag: p.salePrice ? "Sale" : null,
           type: (p.tags?.[0] || "").toLowerCase(),
+          brandLogo: p.seller?.logo ? (p.seller.logo.startsWith('http') ? p.seller.logo : `https://stylehub-backend-tau.vercel.app${p.seller.logo}`) : null,
           category: typeof p.category === "object" ? p.category?.name || "" : p.category || "",
         }));
         setProducts(list);
