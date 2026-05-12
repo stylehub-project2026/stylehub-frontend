@@ -11,7 +11,7 @@ import SellerBrandPage from "./SellerBrandPage";
 import ProfilePage from "./Profilepage";
 import Wishlist from "./wishlist";
 import Women from "./women";
-import MenPage from "./MenPage";
+import MenPage from "./Menpage";
 import Kids from "./kids";
 import ProductDetail from "./ProductDetail";
 import SignIn from "./SignInPage";
@@ -20,12 +20,13 @@ import SellerDashboard from "./SellerDashboard";
 import ResetPasswordPage from "./ResetPasswordPage";
 import Cart from "./cart";
 import Checkout from "./checkout";
-
-
-import { saveCart, saveWishlist, sellerSignOut } from "./api";
 import BuildOutfit from "./BuildOutfit";
 import AboutUs from "./AboutUs";
 import ContactPage from "./ContactPage";
+
+
+import { saveCart, saveWishlist, sellerSignOut } from "./api";
+
 
 // Check if seller is logged in using the new token/seller keys
 function isSellerLoggedIn() {
