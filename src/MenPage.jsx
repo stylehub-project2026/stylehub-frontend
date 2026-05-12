@@ -40,175 +40,6 @@ const CATEGORIES = [
   { name: "Jackets", img: "/images/men-jacket.png", count: "12 styles" },
 ];
 
-const NEW_ARRIVALS = [
-  {
-    id: "na-1",
-    name: "Oversized Polos",
-    price: 800,
-    brand: "Salty",
-    img: "/images/men_cat3.webp",
-    sizes: ["XS", "S", "M", "L", "XL"],
-    colors: ["#1a1a1a", "#4a4a4a"],
-  },
-  {
-    id: "na-2",
-    name: "Shifted Light Gray Tee",
-    price: 800,
-    brand: "27",
-    img: "/images/men-hoodie.png",
-    sizes: ["XS", "S", "M", "L"],
-    colors: ["#8b1a2e", "#1a1a1a"],
-  },
-  {
-    id: "na-3",
-    name: "The Off-White 'Sardine Tales' Tee",
-    price: 750,
-    brand: "Antika",
-    img: "/images/men_antika_arr3.webp",
-    sizes: ["S", "M", "L", "XL"],
-    colors: ["#4a5c38"],
-  },
-  {
-    id: "na-4",
-    name: "Men's Jacket 2",
-    price: 750,
-    old: 1000,
-    brand: "Antika",
-    img: "/images/men_Antika_arr4.webp",
-    sizes: ["XS", "S", "M", "L", "XL"],
-    colors: ["#2a7d8c"],
-    tag: "Sale",
-  },
-  {
-    id: "na-5",
-    name: "Men's Shorts",
-    price: 750,
-    brand: "27",
-    img: "/images/men_27_arr5.webp",
-    sizes: ["S/M", "L/XL"],
-    colors: ["#c8b89a"],
-  },
-];
-
-const TRENDING = [
-  {
-    id: "tr-1",
-    name: "Twenty Seven Puff Hoodie",
-    price: 1200,
-    brand: "Twenty Seven",
-    img: "/images/men-hoodie2.png",
-    rating: 4.7,
-    reviews: 88,
-    sizes: ["S", "M", "L", "XL", "XXL"],
-    colors: ["#888", "#1a1a1a"],
-  },
-  {
-    id: "tr-2",
-    name: "Moon Walk Puff Print Pants",
-    price: 2100,
-    brand: "Moon Walk",
-    img: "/images/men-short.png",
-    rating: 4.8,
-    reviews: 62,
-    sizes: ["XS", "S", "M", "L", "XL"],
-    colors: ["#2a5a8c"],
-    tag: "New",
-  },
-  {
-    id: "tr-3",
-    name: "Wide Leg Jeans",
-    price: 1800,
-    brand: "Salty",
-    img: "/images/men-jacket.png",
-    rating: 4.6,
-    reviews: 45,
-    sizes: ["XS", "S", "M", "L"],
-    colors: ["#4a6890"],
-  },
-  {
-    id: "tr-4",
-    name: "Men's Black Set",
-    price: 2500,
-    old: 3200,
-    brand: "Richness",
-    img: "/images/men-black-set.png",
-    rating: 4.9,
-    reviews: 74,
-    sizes: ["XS", "S", "M", "L", "XL"],
-    colors: ["#2a7d8c"],
-    tag: "Sale",
-  },
-  {
-    id: "tr-5",
-    name: "Men's Blue Set",
-    price: 1600,
-    brand: "Sotra",
-    img: "/images/men-blue-set.png",
-    rating: 4.5,
-    reviews: 39,
-    sizes: ["S/M", "L/XL"],
-    colors: ["#c8b89a"],
-  },
-  {
-    id: "tr-6",
-    name: "Grey Men's Shirt",
-    price: 1400,
-    brand: "Black Closet",
-    img: "/images/men-shirt.png",
-    rating: 4.6,
-    reviews: 54,
-    sizes: ["S", "M", "L", "XL"],
-    colors: ["#555", "#333"],
-  },
-];
-
-const TOP_PICKS = [
-  {
-    id: "pk-1",
-    name: "Knitted Winter Polo",
-    price: 900,
-    brand: "Marble",
-    brandLogo: "/images/Marble.png",
-    img: "/images/men-shirt.png",
-    rating: 4.8,
-    sizes: ["S", "M", "L", "XL"],
-    colors: ["#1a1a1a", "#fff"],
-  },
-  {
-    id: "pk-2",
-    name: "Basic Hoodie",
-    price: 700,
-    brand: "Twenty Seven",
-    brandLogo: "/images/27.png",
-    img: "/images/men-hoodie.png",
-    rating: 4.7,
-    sizes: ["S", "M", "L", "XL", "XXL"],
-    colors: ["#c8a88a", "#1a1a1a"],
-  },
-  {
-    id: "pk-3",
-    name: "Pleated Trouser",
-    price: 1500,
-    brand: "Salty",
-    brandLogo: "/images/salty.avif",
-    img: "/images/men-jacket2.png",
-    rating: 4.6,
-    sizes: ["XS", "S", "M", "L"],
-    colors: ["#f5f0e0", "#1a1a1a"],
-  },
-  {
-    id: "pk-4",
-    name: "Twenty Seven Puff Hoodie",
-    price: 900,
-    brand: "Twenty Seven",
-    brandLogo: "/images/27.png",
-    img: "/images/men-black-set.png",
-    rating: 4.9,
-    sizes: ["S", "M", "L", "XL", "XXL"],
-    colors: ["#1a1a1a", "#888"],
-  },
-];
-
 /* ══════════════════════════════════════════ HELPERS ══════════════════════════════════════════ */
 function Stars({ n }) {
   return (
@@ -569,9 +400,11 @@ export default function MenPage({ cart = [], setCart, wish = [], setWish }) {
   const [toast, setToast] = useState("");
   const [quickView, setQuickView] = useState(null);
   const [menProducts, setMenProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   // ── Fetch men products from backend
   useEffect(() => {
+    setLoading(true);
     fetch(`https://stylehub-backend-tau.vercel.app/api/products?category=men&limit=100`)
       .then(r => r.json())
       .then(data => {
@@ -591,7 +424,8 @@ export default function MenPage({ cart = [], setCart, wish = [], setWish }) {
         }));
         setMenProducts(list);
       })
-      .catch(() => { });
+      .catch(() => { })
+      .finally(() => setLoading(false));
   }, []);
 
   const showToast = (msg) => {
@@ -875,7 +709,11 @@ export default function MenPage({ cart = [], setCart, wish = [], setWish }) {
               <i className="bi bi-chevron-left" />
             </button>
             <div className="sc-track no-sb" ref={newArrRef}>
-              {(menProducts.length > 0 ? menProducts : NEW_ARRIVALS).map((p, i) => (
+              {loading ? (
+                <div style={{ padding: "3rem", color: "#888", fontSize: ".85rem" }}>Loading products...</div>
+              ) : menProducts.length === 0 ? (
+                <div style={{ padding: "3rem", color: "#888", fontSize: ".85rem" }}>No products available yet.</div>
+              ) : menProducts.map((p, i) => (
                 <ProdCard
                   key={p.id}
                   p={p}
@@ -914,7 +752,11 @@ export default function MenPage({ cart = [], setCart, wish = [], setWish }) {
           </h2>
           <div className="sec-line reveal" ref={addRef} />
           <div className="trend-g">
-            {(menProducts.length > 0 ? menProducts.slice(0, 6) : TRENDING).map((p, i) => (
+            {loading ? (
+              <div style={{ padding: "2rem", color: "#888", fontSize: ".85rem", gridColumn: "1/-1" }}>Loading...</div>
+            ) : menProducts.length === 0 ? (
+              <div style={{ padding: "2rem", color: "#888", fontSize: ".85rem", gridColumn: "1/-1" }}>No products available yet.</div>
+            ) : menProducts.slice(0, 6).map((p, i) => (
               <ProdCard
                 key={p.id}
                 p={p}
@@ -944,7 +786,11 @@ export default function MenPage({ cart = [], setCart, wish = [], setWish }) {
           </p>
           <div className="sec-line reveal" ref={addRef} />
           <div className="picks-g">
-            {(menProducts.length > 0 ? menProducts.slice(0, 4) : TOP_PICKS).map((p, i) => (
+            {loading ? (
+              <div style={{ padding: "2rem", color: "#888", fontSize: ".85rem", gridColumn: "1/-1" }}>Loading...</div>
+            ) : menProducts.length === 0 ? (
+              <div style={{ padding: "2rem", color: "#888", fontSize: ".85rem", gridColumn: "1/-1" }}>No products available yet.</div>
+            ) : menProducts.slice(0, 4).map((p, i) => (
               <PickCard
                 key={p.id}
                 p={p}
