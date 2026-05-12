@@ -405,7 +405,7 @@ export default function MenPage({ cart = [], setCart, wish = [], setWish }) {
     // ── Fetch men products from backend
     useEffect(() => {
         setLoading(true);
-        fetch(`https://stylehub-backend-tau.vercel.app/api/products?category=men&limit=100`)
+        fetch(`https://stylehub-backend-tau.vercel.app/api/products?category=men&limit=100&t=${Date.now()}`)
             .then(r => r.json())
             .then(data => {
                 const list = (data.data?.products || []).map(p => ({
