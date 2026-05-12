@@ -487,7 +487,7 @@ export default function App() {
         img: p.images?.[0] ? (p.images[0].startsWith("http") ? p.images[0] : `https://stylehub-backend-tau.vercel.app${p.images[0]}`) : null,
         sizes: p.sizes || [], colors: p.colors || [],
         rating: p.avgRating || 0, reviews: p.reviewCount || 0,
-        tab: "best", category: p.category,
+        tab: "best", category: typeof p.category === "object" ? p.category?.name || "" : p.category || "",
       });
       const all = [
         ...(w.data?.products || []).map(mapP),
@@ -559,9 +559,9 @@ export default function App() {
               ))}
             </div>
             <div className="row row-cols-2 row-cols-md-3 g-3">
-              {(backendProducts.length > 0 ? backendProducts.slice(12, 16) : PRODUCTS.filter(p => p.tab === "picks")).map((p, i) => (
+              {(backendProducts.length > 0 ? backendProducts.slice(0, 6) : PRODUCTS.filter(p => p.tab === tab)).map((p, i) => (
                 <div className="col" key={p.id}>
-                  <TCard p={p} onOpen={setModal} addRef={addRef} d={(i % 4) + 1} wish={wish} toggleWish={toggleWish} onAdd={addToCart} />
+                  <PCard p={p} onOpen={setModal} addRef={addRef} d={(i % 3) + 1} wish={wish} toggleWish={toggleWish} />
                 </div>
               ))}
             </div>
@@ -611,7 +611,7 @@ export default function App() {
           <section className="px-4 py-4 " style={{ marginTop: "6rem" }}  >
             <div className="sec-title reveal" ref={addRef}>Top Picks</div>
             <div className="row row-cols-2 row-cols-md-4 g-3">
-              {backendProducts.length > 0 ? backendProducts.slice(12, 16) : PRODUCTS.filter(p => p.tab === "picks").map((p, i) => (
+              {(backendProducts.length > 0 ? backendProducts.slice(12, 16) : PRODUCTS.filter(p => p.tab === "picks")).map((p, i) => (
                 <div className="col" key={p.id}>
                   <TCard p={p} onOpen={setModal} addRef={addRef} d={(i % 4) + 1} wish={wish} toggleWish={toggleWish} onAdd={addToCart} />
                 </div>
