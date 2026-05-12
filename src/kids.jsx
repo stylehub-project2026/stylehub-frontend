@@ -71,8 +71,8 @@ export default function Kids({ cart, setCart, wish, setWish }) {
           img: p.images?.[0] ? (p.images[0].startsWith('http') ? p.images[0] : `https://stylehub-backend-tau.vercel.app${p.images[0]}`) : null,
           sizes: p.sizes || [],
           colors: p.colors || [],
-          type: p.tags?.[0] || "",
-          category: p.category,
+          type: (p.tags?.[0] || "").toLowerCase(),
+          category: typeof p.category === "object" ? p.category?.name || "" : p.category || "",
         }));
         setAllProducts(list);
       })
@@ -176,10 +176,10 @@ export default function Kids({ cart, setCart, wish, setWish }) {
           {/* Type */}
           <div style={{ borderTop: "1px solid var(--border)", paddingTop: "1.5rem", marginBottom: "1.8rem" }}>
             <div style={{ fontSize: ".65rem", letterSpacing: ".18em", textTransform: "uppercase", fontWeight: 600, marginBottom: ".8rem" }}>Type</div>
-            {[["tops", "Tops"], ["bottoms", "Bottoms"], ["jackets", "Jackets"]].map(([val, label]) => (
-              <div key={val} onClick={() => toggleType(val)} style={{ display: "flex", alignItems: "center", gap: ".5rem", padding: ".3rem 0", cursor: "pointer" }}>
-                <div style={{ width: 14, height: 14, border: `1.5px solid ${selType === val ? "var(--dark)" : "var(--border)"}`, background: selType === val ? "var(--dark)" : "transparent", borderRadius: 2, flexShrink: 0, transition: "all .2s" }} />
-                <span style={{ fontSize: ".75rem", color: selType === val ? "var(--dark)" : "var(--warm)", transition: "color .2s" }}>{label}</span>
+            {[...new Set(allProducts.map(p => p.type).filter(Boolean))].map(t => (
+              <div key={t} onClick={() => toggleType(t)} style={{ display: "flex", alignItems: "center", gap: ".5rem", padding: ".3rem 0", cursor: "pointer" }}>
+                <div style={{ width: 14, height: 14, border: `1.5px solid ${selType === t ? "var(--dark)" : "var(--border)"}`, background: selType === t ? "var(--dark)" : "transparent", borderRadius: 2, flexShrink: 0, transition: "all .2s" }} />
+                <span style={{ fontSize: ".75rem", color: selType === t ? "var(--dark)" : "var(--warm)", transition: "color .2s" }}>{t.charAt(0).toUpperCase() + t.slice(1)}</span>
               </div>
             ))}
           </div>

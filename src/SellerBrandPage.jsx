@@ -36,7 +36,7 @@ function PCard({ p, wish, toggleWish, brandName }) {
         >
             <div style={{ position: "relative", overflow: "hidden", aspectRatio: SZ.gridCardRatio, background: "#f0ece6" }}>
                 {p.images?.[0] ? (
-                    <img src={(p.images[0].startsWith('http') ? p.images[0] : `https://stylehub-backend-tau.vercel.app${p.images[0]}` )} alt={p.name}
+                    <img src={(p.images[0].startsWith('http') ? p.images[0] : `https://stylehub-backend-tau.vercel.app${p.images[0]}`)} alt={p.name}
                         style={{ width: "100%", height: "100%", objectFit: "cover", transition: "transform .5s" }}
                         onMouseEnter={e => e.target.style.transform = "scale(1.06)"}
                         onMouseLeave={e => e.target.style.transform = "scale(1)"}
@@ -140,9 +140,10 @@ export default function SellerBrandPage({ cart, wish = [], setWish }) {
 
     const ALL_SIZES = [...new Set(products.flatMap(p => p.sizes || []))];
     const ALL_COLORS = [...new Set(products.flatMap(p => p.colors || []))];
+    const ALL_TYPES = [...new Set(products.flatMap(p => (p.tags || []).map(t => t.toLowerCase())).filter(Boolean))];
 
     let filtered = [...products];
-    if (selType !== "all") filtered = filtered.filter(p => (p.category === selType) || (p.tags?.includes(selType)));
+    if (selType !== "all") filtered = filtered.filter(p => p.tags?.some(t => t.toLowerCase() === selType));
     if (selSizes) filtered = filtered.filter(p => p.sizes?.includes(selSizes));
     if (selColors) filtered = filtered.filter(p => p.colors?.includes(selColors));
     if (sortBy === "low") filtered = [...filtered].sort((a, b) => a.price - b.price);
@@ -186,7 +187,7 @@ export default function SellerBrandPage({ cart, wish = [], setWish }) {
                 boxShadow: "0 4px 24px rgba(26,26,24,.07)"
             }}>
                 {seller?.heroBg && (
-                    <img src={(seller.heroBg.startsWith('http') ? seller.heroBg : `https://stylehub-backend-tau.vercel.app${seller.heroBg}` )} alt="" aria-hidden
+                    <img src={(seller.heroBg.startsWith('http') ? seller.heroBg : `https://stylehub-backend-tau.vercel.app${seller.heroBg}`)} alt="" aria-hidden
                         style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", opacity: .08, borderRadius: 10 }}
                         onError={e => e.target.style.display = "none"} />
                 )}
@@ -197,7 +198,7 @@ export default function SellerBrandPage({ cart, wish = [], setWish }) {
                     {/* LOGO */}
                     <div style={{ flexShrink: 0, width: SZ.heroLogoSize, height: SZ.heroLogoSize, borderRadius: "50%", overflow: "hidden", background: "#f8f6f2", border: "1.5px solid rgba(26,26,24,.12)", boxShadow: "0 8px 32px rgba(26,26,24,.1)", display: "flex", alignItems: "center", justifyContent: "center", padding: "20px" }}>
                         <img
-                            src={seller?.logo ? (seller.logo.startsWith('http') ? seller.logo : `https://stylehub-backend-tau.vercel.app${seller.logo}` ) : `/${brandSlug?.toLowerCase()}.jpg`}
+                            src={seller?.logo ? (seller.logo.startsWith('http') ? seller.logo : `https://stylehub-backend-tau.vercel.app${seller.logo}`) : `/${brandSlug?.toLowerCase()}.jpg`}
                             alt={brandName}
                             style={{ width: "100%", height: "100%", objectFit: "contain" }}
                             onError={e => {
@@ -252,7 +253,7 @@ export default function SellerBrandPage({ cart, wish = [], setWish }) {
                                 onClick={() => navigate(`/product/${p._id}`)}>
                                 <div style={{ height: SZ.shopCardH, borderRadius: 5, overflow: "hidden", background: "#fff", marginBottom: ".90rem", border: "1px solid var(--border)", display: "flex", alignItems: "center", justifyContent: "center" }}>
                                     {p.images?.[0] ? (
-                                        <img src={(p.images[0].startsWith('http') ? p.images[0] : `https://stylehub-backend-tau.vercel.app${p.images[0]}` )} alt={p.name}
+                                        <img src={(p.images[0].startsWith('http') ? p.images[0] : `https://stylehub-backend-tau.vercel.app${p.images[0]}`)} alt={p.name}
                                             style={{ width: "100%", height: "100%", objectFit: "cover", transition: "transform .5s" }}
                                             onMouseEnter={e => e.target.style.transform = "scale(1.06)"}
                                             onMouseLeave={e => e.target.style.transform = "scale(1)"}
@@ -311,18 +312,13 @@ export default function SellerBrandPage({ cart, wish = [], setWish }) {
                     </div>
 
                     {/* Type */}
-                    <FilterSection title="Type">
-                        {[
-                            ["tops", "Tops"],
-                            ["bottoms", "Bottoms"],
-                            ["jackets", "Jackets"],
-                            ["t-shirt", "T-Shirt"],
-                            ["hoodies", "Hoodies"],
-                            ["dresses", "Dresses"]
-                        ].map(([val, label]) => (
-                            <CheckRow key={val} label={label} active={selType === val} onClick={() => toggleType(val)} />
-                        ))}
-                    </FilterSection>
+                    {ALL_TYPES.length > 0 && (
+                        <FilterSection title="Type">
+                            {ALL_TYPES.map(t => (
+                                <CheckRow key={t} label={t.charAt(0).toUpperCase() + t.slice(1)} active={selType === t} onClick={() => toggleType(t)} />
+                            ))}
+                        </FilterSection>
+                    )}
 
                     {/* Size */}
                     {ALL_SIZES.length > 0 && (
