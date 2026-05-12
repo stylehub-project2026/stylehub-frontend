@@ -583,7 +583,7 @@ export default function App() {
             <div className="row g-3">
               {CATS.map((c, i) => (
                 <div className="col-md-4" key={c.name}>
-                  <a href={c.link} className={`sh-cat reveal d${i + 1}`} ref={addRef}>
+                  <a href={c.link} className={`sh-cat revealed d${i + 1}`} ref={addRef}>
                     {c.img ? <img src={c.img} alt={c.name} /> : <div className="cat-bg d-flex align-items-center justify-content-center" style={{ background: `linear-gradient(${c.gradient})`, height: "100%" }}><span style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: "4rem", color: "rgba(255,255,255,.15)", fontWeight: 300 }}>{c.name[0]}</span></div>}
                     <div className="cat-ov" />
                     <div className="cat-ct"><div className="cat-name">{c.name}</div><div className="cat-sub mt-1">Shop Now →</div></div>
