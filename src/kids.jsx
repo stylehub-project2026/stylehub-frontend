@@ -73,6 +73,7 @@ export default function Kids({ cart, setCart, wish, setWish }) {
           colors: p.colors || [],
           type: (p.tags?.[0] || "").toLowerCase(),
           category: typeof p.category === "object" ? p.category?.name || "" : p.category || "",
+          subcategory: p.subcategory || "",
         }));
         setAllProducts(list);
       })
@@ -90,7 +91,7 @@ export default function Kids({ cart, setCart, wish, setWish }) {
 
   // filter
   let filtered = allProducts;
-  if (selCategory !== "all") filtered = filtered.filter(p => p.category === selCategory);
+  if (selCategory !== "all") filtered = filtered.filter(p => p.subcategory === selCategory);
   if (selType !== "all") filtered = filtered.filter(p => p.type === selType);
   if (selBrands.length > 0) filtered = filtered.filter(p => selBrands.includes(p.brand.toLowerCase()));
   if (selSizes.length > 0) filtered = filtered.filter(p => p.sizes.some(s => selSizes.includes(s)));

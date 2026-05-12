@@ -758,7 +758,7 @@ function ProductsView() {
   const [msg, setMsg] = useState(null);
 
   // Empty form state
-  const emptyForm = { name: "", price: "", salePrice: "", stock: "", category: "", type: "", description: "", sizes: "", images: [] };
+  const emptyForm = { name: "", price: "", salePrice: "", stock: "", category: "", type: "", subcategory: "", description: "", sizes: "", images: [] };
   const [form, setForm] = useState(emptyForm);
 
   const loadProducts = () => {
@@ -780,6 +780,7 @@ function ProductsView() {
       stock: product.stock || "",
       category: product.category || "",
       type: (product.tags?.[0]?.toLowerCase() || ""),
+      subcategory: product.subcategory || "",
       description: product.description || "",
       sizes: (product.sizes || []).join(", "),
       images: (product.images || []).map((img, i) => ({
@@ -822,6 +823,7 @@ function ProductsView() {
       formData.append("stock", form.stock);
       formData.append("category", form.category);
       if (form.type) formData.append("tags", form.type);
+      if (form.category === "kids" && form.subcategory) formData.append("subcategory", form.subcategory);
       formData.append("description", form.description);
       formData.append("sizes", form.sizes);
       const imgs = form.images || [];
@@ -982,7 +984,18 @@ function ProductsView() {
                   <option value="dresses">Dresses</option>
                 </select>
               </div>
-              <div />
+              <div>
+                {form.category === "kids" && (
+                  <>
+                    <label style={labelStyle}>Sub-Category <span style={{ color: "#e74c3c" }}>*</span></label>
+                    <select style={{ ...inputStyle, appearance: "none" }} value={form.subcategory} onChange={e => setForm(f => ({ ...f, subcategory: e.target.value }))}>
+                      <option value="">Select…</option>
+                      <option value="boys">Boys</option>
+                      <option value="girls">Girls</option>
+                    </select>
+                  </>
+                )}
+              </div>
             </div>
 
             <label style={labelStyle}>Description (optional)</label>
