@@ -559,9 +559,9 @@ export default function App() {
               ))}
             </div>
             <div className="row row-cols-2 row-cols-md-3 g-3">
-              {(backendProducts.length > 0 ? backendProducts : PRODUCTS.filter(p => p.tab === tab)).slice(0, 6).map((p, i) => (
+              {(backendProducts.length > 0 ? backendProducts.slice(12, 16) : PRODUCTS.filter(p => p.tab === "picks")).map((p, i) => (
                 <div className="col" key={p.id}>
-                  <PCard p={p} onOpen={setModal} addRef={addRef} d={(i % 3) + 1} wish={wish} toggleWish={toggleWish} />
+                  <TCard p={p} onOpen={setModal} addRef={addRef} d={(i % 4) + 1} wish={wish} toggleWish={toggleWish} onAdd={addToCart} />
                 </div>
               ))}
             </div>
