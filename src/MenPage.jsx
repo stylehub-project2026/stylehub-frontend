@@ -269,7 +269,7 @@ function PickCard({ p, onQuickView, onWish, wishlisted, addRef, d = 1 }) {
     const navigate = useNavigate();
     return (
         <div
-            className={`pick-card reveal d${d}`}
+            className={`pick-card revealed d${d}`}
             ref={addRef}
             onClick={() => navigate(`/product/${p.id}`, { state: { product: p } })}
         >
