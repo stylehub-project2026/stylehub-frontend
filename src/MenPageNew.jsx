@@ -247,12 +247,6 @@ function ProdCard({ p, onQuickView, onWish, wishlisted, addRef, d = 1 }) {
             <div className="prod-info">
                 {p.brand && <div className="prod-brand-lbl" style={{ cursor: "pointer" }} onClick={e => { e.stopPropagation(); navigate(`/brand/${encodeURIComponent(p.brand)}`); }}>{p.brand}</div>}
                 <div className="prod-name">{p.name}</div>
-                {p.rating && (
-                    <div className="prod-stars-row">
-                        <Stars n={p.rating} />
-                        <span className="prod-rev-cnt">({p.reviews})</span>
-                    </div>
-                )}
                 <div className="prod-price-row">
                     {p.old && (
                         <span className="prod-old">LE {p.old.toLocaleString()}</span>
@@ -298,16 +292,15 @@ function PickCard({ p, onQuickView, onWish, wishlisted, addRef, d = 1 }) {
                 <div className="pick-text">
                     <div className="prod-name">{p.name}</div>
                     <div className="prod-price">LE {p.price.toLocaleString()}</div>
-                    {p.rating && <Stars n={p.rating} />}
                 </div>
-                <img
-                    src={p.brandLogo}
-                    alt="brand"
-                    className="pick-brand-logo"
-                    onError={(e) => {
-                        e.target.style.display = "none";
-                    }}
-                />
+                {p.brandLogo && (
+                    <img
+                        src={p.brandLogo}
+                        alt={p.brand}
+                        className="pick-brand-logo"
+                        onError={e => e.target.style.display = "none"}
+                    />
+                )}
             </div>
         </div>
     );
@@ -401,13 +394,6 @@ export default function MenPage({ cart = [], setCart, wish = [], setWish }) {
     const [quickView, setQuickView] = useState(null);
     const [menProducts, setMenProducts] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [selSizes, setSelSizes] = useState(null);
-    const [selColors, setSelColors] = useState(null);
-    const [selType, setSelType] = useState("all");
-    const [selBrands, setSelBrands] = useState([]);
-    const [sortBy, setSortBy] = useState("default");
-    const [filterPage, setFilterPage] = useState(1);
-    const FILTER_PER_PAGE = 9;
 
     // ── Fetch men products from backend
     useEffect(() => {
@@ -428,6 +414,7 @@ export default function MenPage({ cart = [], setCart, wish = [], setWish }) {
                     reviews: p.reviewCount || 0,
                     tag: p.salePrice ? "Sale" : null,
                     type: (p.tags?.[0] || "").toLowerCase(),
+                    brandLogo: p.seller?.logo ? (p.seller.logo.startsWith('http') ? p.seller.logo : `https://stylehub-backend-tau.vercel.app${p.seller.logo}`) : null,
                 }));
                 setMenProducts(list);
             })
@@ -819,134 +806,6 @@ export default function MenPage({ cart = [], setCart, wish = [], setWish }) {
                     onAddToCart={addToCart}
                 />
             )}
-
-            {/* ALL PRODUCTS + FILTERS */}
-            {(() => {
-                const ALL_SIZES = [...new Set(menProducts.flatMap(p => p.sizes))];
-                const ALL_COLORS = [...new Set(menProducts.flatMap(p => p.colors))];
-                const ALL_TYPES = [...new Set(menProducts.map(p => p.type).filter(Boolean))];
-                const ALL_BRANDS = [...new Set(menProducts.map(p => p.brand))];
-
-                let filtered = [...menProducts];
-                if (selType !== "all") filtered = filtered.filter(p => p.type === selType);
-                if (selBrands.length > 0) filtered = filtered.filter(p => selBrands.includes(p.brand));
-                if (selSizes) filtered = filtered.filter(p => p.sizes.includes(selSizes));
-                if (selColors) filtered = filtered.filter(p => p.colors.includes(selColors));
-                if (sortBy === "low") filtered = [...filtered].sort((a, b) => a.price - b.price);
-                if (sortBy === "high") filtered = [...filtered].sort((a, b) => b.price - a.price);
-                if (sortBy === "sale") filtered = filtered.filter(p => p.old);
-
-                const totalPages = Math.ceil(filtered.length / FILTER_PER_PAGE);
-                const paginated = filtered.slice((filterPage - 1) * FILTER_PER_PAGE, filterPage * FILTER_PER_PAGE);
-                const hasFilters = selSizes || selColors || selType !== "all" || selBrands.length > 0;
-
-                return (
-                    <section id="all-products" style={{ background: "var(--c-off)", padding: "3rem 5%" }}>
-                        <h2 className="sec-title reveal" ref={addRef}>All Products</h2>
-                        <div className="sec-line reveal" ref={addRef} />
-                        <div style={{ display: "flex", gap: "2.5rem", alignItems: "flex-start" }}>
-
-                            {/* SIDEBAR */}
-                            <div style={{ width: 185, flexShrink: 0, position: "sticky", top: 70 }}>
-                                <div style={{ marginBottom: "1.8rem" }}>
-                                    <div style={{ fontSize: ".6rem", letterSpacing: ".2em", textTransform: "uppercase", fontWeight: 600, marginBottom: ".65rem", color: "var(--c-dark)" }}>Sort By</div>
-                                    {[["default", "Default"], ["low", "Price: Low → High"], ["high", "Price: High → Low"], ["sale", "On Sale"]].map(([val, label]) => (
-                                        <div key={val} onClick={() => setSortBy(val)} style={{ fontSize: ".75rem", padding: ".28rem 0", cursor: "pointer", color: sortBy === val ? "var(--c-dark)" : "var(--c-gray)", fontWeight: sortBy === val ? 600 : 400, transition: "color .2s" }}>{label}</div>
-                                    ))}
-                                </div>
-
-                                {ALL_BRANDS.length > 0 && (
-                                    <div style={{ borderTop: "1px solid var(--c-gray-lt)", paddingTop: "1.3rem", marginBottom: "1.6rem" }}>
-                                        <div style={{ fontSize: ".6rem", letterSpacing: ".2em", textTransform: "uppercase", fontWeight: 600, marginBottom: ".65rem", color: "var(--c-dark)" }}>Brand</div>
-                                        {ALL_BRANDS.map(b => (
-                                            <div key={b} onClick={() => { setSelBrands(p => p.includes(b) ? p.filter(x => x !== b) : [...p, b]); setFilterPage(1); }} style={{ display: "flex", alignItems: "center", gap: ".5rem", padding: ".26rem 0", cursor: "pointer" }}>
-                                                <div style={{ width: 13, height: 13, border: `1.5px solid ${selBrands.includes(b) ? "var(--c-dark)" : "var(--c-gray-lt)"}`, background: selBrands.includes(b) ? "var(--c-dark)" : "transparent", borderRadius: 2, flexShrink: 0, transition: "all .2s" }} />
-                                                <span style={{ fontSize: ".73rem", color: selBrands.includes(b) ? "var(--c-dark)" : "var(--c-gray)", transition: "color .2s" }}>{b}</span>
-                                            </div>
-                                        ))}
-                                    </div>
-                                )}
-
-                                {ALL_TYPES.length > 0 && (
-                                    <div style={{ borderTop: "1px solid var(--c-gray-lt)", paddingTop: "1.3rem", marginBottom: "1.6rem" }}>
-                                        <div style={{ fontSize: ".6rem", letterSpacing: ".2em", textTransform: "uppercase", fontWeight: 600, marginBottom: ".65rem", color: "var(--c-dark)" }}>Type</div>
-                                        {ALL_TYPES.map(t => (
-                                            <div key={t} onClick={() => { setSelType(p => p === t ? "all" : t); setFilterPage(1); }} style={{ display: "flex", alignItems: "center", gap: ".5rem", padding: ".26rem 0", cursor: "pointer" }}>
-                                                <div style={{ width: 13, height: 13, border: `1.5px solid ${selType === t ? "var(--c-dark)" : "var(--c-gray-lt)"}`, background: selType === t ? "var(--c-dark)" : "transparent", borderRadius: 2, flexShrink: 0, transition: "all .2s" }} />
-                                                <span style={{ fontSize: ".73rem", color: selType === t ? "var(--c-dark)" : "var(--c-gray)", transition: "color .2s" }}>{t.charAt(0).toUpperCase() + t.slice(1)}</span>
-                                            </div>
-                                        ))}
-                                    </div>
-                                )}
-
-                                {ALL_SIZES.length > 0 && (
-                                    <div style={{ borderTop: "1px solid var(--c-gray-lt)", paddingTop: "1.3rem", marginBottom: "1.6rem" }}>
-                                        <div style={{ fontSize: ".6rem", letterSpacing: ".2em", textTransform: "uppercase", fontWeight: 600, marginBottom: ".65rem", color: "var(--c-dark)" }}>Size</div>
-                                        <div style={{ display: "flex", flexWrap: "wrap", gap: ".32rem" }}>
-                                            {ALL_SIZES.map(s => (
-                                                <button key={s} onClick={() => { setSelSizes(p => p === s ? null : s); setFilterPage(1); }} style={{ padding: ".26rem .52rem", fontSize: ".63rem", border: `1.5px solid ${selSizes === s ? "var(--c-dark)" : "var(--c-gray-lt)"}`, background: selSizes === s ? "var(--c-dark)" : "transparent", color: selSizes === s ? "#fff" : "var(--c-dark)", cursor: "pointer", fontFamily: "var(--fb)", transition: "all .2s", minWidth: 32, borderRadius: 3 }}>{s}</button>
-                                            ))}
-                                        </div>
-                                    </div>
-                                )}
-
-                                {ALL_COLORS.length > 0 && (
-                                    <div style={{ borderTop: "1px solid var(--c-gray-lt)", paddingTop: "1.3rem", marginBottom: "1.6rem" }}>
-                                        <div style={{ fontSize: ".6rem", letterSpacing: ".2em", textTransform: "uppercase", fontWeight: 600, marginBottom: ".65rem", color: "var(--c-dark)" }}>Color</div>
-                                        <div style={{ display: "flex", flexWrap: "wrap", gap: ".4rem" }}>
-                                            {ALL_COLORS.map((c, i) => (
-                                                <div key={i} onClick={() => { setSelColors(p => p === c ? null : c); setFilterPage(1); }} style={{ width: 22, height: 22, borderRadius: "50%", background: c, cursor: "pointer", border: (c === "#fff" || c === "#ffffff" || c === "#ffffffff") ? "1.5px solid var(--c-gray-lt)" : "2px solid transparent", boxShadow: selColors === c ? "0 0 0 2.5px var(--c-dark)" : "none", transform: selColors === c ? "scale(1.2)" : "none", transition: "all .2s" }} />
-                                            ))}
-                                        </div>
-                                    </div>
-                                )}
-
-                                {hasFilters && (
-                                    <button onClick={() => { setSelSizes(null); setSelColors(null); setSelType("all"); setSelBrands([]); setFilterPage(1); }} style={{ fontSize: ".61rem", letterSpacing: ".1em", textTransform: "uppercase", background: "none", border: "1px solid var(--c-gray-lt)", padding: ".36rem .8rem", cursor: "pointer", color: "var(--c-gray)", fontFamily: "var(--fb)", width: "100%", borderRadius: 3 }}>Clear Filters</button>
-                                )}
-                            </div>
-
-                            {/* GRID */}
-                            <div style={{ flex: 1 }}>
-                                <div style={{ fontSize: ".7rem", color: "var(--c-gray)", marginBottom: "1rem", letterSpacing: ".04em" }}>
-                                    {filtered.length} product{filtered.length !== 1 ? "s" : ""}{totalPages > 1 ? ` — page ${filterPage} of ${totalPages}` : ""}
-                                </div>
-                                {filtered.length === 0
-                                    ? <div style={{ textAlign: "center", padding: "4rem 0", color: "var(--c-gray)", fontSize: ".85rem" }}>No products match your filters.</div>
-                                    : <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: "1.4rem" }}>
-                                        {paginated.map(p => (
-                                            <div key={p.id} className="prod-card" onClick={() => setQuickView(p)}>
-                                                <div className="ib">
-                                                    {p.img ? <img src={p.img} alt={p.name} onError={e => e.target.style.display = "none"} /> : <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "2rem" }}>👕</div>}
-                                                    {p.old && <div className="tag-b sale">SALE</div>}
-                                                    <div className="pc-hover-ov"><button className="pc-qv-btn">Quick View</button></div>
-                                                </div>
-                                                <div className="prod-info">
-                                                    <div className="prod-brand-lbl">{p.brand}</div>
-                                                    <div className="prod-name">{p.name}</div>
-                                                    <div className="prod-price-row">
-                                                        {p.old && <span className="prod-old">LE {p.old?.toLocaleString()}</span>}
-                                                        <span className="prod-price" style={{ color: p.old ? "var(--c-red)" : "" }}>LE {p.price?.toLocaleString()}</span>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        ))}
-                                    </div>
-                                }
-                                {totalPages > 1 && (
-                                    <div style={{ display: "flex", justifyContent: "center", gap: ".45rem", padding: "2.5rem 0" }}>
-                                        <button onClick={() => setFilterPage(p => Math.max(1, p - 1))} disabled={filterPage === 1} style={{ width: 34, height: 34, borderRadius: "50%", border: "1px solid var(--c-gray-lt)", background: "none", cursor: filterPage === 1 ? "not-allowed" : "pointer", opacity: filterPage === 1 ? .4 : 1, fontSize: "1rem" }}>‹</button>
-                                        {Array.from({ length: totalPages }, (_, i) => i + 1).map(n => (
-                                            <button key={n} onClick={() => setFilterPage(n)} style={{ width: 34, height: 34, borderRadius: "50%", border: `1px solid ${filterPage === n ? "var(--c-dark)" : "var(--c-gray-lt)"}`, background: filterPage === n ? "var(--c-dark)" : "none", color: filterPage === n ? "#fff" : "var(--c-dark)", cursor: "pointer", fontSize: ".75rem", fontWeight: filterPage === n ? 600 : 400, transition: "all .2s" }}>{n}</button>
-                                        ))}
-                                        <button onClick={() => setFilterPage(p => Math.min(totalPages, p + 1))} disabled={filterPage === totalPages} style={{ width: 34, height: 34, borderRadius: "50%", border: "1px solid var(--c-gray-lt)", background: "none", cursor: filterPage === totalPages ? "not-allowed" : "pointer", opacity: filterPage === totalPages ? .4 : 1, fontSize: "1rem" }}>›</button>
-                                    </div>
-                                )}
-                            </div>
-                        </div>
-                    </section>
-                );
-            })()}
 
             <div className={`sh-toast ${toast ? "on" : ""}`}>{toast}</div>
 
