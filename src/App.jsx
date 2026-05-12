@@ -23,6 +23,9 @@ import Checkout from "./checkout";
 
 
 import { saveCart, saveWishlist, sellerSignOut } from "./api";
+import BuildOutfit from "./BuildOutfit";
+import AboutUs from "./AboutUs";
+import ContactPage from "./ContactPage";
 
 // Check if seller is logged in using the new token/seller keys
 function isSellerLoggedIn() {
@@ -527,6 +530,9 @@ export default function App() {
       <Route path="/menpage" element={<MenPage cart={cart} setCart={setCart} wish={wish} setWish={setWish} />} />
       <Route path="/seller" element={sellerLoggedIn ? <SellerDashboard onLogout={handleSellerLogout} /> : <Seller onSellerLoggedIn={handleSellerLogin} cart={cart} wish={wish} />} />
       <Route path="/seller/dashboard" element={sellerLoggedIn ? <SellerDashboard onLogout={handleSellerLogout} /> : <Seller onSellerLoggedIn={handleSellerLogin} cart={cart} wish={wish} />} />
+      <Route path="/buildoutfit" element={<BuildOutfit cart={cart} setCart={setCart} wish={wish} setWish={setWish} />} />
+      <Route path="/aboutus" element={<AboutUs cart={cart} wish={wish} />} />
+      <Route path="/contact" element={<ContactPage cart={cart} wish={wish} />} />
 
       <Route path="/" element={
         <div key={location.key}>
