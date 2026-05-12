@@ -59,7 +59,7 @@ export default function Kids({ cart, setCart, wish, setWish }) {
   const addRef = useScrollReveal();
 
   useEffect(() => {
-    fetch(`${API}/products?category=kids&limit=100&t=${Date.now()}`)
+    fetch(`https://stylehub-backend-tau.vercel.app/api/products?category=kids&limit=100&t=${Date.now()}`)
       .then(r => r.json())
       .then(data => {
         const list = (data.data?.products || []).map(p => ({
