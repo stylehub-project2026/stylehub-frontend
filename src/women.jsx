@@ -418,7 +418,7 @@ export default function WomenPage() {
 
   // ── Fetch women products from backend
   useEffect(() => {
-    fetch(`...?category=women&limit=100&t=${Date.now()}`)
+    fetch(`https://stylehub-backend-tau.vercel.app/api/products?category=women&limit=100&t=${Date.now()}`)
       .then(r => r.json())
       .then(data => {
         const list = (data.data?.products || []).map(p => ({
