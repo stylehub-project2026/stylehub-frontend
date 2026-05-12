@@ -11,7 +11,7 @@ import SellerBrandPage from "./SellerBrandPage";
 import ProfilePage from "./Profilepage";
 import Wishlist from "./wishlist";
 import Women from "./women";
-import MenPage from "./Menpage";
+import MenPage from "./MenPageNew";
 import Kids from "./kids";
 import ProductDetail from "./ProductDetail";
 import SignIn from "./SignInPage";
