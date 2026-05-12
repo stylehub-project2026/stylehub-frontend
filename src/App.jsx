@@ -531,6 +531,7 @@ export default function App() {
       <Route path="/seller" element={sellerLoggedIn ? <SellerDashboard onLogout={handleSellerLogout} /> : <Seller onSellerLoggedIn={handleSellerLogin} cart={cart} wish={wish} />} />
       <Route path="/seller/dashboard" element={sellerLoggedIn ? <SellerDashboard onLogout={handleSellerLogout} /> : <Seller onSellerLoggedIn={handleSellerLogin} cart={cart} wish={wish} />} />
       <Route path="/buildoutfit" element={<BuildOutfit cart={cart} setCart={setCart} wish={wish} setWish={setWish} />} />
+      <Route path="/BuildOutfit" element={<BuildOutfit cart={cart} setCart={setCart} wish={wish} setWish={setWish} />} />
       <Route path="/aboutus" element={<AboutUs cart={cart} wish={wish} />} />
       <Route path="/contact" element={<ContactPage cart={cart} wish={wish} />} />
 

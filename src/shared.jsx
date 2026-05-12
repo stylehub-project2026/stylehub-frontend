@@ -49,7 +49,7 @@ export const NAV_LINKS = [
   { label: "Women", href: "/women" },
   { label: "Men", href: "/men" },
   { label: "Kids", href: "/kids" },
-  { label: "Sell with us", href: "#" },
+  { label: "Sell with us", href: "/seller" },
   { label: "Build an Outfit", href: "/BuildOutfit" },
   { label: "Brands", href: "#", dropdown: true },
 ];

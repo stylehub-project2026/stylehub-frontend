@@ -3,85 +3,85 @@ import { SHNav, SHFooter, SHARED_CSS, useScrollReveal } from "./shared";
 
 const VALUES = [
   {
-    id:"01", label:"Quality",
-    headline:"Uncompromising Standards",
-    body:"We are committed to maintaining the highest standards of quality across every aspect of our business — from the brands we partner with to the experience we deliver.",
-    icon:(
+    id: "01", label: "Quality",
+    headline: "Uncompromising Standards",
+    body: "We are committed to maintaining the highest standards of quality across every aspect of our business — from the brands we partner with to the experience we deliver.",
+    icon: (
       <svg viewBox="0 0 40 40" fill="none" stroke="currentColor" strokeWidth="1.4">
-        <polygon points="20,4 24,15 36,15 27,22 30,34 20,27 10,34 13,22 4,15 16,15"/>
+        <polygon points="20,4 24,15 36,15 27,22 30,34 20,27 10,34 13,22 4,15 16,15" />
       </svg>
     ),
-    accent:"#92A079"
+    accent: "#92A079"
   },
   {
-    id:"02", label:"Security",
-    headline:"Your Trust, Protected",
-    body:"We are committed to maintaining the highest standards of security to protect our systems, data, and users at every level of our operations.",
-    icon:(
+    id: "02", label: "Security",
+    headline: "Your Trust, Protected",
+    body: "We are committed to maintaining the highest standards of security to protect our systems, data, and users at every level of our operations.",
+    icon: (
       <svg viewBox="0 0 40 40" fill="none" stroke="currentColor" strokeWidth="1.4">
-        <path d="M20 4 L34 10 L34 22 C34 30 20 36 20 36 C20 36 6 30 6 22 L6 10 Z"/>
+        <path d="M20 4 L34 10 L34 22 C34 30 20 36 20 36 C20 36 6 30 6 22 L6 10 Z" />
       </svg>
     ),
-    accent:"#b8a88a"
+    accent: "#b8a88a"
   },
   {
-    id:"03", label:"Innovation",
-    headline:"Always Moving Forward",
-    body:"We drive ongoing innovation through advanced technology and creative marketing to stay ahead in a competitive market and bring our designers to more people.",
-    icon:(
+    id: "03", label: "Innovation",
+    headline: "Always Moving Forward",
+    body: "We drive ongoing innovation through advanced technology and creative marketing to stay ahead in a competitive market and bring our designers to more people.",
+    icon: (
       <svg viewBox="0 0 40 40" fill="none" stroke="currentColor" strokeWidth="1.4">
-        <circle cx="20" cy="16" r="7"/>
-        <line x1="20" y1="23" x2="20" y2="30"/>
-        <line x1="15" y1="36" x2="25" y2="36"/>
-        <line x1="13" y1="32" x2="27" y2="32"/>
+        <circle cx="20" cy="16" r="7" />
+        <line x1="20" y1="23" x2="20" y2="30" />
+        <line x1="15" y1="36" x2="25" y2="36" />
+        <line x1="13" y1="32" x2="27" y2="32" />
       </svg>
     ),
-    accent:"#7a9ab8"
+    accent: "#7a9ab8"
   },
   {
-    id:"04", label:"Sustainability",
-    headline:"Fashion With Conscience",
-    body:"We are committed to a sustainable, responsible business that supports local industry growth while minimizing environmental impact. Local is the new luxury.",
-    icon:(
+    id: "04", label: "Sustainability",
+    headline: "Fashion With Conscience",
+    body: "We are committed to a sustainable, responsible business that supports local industry growth while minimizing environmental impact. Local is the new luxury.",
+    icon: (
       <svg viewBox="0 0 40 40" fill="none" stroke="currentColor" strokeWidth="1.4">
-        <path d="M20 34 C20 34 6 26 6 14 C6 14 12 8 20 14 C28 8 34 14 34 14 C34 26 20 34 20 34Z"/>
+        <path d="M20 34 C20 34 6 26 6 14 C6 14 12 8 20 14 C28 8 34 14 34 14 C34 26 20 34 20 34Z" />
       </svg>
     ),
-    accent:"#92A079"
+    accent: "#92A079"
   },
   {
-    id:"05", label:"Partnership",
-    headline:"Built on Collaboration",
-    body:"We value strategic partnerships with suppliers and stakeholders built on collaboration and mutual benefit — growing together with Egypt's creative community.",
-    icon:(
+    id: "05", label: "Partnership",
+    headline: "Built on Collaboration",
+    body: "We value strategic partnerships with suppliers and stakeholders built on collaboration and mutual benefit — growing together with Egypt's creative community.",
+    icon: (
       <svg viewBox="0 0 40 40" fill="none" stroke="currentColor" strokeWidth="1.4">
-        <circle cx="13" cy="15" r="5"/>
-        <circle cx="27" cy="15" r="5"/>
-        <path d="M6 33 C6 27 10 24 13 24 L20 24 L27 24 C30 24 34 27 34 33"/>
-        <line x1="20" y1="10" x2="20" y2="30"/>
+        <circle cx="13" cy="15" r="5" />
+        <circle cx="27" cy="15" r="5" />
+        <path d="M6 33 C6 27 10 24 13 24 L20 24 L27 24 C30 24 34 27 34 33" />
+        <line x1="20" y1="10" x2="20" y2="30" />
       </svg>
     ),
-    accent:"#c8a96e"
+    accent: "#c8a96e"
   },
   {
-    id:"06", label:"Authenticity",
-    headline:"Real Brands, Real Stories",
-    body:"We uphold strict verification standards to ensure the authenticity and integrity of information — so every brand on StyleHub is exactly who they say they are.",
-    icon:(
+    id: "06", label: "Authenticity",
+    headline: "Real Brands, Real Stories",
+    body: "We uphold strict verification standards to ensure the authenticity and integrity of information — so every brand on StyleHub is exactly who they say they are.",
+    icon: (
       <svg viewBox="0 0 40 40" fill="none" stroke="currentColor" strokeWidth="1.4">
-        <circle cx="20" cy="20" r="14"/>
-        <polyline points="13,20 18,25 27,15"/>
+        <circle cx="20" cy="20" r="14" />
+        <polyline points="13,20 18,25 27,15" />
       </svg>
     ),
-    accent:"#a07892"
+    accent: "#a07892"
   },
 ];
 
 const STATS = [
-  { num:"10+",  label:"Local Brands" },
-  { num:"11K+", label:"Happy Shoppers" },
-  { num:"3",    label:"Cities Covered" },
-  { num:"2025", label:"Est. in Alexandria" },
+  { num: "10+", label: "Local Brands" },
+  { num: "11K+", label: "Happy Shoppers" },
+  { num: "3", label: "Cities Covered" },
+  { num: "2025", label: "Est. in Alexandria" },
 ];
 
 const CSS = `
@@ -362,7 +362,7 @@ const CSS = `
 }
 `;
 
-export default function AboutUs({ cart=[], wish=[] }) {
+export default function AboutUs({ cart = [], wish = [] }) {
   const addRef = useScrollReveal();
   const lineRef = useRef(null);
 
@@ -377,19 +377,19 @@ export default function AboutUs({ cart=[], wish=[] }) {
   }, []);
 
   return (
-    <div style={{minHeight:"100vh",background:"var(--cream)"}}>
+    <div style={{ minHeight: "100vh", background: "var(--cream)" }}>
       <style>{SHARED_CSS}</style>
       <style>{CSS}</style>
 
-      <SHNav cart={cart} wish={wish}/>
+      <SHNav cart={cart} wish={wish} />
 
       {/* ── HERO ── */}
       <section className="au-hero">
         <div className="au-hero-left">
-          <div className="au-tag" style={{color:"var(--sage)"}}>Our Story</div>
+          <div className="au-tag" style={{ color: "var(--sage)" }}>Our Story</div>
           <h1 className="au-h1">
-            Where Egyptian<br/>
-            Fashion<br/>
+            Where Egyptian<br />
+            Fashion<br />
             <em className="au-h1-em">Finds Its Stage</em>
           </h1>
         </div>
@@ -399,7 +399,7 @@ export default function AboutUs({ cart=[], wish=[] }) {
             StyleHub was born from a simple belief: <strong>Egypt's designers deserve a world-class platform.</strong>{" "}
             We connect independent local brands with fashion lovers who value originality, craftsmanship, and identity over mass production.
           </p>
-          <p className="au-mission" style={{marginBottom:"2rem"}}>
+          <p className="au-mission" style={{ marginBottom: "2rem" }}>
             We're not just a marketplace — we're a movement for <strong>local fashion culture.</strong> Every purchase supports a real Egyptian designer, a real story, and a more vibrant creative economy.
           </p>
           <a href="/seller" className="au-btn">Become a Brand Partner</a>
@@ -409,7 +409,7 @@ export default function AboutUs({ cart=[], wish=[] }) {
       {/* ── STATS ── */}
       <div className="au-stats">
         {STATS.map(s => (
-          <div key={s.label} className="reveal" ref={addRef}>
+          <div key={s.label} className="revealed" ref={addRef}>
             <div className="au-stat-num">{s.num}</div>
             <div className="au-stat-label">{s.label}</div>
           </div>
@@ -420,16 +420,16 @@ export default function AboutUs({ cart=[], wish=[] }) {
       <section className="au-section">
         <div className="au-section-tag">What We Stand For</div>
         <h2 className="au-section-title reveal" ref={addRef}>
-          Six principles that shape<br/>
-          <em style={{fontStyle:"italic",fontFamily:"'Cormorant Garamond',serif"}}>everything we do</em>
+          Six principles that shape<br />
+          <em style={{ fontStyle: "italic", fontFamily: "'Cormorant Garamond',serif" }}>everything we do</em>
         </h2>
         <div className="au-values-grid">
           {VALUES.map((v, i) => (
             <div
               key={v.id}
-              className={`au-value-card reveal d${(i%4)+1}`}
+              className={`au-value-card revealed d${(i % 4) + 1}`}
               ref={addRef}
-              style={{"--accent-color": v.accent}}
+              style={{ "--accent-color": v.accent }}
             >
               <div className="au-value-num">{v.id}</div>
               <div className="au-value-icon">{v.icon}</div>
@@ -443,18 +443,18 @@ export default function AboutUs({ cart=[], wish=[] }) {
 
       {/* ── MANIFESTO ── */}
       <section className="au-manifesto">
-        <p className="au-manifesto-text reveal" ref={addRef}>
-          "Fashion is not just clothing — it's a language.<br/>
+        <p className="au-manifesto-text revealed" ref={addRef}>
+          "Fashion is not just clothing — it's a language.<br />
           And we're here to give <em>Egypt's voice</em> the platform it deserves."
         </p>
         <div className="au-manifesto-sig">— The StyleHub Team</div>
       </section>
 
       {/* ── JOIN / SELL ── */}
-      <section style={{padding:"6rem 2rem",maxWidth:1100,margin:"0 auto"}} className="reveal" ref={addRef}>
+      <section style={{ padding: "6rem 2rem", maxWidth: 1100, margin: "0 auto" }} className="revealed" ref={addRef}>
         <div className="au-join">
           <div className="au-join-left">
-            <div className="au-tag" style={{color:"rgba(255,255,255,.6)"}}>For Designers</div>
+            <div className="au-tag" style={{ color: "rgba(255,255,255,.6)" }}>For Designers</div>
             <div className="au-join-title">Sell With Us</div>
             <p className="au-join-body">
               Are you an Egyptian fashion brand? Join StyleHub and reach thousands of shoppers who love local. We handle the platform — you focus on creating.
@@ -462,8 +462,8 @@ export default function AboutUs({ cart=[], wish=[] }) {
             <a href="/seller" className="au-btn">Apply Now</a>
           </div>
           <div className="au-join-right">
-            <div className="au-tag" style={{color:"rgba(255,255,255,.4)"}}>For Shoppers</div>
-            <div className="au-join-title" style={{fontSize:"1.6rem"}}>Discover Local Fashion</div>
+            <div className="au-tag" style={{ color: "rgba(255,255,255,.4)" }}>For Shoppers</div>
+            <div className="au-join-title" style={{ fontSize: "1.6rem" }}>Discover Local Fashion</div>
             <p className="au-join-body">
               Browse curated collections from Egypt's most exciting independent brands — all in one place.
             </p>
@@ -472,7 +472,7 @@ export default function AboutUs({ cart=[], wish=[] }) {
         </div>
       </section>
 
-      <SHFooter/>
+      <SHFooter />
     </div>
   );
 }
