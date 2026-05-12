@@ -54,17 +54,17 @@ export default function ProductDetail({ cart, setCart, wish, setWish }) {
           price: raw.price,
           salePrice: raw.salePrice,
           description: raw.description,
-          sizes: raw.sizes || [],
-          colors: raw.colors || [],
+          sizes: (raw.sizes || []).map(s => typeof s === "object" ? s.name || String(s) : s),
+          colors: (raw.colors || []).map(c => typeof c === "object" ? c.hex || c.value || String(c) : c),
           images: raw.images || [],
           rating: raw.avgRating || 0,
           reviewCount: raw.reviewCount || 0,
           stock: raw.stock || 0,
-          category: raw.category,
+          category: typeof raw.category === "object" ? raw.category?.name || "" : raw.category || "",
           tags: raw.tags || [],
         });
       })
-      .catch(() => {})
+      .catch(() => { })
       .finally(() => setLoading(false));
   }, [id]);
 
@@ -73,7 +73,7 @@ export default function ProductDetail({ cart, setCart, wish, setWish }) {
     fetch(`${API}/products/${id}/reviews`)
       .then(r => r.json())
       .then(data => setReviews(data.data?.reviews || []))
-      .catch(() => {});
+      .catch(() => { });
   }, [id]);
 
   const toggleWish = () => {
@@ -127,7 +127,7 @@ export default function ProductDetail({ cart, setCart, wish, setWish }) {
       setReviewMsg({ type: "success", text: "Review submitted! Thank you 🎉" });
       setReviewRating(0);
       setReviewComment("");
-      fetch(`${API}/products/${id}/reviews`).then(r => r.json()).then(d => setReviews(d.data?.reviews || [])).catch(() => {});
+      fetch(`${API}/products/${id}/reviews`).then(r => r.json()).then(d => setReviews(d.data?.reviews || [])).catch(() => { });
     } catch (err) {
       setReviewMsg({ type: "error", text: err.message });
     } finally {
@@ -217,7 +217,7 @@ export default function ProductDetail({ cart, setCart, wish, setWish }) {
           {/* Rating */}
           <div style={{ display: "flex", alignItems: "center", gap: ".5rem", marginBottom: "1.2rem" }}>
             <div style={{ display: "flex", gap: ".1rem" }}>
-              {[1,2,3,4,5].map(i => <StarIcon key={i} filled={i <= Math.round(product.rating)} />)}
+              {[1, 2, 3, 4, 5].map(i => <StarIcon key={i} filled={i <= Math.round(product.rating)} />)}
             </div>
             <span style={{ fontSize: ".72rem", color: "var(--warm)", fontFamily: "'DM Sans',sans-serif" }}>
               {product.rating.toFixed(1)} · {product.reviewCount} review{product.reviewCount !== 1 ? "s" : ""}
@@ -321,7 +321,7 @@ export default function ProductDetail({ cart, setCart, wish, setWish }) {
               <div style={{ marginBottom: "1.2rem" }}>
                 <div style={{ fontSize: ".62rem", letterSpacing: ".18em", textTransform: "uppercase", fontWeight: 700, color: "var(--dark)", marginBottom: ".6rem", fontFamily: "'DM Sans',sans-serif" }}>Your Rating</div>
                 <div style={{ display: "flex", gap: ".3rem" }}>
-                  {[1,2,3,4,5].map(i => (
+                  {[1, 2, 3, 4, 5].map(i => (
                     <button key={i} type="button"
                       onClick={() => setReviewRating(i)}
                       onMouseEnter={() => setReviewHover(i)}
@@ -379,7 +379,7 @@ export default function ProductDetail({ cart, setCart, wish, setWish }) {
               {reviews.map(r => (
                 <div key={r._id} style={{ padding: "1.2rem", border: "1px solid var(--border)", background: "var(--cream)", borderRadius: 4 }}>
                   <div style={{ display: "flex", gap: ".1rem", marginBottom: ".5rem" }}>
-                    {[1,2,3,4,5].map(i => <StarIcon key={i} filled={i <= r.rating} />)}
+                    {[1, 2, 3, 4, 5].map(i => <StarIcon key={i} filled={i <= r.rating} />)}
                   </div>
                   {r.comment && <p style={{ fontSize: ".8rem", color: "#555", lineHeight: 1.6, marginBottom: ".5rem" }}>{r.comment}</p>}
                   <div style={{ fontSize: ".65rem", color: "var(--warm)", fontFamily: "'DM Sans',sans-serif" }}>
