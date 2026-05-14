@@ -96,6 +96,10 @@ export default function ProductDetail({ cart, setCart, wish, setWish }) {
 
   useEffect(() => {
     if (!id) return;
+    // لو منتج hardcoded → مفيش reviews من الـ backend
+    const isLocal = PRODUCTS.some(p => String(p.id) === String(id));
+    if (isLocal) { setReviews([]); return; }
+
     fetch(`${API}/products/${id}/reviews`)
       .then(r => r.json())
       .then(data => setReviews(data.data?.reviews || []))
