@@ -36,6 +36,9 @@ export default function ProductDetail({ cart, setCart, wish, setWish }) {
   const getImageUrl = (img) => {
     if (!img) return null;
     if (img.startsWith("http")) return img;
+    // لو المنتج hardcoded → الصورة في الـ frontend /public
+    const isLocal = PRODUCTS.some(p => String(p.id) === String(id));
+    if (isLocal) return img; // ← ترجعها زي ما هي /g1.jpg
     return `https://stylehub-backend-tau.vercel.app${img}`;
   };
 
