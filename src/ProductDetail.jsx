@@ -55,7 +55,7 @@ export default function ProductDetail({ cart, setCart, wish, setWish }) {
         description: local.desc || "",
         sizes: local.sizes || [],
         colors: local.colors || [],
-        images: local.imgs || (local.img ? [local.img] : []),
+        images: [local.img, ...(local.imgs || [])].filter(Boolean),
         rating: local.rating || 0,
         reviewCount: local.reviews || 0,
         stock: 99,
