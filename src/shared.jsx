@@ -54,6 +54,11 @@ export const NAV_LINKS = [
   { label: "Brands", href: "#", dropdown: true },
 ];
 
+// ─── SHUFFLE UTILITY ───
+export function shuffle(arr) {
+  return [...arr].sort(() => Math.random() - 0.5);
+}
+
 export const FOOTER_COLS = [
   { title: "Shop", links: [["Women", "/women"], ["Men", "#"], ["Kids", "/kids"]] },
   { title: "Sell With Us", links: [["Sign Up", "/seller"], ["How It Works", "/seller"], ["Brand Stories", "#"]] },

@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { Routes, Route, useNavigate, useLocation } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
-import { PRODUCTS, BRANDS, CATS, NAV_LINKS, FOOTER_COLS, SHNav, SHFooter } from "./shared";
+import { PRODUCTS, BRANDS, CATS, NAV_LINKS, FOOTER_COLS, SHNav, SHFooter, shuffle } from "./shared";
 
 import Salty from "./salty";
 import BlackCloset from "./blackcloset";
@@ -469,34 +469,15 @@ export default function App() {
 
 
   const [toast, setToast] = useState("");
-  const [backendProducts, setBackendProducts] = useState([]);
 
-  // Fetch backend products for home page
-  useEffect(() => {
-    const API = "https://stylehub-backend-tau.vercel.app/api";
-    Promise.all([
-      fetch(`${API}/products?category=women&limit=20&t=${Date.now()}`).then(r => r.json()),
-      fetch(`${API}/products?category=men&limit=20&t=${Date.now()}`).then(r => r.json()),
-      fetch(`${API}/products?category=kids&limit=20&t=${Date.now()}`).then(r => r.json()),
-    ]).then(([w, m, k]) => {
-      const mapP = p => ({
-        id: p._id, _id: p._id, name: p.name,
-        brand: p.seller?.brandName || "StyleHub",
-        price: `LE ${p.price?.toLocaleString()}`,
-        oldPrice: p.salePrice ? `LE ${p.salePrice?.toLocaleString()}` : null,
-        img: p.images?.[0] ? (p.images[0].startsWith("http") ? p.images[0] : `https://stylehub-backend-tau.vercel.app${p.images[0]}`) : null,
-        sizes: p.sizes || [], colors: p.colors || [],
-        rating: p.avgRating || 0, reviews: p.reviewCount || 0,
-        tab: "best", category: typeof p.category === "object" ? p.category?.name || "" : p.category || "",
-      });
-      const all = [
-        ...(w.data?.products || []).map(mapP),
-        ...(m.data?.products || []).map(mapP),
-        ...(k.data?.products || []).map(mapP),
-      ];
-      setBackendProducts(all);
-    }).catch(() => { });
-  }, []);
+  // ─── HOMEPAGE PRODUCTS — hardcoded, shuffled once on mount ───────────────
+  const [homeProducts] = useState(() => ({
+    best: shuffle(PRODUCTS.filter(p => p.tab === "best")),
+    new: shuffle(PRODUCTS.filter(p => p.tab === "new")),
+    sale: shuffle(PRODUCTS.filter(p => p.tab === "sale")),
+    trend: shuffle(PRODUCTS.filter(p => p.tab === "trend")),
+    picks: shuffle(PRODUCTS.filter(p => p.tab === "picks")),
+  }));
   const addRef = useScrollReveal();
   const location = useLocation();
 
@@ -559,7 +540,7 @@ export default function App() {
               ))}
             </div>
             <div className="row row-cols-2 row-cols-md-3 g-3">
-              {(backendProducts.length > 0 ? backendProducts.slice(0, 6) : PRODUCTS.filter(p => p.tab === tab)).map((p, i) => (
+              {homeProducts[tab].slice(0, 6).map((p, i) => (
                 <div className="col" key={p.id}>
                   <PCard p={p} onOpen={setModal} addRef={addRef} d={(i % 3) + 1} wish={wish} toggleWish={toggleWish} />
                 </div>
@@ -604,14 +585,14 @@ export default function App() {
           {/* TRENDING */}
           <section className="px-4 py-4 " style={{ marginTop: "6rem" }}>
             <div className="sec-title reveal" ref={addRef}>Trending Now</div>
-            <TrendingCarousel products={backendProducts.length > 0 ? backendProducts.slice(6, 12) : PRODUCTS.filter(p => p.tab === "trend")} onOpen={setModal} wish={wish} toggleWish={toggleWish} onAdd={addToCart} />
+            <TrendingCarousel products={homeProducts.trend} onOpen={setModal} wish={wish} toggleWish={toggleWish} onAdd={addToCart} />
           </section>
 
           {/* TOP PICKS */}
           <section className="px-4 py-4 " style={{ marginTop: "6rem" }}  >
             <div className="sec-title reveal" ref={addRef}>Top Picks</div>
             <div className="row row-cols-2 row-cols-md-4 g-3">
-              {(backendProducts.length > 0 ? backendProducts.slice(12, 16) : PRODUCTS.filter(p => p.tab === "picks")).map((p, i) => (
+              {homeProducts.picks.map((p, i) => (
                 <div className="col" key={p.id}>
                   <TCard p={p} onOpen={setModal} addRef={addRef} d={(i % 4) + 1} wish={wish} toggleWish={toggleWish} onAdd={addToCart} />
                 </div>

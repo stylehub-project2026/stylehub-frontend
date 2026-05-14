@@ -1,9 +1,8 @@
 import React from "react";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { SHNav, SHFooter, SHARED_CSS, useScrollReveal } from "./shared";
+import { SHNav, SHFooter, SHARED_CSS, useScrollReveal, PRODUCTS, shuffle } from "./shared";
 
-const API = "https://stylehub-backend-tau.vercel.app/api";
 
 const Heart = ({ on }) => (
   <svg width="16" height="16" viewBox="0 0 24 24" fill={on ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -58,26 +57,26 @@ export default function Kids({ cart, setCart, wish, setWish }) {
 
   const addRef = useScrollReveal();
 
+  // ── Kids products — hardcoded from shared.jsx, shuffled ─────────────────
   useEffect(() => {
-    fetch(`https://stylehub-backend-tau.vercel.app/api/products?category=kids&limit=100&t=${Date.now()}`)
-      .then(r => r.json())
-      .then(data => {
-        const list = (data.data?.products || []).map(p => ({
-          id: p._id,
+    const list = shuffle(
+      PRODUCTS
+        .filter(p => p.category === "boys" || p.category === "girls" || p.category === "kids")
+        .map(p => ({
+          id: p.id,
           name: p.name,
-          price: `LE ${p.price?.toLocaleString()}`,
-          oldPrice: p.salePrice ? `LE ${p.salePrice?.toLocaleString()}` : null,
-          brand: p.seller?.brandName || "StyleHub",
-          img: p.images?.[0] ? (p.images[0].startsWith('http') ? p.images[0] : `https://stylehub-backend-tau.vercel.app${p.images[0]}`) : null,
+          price: p.price,
+          oldPrice: p.oldPrice || null,
+          brand: p.brand,
+          img: p.img || null,
           sizes: p.sizes || [],
           colors: p.colors || [],
-          type: (p.tags?.[0] || "").toLowerCase(),
-          category: typeof p.category === "object" ? p.category?.name || "" : p.category || "",
-          subcategory: p.subcategory || "",
-        }));
-        setAllProducts(list);
-      })
-      .catch(() => { });
+          type: (p.type || "").toLowerCase(),
+          category: p.category || "",
+          subcategory: p.category || "",
+        }))
+    );
+    setAllProducts(list);
   }, []);
 
   const ALL_SIZES = [...new Set(allProducts.flatMap(p => p.sizes))].sort();

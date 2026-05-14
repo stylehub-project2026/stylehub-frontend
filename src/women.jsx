@@ -1,9 +1,8 @@
 import React from "react";
 import { useState, useRef, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { SHNav, SHFooter, useScrollReveal, SHARED_CSS } from "./shared";
+import { SHNav, SHFooter, useScrollReveal, SHARED_CSS, PRODUCTS, shuffle } from "./shared";
 
-const API = "https://stylehub-backend-tau.vercel.app/api";
 
 /* ══════════════════════════════════════════ DATA ══════════════════════════════════════════ */
 const HERO_SLIDES = [
@@ -424,30 +423,29 @@ export default function WomenPage() {
   const [filterPage, setFilterPage] = useState(1);
   const FILTER_PER_PAGE = 9;
 
-  // ── Fetch women products from backend
+  // ── Women products — hardcoded from shared.jsx, shuffled ────────────────
   useEffect(() => {
-    fetch(`https://stylehub-backend-tau.vercel.app/api/products?category=women&limit=100&t=${Date.now()}`)
-      .then(r => r.json())
-      .then(data => {
-        const list = (data.data?.products || []).map(p => ({
-          id: p._id,
+    const list = shuffle(
+      PRODUCTS
+        .filter(p => p.gender === "women" || p.gender === "unisex")
+        .map(p => ({
+          id: p.id,
           name: p.name,
-          price: p.price,
-          old: p.salePrice || null,
-          brand: p.seller?.brandName || "StyleHub",
-          img: p.images?.[0] ? (p.images[0].startsWith('http') ? p.images[0] : `https://stylehub-backend-tau.vercel.app${p.images[0]}`) : null,
+          price: parseInt(p.price.replace(/[^0-9]/g, ""), 10),
+          old: p.oldPrice ? parseInt(p.oldPrice.replace(/[^0-9]/g, ""), 10) : null,
+          brand: p.brand,
+          img: p.img || null,
           sizes: p.sizes || [],
           colors: p.colors || [],
-          rating: p.avgRating || 0,
-          reviews: p.reviewCount || 0,
-          tag: p.salePrice ? "Sale" : null,
-          type: (p.tags?.[0] || "").toLowerCase(),
-          brandLogo: p.seller?.logo ? (p.seller.logo.startsWith('http') ? p.seller.logo : `https://stylehub-backend-tau.vercel.app${p.seller.logo}`) : null,
-          category: typeof p.category === "object" ? p.category?.name || "" : p.category || "",
-        }));
-        setProducts(list);
-      })
-      .catch(() => { });
+          rating: p.rating || 0,
+          reviews: p.reviews || 0,
+          tag: p.oldPrice ? "Sale" : null,
+          type: (p.type || "").toLowerCase(),
+          brandLogo: null,
+          category: "women",
+        }))
+    );
+    setProducts(list);
   }, []);
 
   const NEW_ARRIVALS = products.slice(0, 6);

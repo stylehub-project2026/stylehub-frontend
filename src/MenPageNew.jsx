@@ -1,7 +1,7 @@
 import React from "react";
 import { useState, useRef, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { SHNav, SHFooter, SHARED_CSS } from "./shared";
+import { SHNav, SHFooter, SHARED_CSS, PRODUCTS, shuffle } from "./shared";
 
 /* ══════════════════════════════════════════ DATA ══════════════════════════════════════════ */
 const HERO_SLIDES = [
@@ -395,31 +395,29 @@ export default function MenPage({ cart = [], setCart, wish = [], setWish }) {
     const [menProducts, setMenProducts] = useState([]);
     const [loading, setLoading] = useState(true);
 
-    // ── Fetch men products from backend
+    // ── Men products — hardcoded from shared.jsx, shuffled ──────────────────
     useEffect(() => {
-        setLoading(true);
-        fetch(`https://stylehub-backend-tau.vercel.app/api/products?category=men&limit=100&t=${Date.now()}`)
-            .then(r => r.json())
-            .then(data => {
-                const list = (data.data?.products || []).map(p => ({
-                    id: p._id,
+        const list = shuffle(
+            PRODUCTS
+                .filter(p => p.gender === "men" || p.gender === "unisex")
+                .map(p => ({
+                    id: p.id,
                     name: p.name,
-                    price: p.price,
-                    old: p.salePrice || null,
-                    brand: p.seller?.brandName || "StyleHub",
-                    img: p.images?.[0] ? (p.images[0].startsWith('http') ? p.images[0] : `https://stylehub-backend-tau.vercel.app${p.images[0]}`) : null,
+                    price: parseInt(p.price.replace(/[^0-9]/g, ""), 10),
+                    old: p.oldPrice ? parseInt(p.oldPrice.replace(/[^0-9]/g, ""), 10) : null,
+                    brand: p.brand,
+                    img: p.img || null,
                     sizes: p.sizes || [],
                     colors: p.colors || [],
-                    rating: p.avgRating || 0,
-                    reviews: p.reviewCount || 0,
-                    tag: p.salePrice ? "Sale" : null,
-                    type: (p.tags?.[0] || "").toLowerCase(),
-                    brandLogo: p.seller?.logo ? (p.seller.logo.startsWith('http') ? p.seller.logo : `https://stylehub-backend-tau.vercel.app${p.seller.logo}`) : null,
-                }));
-                setMenProducts(list);
-            })
-            .catch(() => { })
-            .finally(() => setLoading(false));
+                    rating: p.rating || 0,
+                    reviews: p.reviews || 0,
+                    tag: p.oldPrice ? "Sale" : null,
+                    type: (p.type || "").toLowerCase(),
+                    brandLogo: null,
+                }))
+        );
+        setMenProducts(list);
+        setLoading(false);
     }, []);
 
     const showToast = (msg) => {
