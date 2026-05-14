@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { SHNav, SHFooter, SHARED_CSS } from "./shared";
+import { SHNav, SHFooter, SHARED_CSS, PRODUCTS } from "./shared";
 
 const API = "https://stylehub-backend-tau.vercel.app/api";
 
@@ -41,6 +41,32 @@ export default function ProductDetail({ cart, setCart, wish, setWish }) {
 
   useEffect(() => {
     setLoading(true);
+
+    // ── أولاً: شوف لو المنتج موجود في الـ hardcoded PRODUCTS ────────────────
+    const local = PRODUCTS.find(p => String(p.id) === String(id));
+    if (local) {
+      setProduct({
+        id: local.id,
+        _id: local.id,
+        name: local.name,
+        brand: local.brand,
+        price: parseInt(String(local.price).replace(/[^0-9]/g, ""), 10),
+        salePrice: local.oldPrice ? parseInt(String(local.oldPrice).replace(/[^0-9]/g, ""), 10) : null,
+        description: local.desc || "",
+        sizes: local.sizes || [],
+        colors: local.colors || [],
+        images: local.imgs || (local.img ? [local.img] : []),
+        rating: local.rating || 0,
+        reviewCount: local.reviews || 0,
+        stock: 99,
+        category: local.category || "",
+        tags: [],
+      });
+      setLoading(false);
+      return; // مش محتاجين نكلم الـ backend
+    }
+
+    // ── ثانياً: لو مش موجود locally → اجيبه من الـ backend (منتجات السيلرز) ─
     fetch(`${API}/products/${id}`)
       .then(r => r.json())
       .then(data => {
