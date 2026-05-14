@@ -1,7 +1,7 @@
 import React from "react";
 import { useState, useRef, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { SHNav, SHFooter, SHARED_CSS, PRODUCTS, shuffle } from "./shared";
+import { SHNav, SHFooter, SHARED_CSS } from "./shared";
 
 /* ══════════════════════════════════════════ DATA ══════════════════════════════════════════ */
 const HERO_SLIDES = [
@@ -290,6 +290,7 @@ function PickCard({ p, onQuickView, onWish, wishlisted, addRef, d = 1 }) {
             </div>
             <div className="pick-info">
                 <div className="pick-text">
+                    {p.brand && <div className="prod-brand-lbl">{p.brand}</div>}
                     <div className="prod-name">{p.name}</div>
                     <div className="prod-price">LE {p.price.toLocaleString()}</div>
                 </div>
@@ -395,29 +396,31 @@ export default function MenPage({ cart = [], setCart, wish = [], setWish }) {
     const [menProducts, setMenProducts] = useState([]);
     const [loading, setLoading] = useState(true);
 
-    // ── Men products — hardcoded from shared.jsx, shuffled ──────────────────
+    // ── Fetch men products from backend
     useEffect(() => {
-        const list = shuffle(
-            PRODUCTS
-                .filter(p => p.gender === "men" || p.gender === "unisex")
-                .map(p => ({
-                    id: p.id,
+        setLoading(true);
+        fetch(`https://stylehub-backend-tau.vercel.app/api/products?category=men&limit=100&t=${Date.now()}`)
+            .then(r => r.json())
+            .then(data => {
+                const list = (data.data?.products || []).map(p => ({
+                    id: p._id,
                     name: p.name,
-                    price: parseInt(p.price.replace(/[^0-9]/g, ""), 10),
-                    old: p.oldPrice ? parseInt(p.oldPrice.replace(/[^0-9]/g, ""), 10) : null,
-                    brand: p.brand,
-                    img: p.img || null,
+                    price: p.price,
+                    old: p.salePrice || null,
+                    brand: p.seller?.brandName || "StyleHub",
+                    img: p.images?.[0] ? (p.images[0].startsWith('http') ? p.images[0] : `https://stylehub-backend-tau.vercel.app${p.images[0]}`) : null,
                     sizes: p.sizes || [],
                     colors: p.colors || [],
-                    rating: p.rating || 0,
-                    reviews: p.reviews || 0,
-                    tag: p.oldPrice ? "Sale" : null,
-                    type: (p.type || "").toLowerCase(),
-                    brandLogo: null,
-                }))
-        );
-        setMenProducts(list);
-        setLoading(false);
+                    rating: p.avgRating || 0,
+                    reviews: p.reviewCount || 0,
+                    tag: p.salePrice ? "Sale" : null,
+                    type: (p.tags?.[0] || "").toLowerCase(),
+                    brandLogo: p.seller?.logo ? (p.seller.logo.startsWith('http') ? p.seller.logo : `https://stylehub-backend-tau.vercel.app${p.seller.logo}`) : null,
+                }));
+                setMenProducts(list);
+            })
+            .catch(() => { })
+            .finally(() => setLoading(false));
     }, []);
 
     const showToast = (msg) => {
