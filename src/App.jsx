@@ -24,9 +24,7 @@ import BuildOutfit from "./BuildOutfit";
 import AboutUs from "./AboutUs";
 import ContactPage from "./ContactPage";
 
-
 import { saveCart, saveWishlist, sellerSignOut } from "./api";
-
 
 // Check if seller is logged in using the new token/seller keys
 function isSellerLoggedIn() {
@@ -36,7 +34,6 @@ function isSellerLoggedIn() {
 function useScrollReveal() {
   const refs = useRef([]);
   useEffect(() => {
-    // small delay so DOM is fully painted before observing
     const timer = setTimeout(() => {
       refs.current.forEach(r => r && r.classList.remove("revealed"));
       const obs = new IntersectionObserver(
@@ -69,11 +66,7 @@ const Heart = ({ on }) => (
 );
 const Stars = ({ n }) => <>{[1, 2, 3, 4, 5].map(i => <span key={i} style={{ color: "#c8a96e", fontSize: ".65rem" }}>{i <= Math.round(n) ? "★" : "☆"}</span>)}</>;
 
-// ─── DATA ───
-// 📸 IMAGES: put files in src/assets/ then replace null with "/filename.jpg"
-// 🔗 LINKS: replace "#" with "/pagename" when page is ready
-
-// ─── CUSTOM CSS — only effects, colors, fonts ───
+// ─── CUSTOM CSS ───
 const CSS = `
 @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap');
 :root { --cream:#F8F6F2; --dark:#1a1a18; --sage:#92A079; --deep:#728060; --warm:#8c8880; --border:#e4e0da; --gold:#c8a96e; --red:#e63946; }
@@ -99,7 +92,6 @@ body { font-family:'DM Sans',sans-serif; background:var(--cream); color:var(--da
 .dropdown { position:absolute; top:100%; left:0; background:#fff; border:1px solid var(--border); min-width:160px; opacity:0; pointer-events:none; transform:translateY(8px); transition:all .25s; z-index:100; box-shadow:0 8px 24px rgba(0,0,0,.08); }
 .dropdown a { display:block; padding:.6rem 1.2rem; font-size:.72rem; color:var(--dark); text-decoration:none; letter-spacing:.04em; transition:background .2s; }
 .dropdown a:hover { background:var(--cream); color:var(--sage); }
-
 
 /* HERO */
 .sh-hero { position:relative; height:490px; overflow:hidden; }
@@ -134,15 +126,8 @@ body { font-family:'DM Sans',sans-serif; background:var(--cream); color:var(--da
 .brands-wrap { overflow:hidden; width:80%; }
 .brands-track { display:flex; transition:transform .6s cubic-bezier(.22,1,.36,1); }
 .brand-slide { min-width:25%; display:flex; align-items:center; justify-content:center; padding:.8rem 1rem; height:80px; width:25%;}
-
 .brand-txt { font-family:'Cormorant Garamond',serif; font-size:1.4rem; font-weight:700; opacity:.5; cursor:pointer; transition:opacity .3s,transform .25s; white-space:nowrap; }
 .brand-txt:hover { opacity:1; transform:scale(1.08); }
-
-
-
-
-
-
 
 /* TABS */
 .sh-tabs { display:flex; gap:2rem; border-bottom:1px solid var(--border); justify-content:center; margin-bottom:1.8rem; }
@@ -291,6 +276,7 @@ function PCard({ p, onOpen, addRef, d = 1, wish, toggleWish }) {
     </div>
   );
 }
+
 // ─── TRENDING CARD ───
 function TCard({ p, onOpen, addRef, d = 1, wish, toggleWish, onAdd }) {
   const [qty, setQty] = useState(0);
@@ -327,7 +313,6 @@ function TrendingCarousel({ products, onOpen, wish, toggleWish, onAdd }) {
     const t = setInterval(() => setCur(c => c >= max ? 0 : c + 1), 3000);
     return () => clearInterval(t);
   }, [max]);
-
 
   if (!products.length) return null;
   return (
@@ -396,7 +381,8 @@ function BrandsCarousel() {
             {BRANDS.map((b, i) => (
               <div key={i} className="brand-slide">
                 <a href={b.href} style={{ textDecoration: "none", color: "inherit" }}>
-                  {b.logo ? <img src={b.logo} alt={b.name} style={{ height: "50px", width: "130px", objectFit: "contain" }} /> : <span className="brand-txt">{b.name}</span>}                </a>
+                  {b.logo ? <img src={b.logo} alt={b.name} style={{ height: "50px", width: "130px", objectFit: "contain" }} /> : <span className="brand-txt">{b.name}</span>}
+                </a>
               </div>
             ))}
           </div>
@@ -442,35 +428,38 @@ function HeroCarousel() {
 export default function App() {
   const [tab, setTab] = useState("best");
   const [modal, setModal] = useState(null);
-  // ─── CART — persisted via api.js (swap to backend by setting USE_BACKEND=true) ───
+
+  // ─── CART ───
   const [cart, setCart] = useState(() => {
     try { return JSON.parse(localStorage.getItem("stylehub-cart") || "[]"); }
     catch { return []; }
   });
   useEffect(() => { saveCart(cart); }, [cart]);
 
-  // ─── WISHLIST — persisted via api.js ───────────────────────────────────────
+  // ─── WISHLIST ───
   const [wish, setWish] = useState(() => {
     try { return JSON.parse(localStorage.getItem("stylehub-wish") || "[]"); }
     catch { return []; }
   });
   useEffect(() => { saveWishlist(wish); }, [wish]);
 
-  // ─── SELLER AUTH — via api.js ──────────────────────────────────────────────
+  // ─── SELLER AUTH ───
   const [sellerLoggedIn, setSellerLoggedIn] = useState(() => isSellerLoggedIn());
-
   const handleSellerLogin = () => setSellerLoggedIn(true);
   const handleSellerLogout = () => { sellerSignOut(); setSellerLoggedIn(false); };
 
-
-
-
-
-
+  // ─── BACKEND PRODUCTS — fetched once, passed to all brand pages ───
+  const [backendProducts, setBackendProducts] = useState([]);
+  useEffect(() => {
+    fetch("https://stylehub-backend-tau.vercel.app/api/products?limit=200")
+      .then(r => r.json())
+      .then(data => setBackendProducts(data.data?.products || []))
+      .catch(() => setBackendProducts([]));
+  }, []);
 
   const [toast, setToast] = useState("");
 
-  // ─── HOMEPAGE PRODUCTS — hardcoded, shuffled once on mount ───────────────
+  // ─── HOMEPAGE PRODUCTS — hardcoded, shuffled once on mount ───
   const [homeProducts] = useState(() => ({
     best: shuffle(PRODUCTS.filter(p => p.tab === "best")),
     new: shuffle(PRODUCTS.filter(p => p.tab === "new")),
@@ -501,10 +490,10 @@ export default function App() {
       <Route path="/women" element={<Women cart={cart} setCart={setCart} wish={wish} setWish={setWish} />} />
       <Route path="/signin" element={<SignIn cart={cart} wish={wish} />} />
       <Route path="/reset-password" element={<ResetPasswordPage />} />
-      <Route path="/brand/blackcloset" element={<BlackCloset cart={cart} setCart={setCart} wish={wish} setWish={setWish} />} />
-      <Route path="/brand/salty" element={<Salty cart={cart} setCart={setCart} wish={wish} setWish={setWish} />} />
-      <Route path="/brand/ninos" element={<Ninos cart={cart} setCart={setCart} wish={wish} setWish={setWish} />} />
-      <Route path="/brand/27" element={<TwentySeven cart={cart} setCart={setCart} wish={wish} setWish={setWish} />} />
+      <Route path="/brand/blackcloset" element={<BlackCloset cart={cart} setCart={setCart} wish={wish} setWish={setWish} products={backendProducts} />} />
+      <Route path="/brand/salty" element={<Salty cart={cart} setCart={setCart} wish={wish} setWish={setWish} products={backendProducts} />} />
+      <Route path="/brand/ninos" element={<Ninos cart={cart} setCart={setCart} wish={wish} setWish={setWish} products={backendProducts} />} />
+      <Route path="/brand/27" element={<TwentySeven cart={cart} setCart={setCart} wish={wish} setWish={setWish} products={backendProducts} />} />
       <Route path="/brand/:brandSlug" element={<SellerBrandPage cart={cart} wish={wish} setWish={setWish} />} />
       <Route path="/wishlist" element={<Wishlist cart={cart} setCart={setCart} wish={wish} setWish={setWish} />} />
       <Route path="/profile" element={<ProfilePage cart={cart} wish={wish} />} />
@@ -520,8 +509,6 @@ export default function App() {
       <Route path="/" element={
         <div key={location.key}>
           <style>{CSS}</style>
-
-
 
           {/* NAV */}
           <SHNav cart={cart} wish={wish} />
@@ -549,7 +536,7 @@ export default function App() {
           </section>
 
           {/* JOIN */}
-          <div className="sh-join text-center reveal py-5 mx-4 " ref={addRef} style={{ marginTop: "7rem" }} >
+          <div className="sh-join text-center reveal py-5 mx-4" ref={addRef} style={{ marginTop: "7rem" }}>
             <h3 className="mb-2">Join Style Hub</h3>
             <a href="/seller">Sell with us ›</a>
           </div>
@@ -567,7 +554,7 @@ export default function App() {
           </div>
 
           {/* CATEGORIES */}
-          <section className="px-4 py-4 " style={{ marginTop: "8rem" }}>
+          <section className="px-4 py-4" style={{ marginTop: "8rem" }}>
             <div className="sec-title reveal" ref={addRef}>Shop By Categories</div>
             <div className="row g-3">
               {CATS.map((c, i) => (
@@ -583,13 +570,13 @@ export default function App() {
           </section>
 
           {/* TRENDING */}
-          <section className="px-4 py-4 " style={{ marginTop: "6rem" }}>
+          <section className="px-4 py-4" style={{ marginTop: "6rem" }}>
             <div className="sec-title reveal" ref={addRef}>Trending Now</div>
             <TrendingCarousel products={homeProducts.trend} onOpen={setModal} wish={wish} toggleWish={toggleWish} onAdd={addToCart} />
           </section>
 
           {/* TOP PICKS */}
-          <section className="px-4 py-4 " style={{ marginTop: "6rem" }}  >
+          <section className="px-4 py-4" style={{ marginTop: "6rem" }}>
             <div className="sec-title reveal" ref={addRef}>Top Picks</div>
             <div className="row row-cols-2 row-cols-md-4 g-3">
               {homeProducts.picks.map((p, i) => (
@@ -601,7 +588,7 @@ export default function App() {
           </section>
 
           {/* EDITORIAL */}
-          <div className="row g-3 px-4  pt-3  reveal" ref={addRef} style={{ marginTop: "8rem", marginBottom: "12rem" }}  >
+          <div className="row g-3 px-4 pt-3 reveal" ref={addRef} style={{ marginTop: "8rem", marginBottom: "12rem" }}>
             {[
               { tag: "Editorial", title: "Discover Latest in Fashion", gradient: "145deg,#8a9a7a,#4a5c40", img: "/edit.png", href: "#" },
               { tag: "Explore", title: "Explore Fashion New Era", gradient: "145deg,#c4a882,#8a7060", img: "/ban.jpg", href: "#" },
