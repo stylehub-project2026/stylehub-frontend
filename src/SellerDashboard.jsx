@@ -9,7 +9,7 @@ const BACKEND_BASE = "https://stylehub-backend-tau.vercel.app/api";
 
 async function sellerRequest(method, path, body = null) {
   const headers = { "Content-Type": "application/json" };
-  const token = localStorage.getItem("sellerToken");
+  const token = localStorage.getItem("token");
   if (token) headers["Authorization"] = `Bearer ${token}`;
   const res = await fetch(`${BACKEND_BASE}${path}`, {
     method,
@@ -754,6 +754,7 @@ function ProductsView() {
   const [loading, setLoading] = useState(true);
   const [editProduct, setEditProduct] = useState(null);   // product being edited
   const [showAdd, setShowAdd] = useState(false);          // show add modal
+  const [saving, setSaving] = useState(false);
   const [msg, setMsg] = useState(null);
 
   // Empty form state
@@ -814,7 +815,7 @@ function ProductsView() {
     setSaving(true);
     setMsg(null);
     try {
-      const token = localStorage.getItem("sellerToken");
+      const token = localStorage.getItem("token");
       const formData = new FormData();
       formData.append("name", form.name);
       formData.append("price", form.price);
@@ -856,7 +857,7 @@ function ProductsView() {
   const handleDelete = async (productId) => {
 
     try {
-      const token = localStorage.getItem("sellerToken") || localStorage.getItem("token");
+      const token = localStorage.getItem("token") || localStorage.getItem("token");
       const res = await fetch(`https://stylehub-backend-tau.vercel.app/api/products/${productId}`, {
         method: "DELETE",
         headers: { "Authorization": `Bearer ${token}`, "Content-Type": "application/json" },
@@ -1522,7 +1523,7 @@ export default function SellerDashboard({ onLogout }) {
           <header className="dash-header">
             <div className="dash-welcome">
               <h1>
-                {activeNav === "dashboard" && "Welcome back, Seller!"}
+                {activeNav === "dashboard" && `Welcome back, ${brandName}!`}
                 {activeNav === "orders" && "Manage Orders"}
                 {activeNav === "products" && "Your Products"}
                 {activeNav === "reviews" && "Customer Reviews"}
