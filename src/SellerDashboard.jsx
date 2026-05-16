@@ -1468,6 +1468,8 @@ function SettingsView() {
 
 export default function SellerDashboard({ onLogout }) {
   const [activeNav, setActiveNav] = useState("dashboard");
+  const seller = (() => { try { return JSON.parse(localStorage.getItem("seller") || "{}"); } catch { return {}; } })();
+  const brandName = seller.brandName || seller.storeName || seller.name || "Seller";
 
   const today = new Date().toLocaleDateString("en-US", {
     weekday: "long",
