@@ -79,9 +79,8 @@ const PAGE_CSS = `
 .b27-cta-btn:hover { background:var(--dark); }
 `;
 
-export default function TwentySevenBrand({ cart, wish = [], setWish }) {
+export default function TwentySevenBrand({ cart, wish = [], setWish, products = [] }) {
   const [allProducts, setAllProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [selSizes, setSelSizes] = useState(null);
   const [selColors, setSelColors] = useState(null);
   const [sortBy, setSortBy] = useState("default");
@@ -99,25 +98,20 @@ export default function TwentySevenBrand({ cart, wish = [], setWish }) {
   const scrollGrid = () => document.getElementById("b27-grid")?.scrollIntoView({ behavior: "smooth" });
 
   useEffect(() => {
-    setLoading(true);
-    fetch(`${API}/products?brand=27&limit=100`)
-      .then(r => r.json())
-      .then(data => {
-        const prods = (data.data?.products || []).map(p => ({
-          id: p._id, _id: p._id, name: p.name, brand: "27",
-          price: `LE ${p.price?.toLocaleString()}`,
-          oldPrice: p.salePrice ? `LE ${p.salePrice?.toLocaleString()}` : null,
-          img: (p.images && p.images[0]) ? p.images[0] : null,
-          imgs: p.images?.slice(1) || [],
-          colors: p.colors || [], sizes: p.sizes || [],
-          rating: p.avgRating || 0, reviews: p.reviewCount || 0,
-          desc: p.description || "", type: p.tags?.[0] || "tops", mongoId: p._id,
-        }));
-        setAllProducts(prods);
-      })
-      .catch(() => setAllProducts([]))
-      .finally(() => setLoading(false));
-  }, []);
+    const prods = products
+      .filter(p => ["27", "Twenty Seven", "TwentySeven"].includes(p.brand))
+      .map(p => ({
+        id: p._id, _id: p._id, name: p.name, brand: "27",
+        price: `LE ${p.price?.toLocaleString()}`,
+        oldPrice: p.salePrice ? `LE ${p.salePrice?.toLocaleString()}` : null,
+        img: (p.images && p.images[0]) ? p.images[0] : null,
+        imgs: p.images?.slice(1) || [],
+        colors: p.colors || [], sizes: p.sizes || [],
+        rating: p.avgRating || 0, reviews: p.reviewCount || 0,
+        desc: p.description || "", type: p.tags?.[0] || "tops", mongoId: p._id,
+      }));
+    setAllProducts(prods);
+  }, [products]);
 
   const ALL_SIZES = [...new Set(allProducts.flatMap(p => p.sizes))];
   const ALL_COLORS = [...new Set(allProducts.flatMap(p => p.colors))];
@@ -132,12 +126,6 @@ export default function TwentySevenBrand({ cart, wish = [], setWish }) {
 
   const totalPages = Math.ceil(filtered.length / PER_PAGE);
   const paginated = filtered.slice((page - 1) * PER_PAGE, page * PER_PAGE);
-
-  if (loading) return (
-    <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "var(--cream)" }}>
-      <div style={{ fontFamily: "'DM Sans',sans-serif", color: "var(--warm)", fontSize: ".9rem" }}>Loading products...</div>
-    </div>
-  );
 
   return (
     <div style={{ minHeight: "100vh", background: "var(--cream)" }}>

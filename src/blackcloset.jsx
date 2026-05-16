@@ -125,12 +125,6 @@ export default function BlackClosetBrand({ cart, wish = [], setWish, products = 
   const totalPages = Math.ceil(filtered.length / PER_PAGE);
   const paginated = filtered.slice((page - 1) * PER_PAGE, page * PER_PAGE);
 
-  if (loading) return (
-    <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "var(--cream)" }}>
-      <div style={{ fontFamily: "'DM Sans',sans-serif", color: "var(--warm)", fontSize: ".9rem" }}>Loading products...</div>
-    </div>
-  );
-
   return (
     <div style={{ minHeight: "100vh", background: "var(--cream)" }}>
       <style>{SHARED_CSS + PAGE_CSS}</style>

@@ -5,10 +5,10 @@ import { SHNav, SHFooter, SHARED_CSS, useScrollReveal } from "./shared";
 
 // ─── BRAND CONFIG ───
 const BRAND = {
-  name: "Marble",
-  desc: "Marble is an Egyptian premium streetwear brand driven by self-expression and craft. Each piece is built from 98% Egyptian cotton with bold printed graphics and structured silhouettes — for those who treat getting dressed as a statement, not an afterthought.",
-  logo: "/marble.jpg",
-  heroBg: "/mar.jpg",
+  name: "Black Closet",
+  desc: "Black Closet is a clothing brand that blends classic, Old Money aesthetics with modern streetwear. The brand focuses on creating stylish everyday pieces such as hoodies, baggy jeans, polos and sweaters — combining comfort with a refined yet edgy look for people who appreciate timeless style with a modern urban twist.",
+  logo: "/images/blackcloset%20logo.jpg",
+  heroBg: "/blackcloset-hero.jpg",
   accentColor: "#92A079",
   heroOverlay: "rgba(255,255,255,.55)",
 };
@@ -56,7 +56,7 @@ function PCard({ p, wish, toggleWish }) {
         </button>
       </div>
       <div style={{ padding: ".55rem .65rem" }}>
-        <div style={{ fontSize: ".52rem", letterSpacing: ".15em", textTransform: "uppercase", color: "var(--warm)", marginBottom: ".15rem" }}>Marble</div>
+        <div style={{ fontSize: ".52rem", letterSpacing: ".15em", textTransform: "uppercase", color: "var(--warm)", marginBottom: ".15rem" }}>Black Closet</div>
         <div style={{ fontSize: ".78rem", fontWeight: 500, marginBottom: ".25rem", lineHeight: 1.3 }}>{p.name}</div>
         <div style={{ display: "flex", gap: ".5rem", alignItems: "center" }}>
           {p.oldPrice && <span style={{ fontSize: ".68rem", color: "var(--warm)", textDecoration: "line-through" }}>{p.oldPrice}</span>}
@@ -68,9 +68,8 @@ function PCard({ p, wish, toggleWish }) {
 }
 
 // ─── MAIN PAGE ───
-export default function MarbleBrand({ cart, wish = [], setWish }) {
+export default function BlackClosetBrand({ cart, wish = [], setWish, products = [] }) {
   const [allProducts, setAllProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [selSizes, setSelSizes] = useState(null);
   const [selColors, setSelColors] = useState(null);
   const [sortBy, setSortBy] = useState("default");
@@ -85,36 +84,32 @@ export default function MarbleBrand({ cart, wish = [], setWish }) {
   const toggleColor = c => { setSelColors(p => p === c ? null : c); setPage(1); };
   const toggleType = t => { setSelType(p => p === t ? "all" : t); setPage(1); };
   const toNum = s => parseInt((s || "").toString().replace(/\D/g, "")) || 0;
-  const scrollGrid = () => document.getElementById("marble-grid")?.scrollIntoView({ behavior: "smooth" });
+  const scrollGrid = () => document.getElementById("blackcloset-grid")?.scrollIntoView({ behavior: "smooth" });
 
-  // Fetch products from backend
+  // Map dashboard products to the shape PCard expects
   useEffect(() => {
-    setLoading(true);
-    fetch(`${API}/products?brand=Marble&limit=100`)
-      .then(r => r.json())
-      .then(data => {
-        const prods = (data.data?.products || []).map(p => ({
-          id: p._id,
-          _id: p._id,
-          name: p.name,
-          brand: "Marble",
-          price: `LE ${p.price?.toLocaleString()}`,
-          oldPrice: p.salePrice ? `LE ${p.salePrice?.toLocaleString()}` : null,
-          img: (p.images && p.images[0]) ? p.images[0] : null,
-          imgs: p.images?.slice(1) || [],
-          colors: p.colors || [],
-          sizes: p.sizes || [],
-          rating: p.avgRating || 0,
-          reviews: p.reviewCount || 0,
-          desc: p.description || "",
-          type: p.tags?.[0] || "tops",
-          mongoId: p._id,
-        }));
-        setAllProducts(prods);
-      })
-      .catch(() => setAllProducts([]))
-      .finally(() => setLoading(false));
-  }, []);
+    const prods = products
+      .filter(p => p.brand === "Black Closet" || p.brand === "blackcloset")
+      .map(p => ({
+        id: p._id,
+        _id: p._id,
+        name: p.name,
+        brand: "Black Closet",
+        price: `LE ${p.price?.toLocaleString()}`,
+        oldPrice: p.salePrice ? `LE ${p.salePrice?.toLocaleString()}` : null,
+        img: (p.images && p.images[0]) ? p.images[0] : null,
+        imgs: p.images?.slice(1) || [],
+        colors: p.colors || [],
+        sizes: p.sizes || [],
+        rating: p.avgRating || 0,
+        reviews: p.reviewCount || 0,
+        desc: p.description || "",
+        type: p.tags?.[0] || "tops",
+        mongoId: p._id,
+      }));
+    setAllProducts(prods);
+  }, [products]);
+
 
   const ALL_SIZES = [...new Set(allProducts.flatMap(p => p.sizes))];
   const ALL_COLORS = [...new Set(allProducts.flatMap(p => p.colors))];
@@ -129,12 +124,6 @@ export default function MarbleBrand({ cart, wish = [], setWish }) {
 
   const totalPages = Math.ceil(filtered.length / PER_PAGE);
   const paginated = filtered.slice((page - 1) * PER_PAGE, page * PER_PAGE);
-
-  if (loading) return (
-    <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "var(--cream)" }}>
-      <div style={{ fontFamily: "'DM Sans',sans-serif", color: "var(--warm)", fontSize: ".9rem" }}>Loading products...</div>
-    </div>
-  );
 
   return (
     <div style={{ minHeight: "100vh", background: "var(--cream)" }}>
@@ -160,67 +149,33 @@ export default function MarbleBrand({ cart, wish = [], setWish }) {
         <div style={{ position: "relative", zIndex: 2, display: "flex", alignItems: "center", gap: "4rem", padding: "0 6%", width: "100%" }}>
 
           {/* LOGO */}
-          <div style={{ flexShrink: 0, width: SZ.heroLogoSize, height: SZ.heroLogoSize, borderRadius: "50%", overflow: "hidden", background: "#f8f6f2", border: "1.5px solid rgba(26,26,24,.12)", boxShadow: "0 8px 32px rgba(26,26,24,.1)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+          <div style={{ width: SZ.heroLogoSize, height: SZ.heroLogoSize, borderRadius: "50%", overflow: "hidden", flexShrink: 0, border: "3px solid rgba(26,26,24,.15)", boxShadow: "0 8px 32px rgba(26,26,24,.12)", background: "#fff", display: "flex", alignItems: "center", justifyContent: "center" }}>
             <img src={BRAND.logo} alt={BRAND.name}
-              style={{ width: "100%", height: "100%", objectFit: "contain" }}
-              onError={e => { e.target.style.display = "none"; e.target.nextSibling.style.display = "flex"; }} />
-            <div style={{ display: "none", width: "100%", height: "100%", alignItems: "center", justifyContent: "center", fontFamily: "'Cormorant Garamond',serif", fontSize: "4rem", fontWeight: 600, color: BRAND.accentColor }}>
-              {BRAND.name[0]}
-            </div>
+              style={{ width: "85%", height: "85%", objectFit: "contain" }}
+              onError={e => e.target.style.display = "none"} />
           </div>
 
           {/* TEXT */}
-          <div style={{ maxWidth: 500 }}>
-            <div style={{ fontSize: ".58rem", letterSpacing: ".3em", textTransform: "uppercase", color: "var(--warm)", marginBottom: ".6rem" }}>StyleHub · Brand</div>
-            <h1 style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: "clamp(2.6rem,4vw,3.6rem)", fontWeight: 400, lineHeight: 1.1, marginBottom: "1rem", color: "var(--dark)" }}>
-              {BRAND.name}
-            </h1>
-            <p style={{ fontSize: ".90rem", lineHeight: 1.85, color: "#555252", marginBottom: "1.8rem", maxWidth: 440 }}>
-              {BRAND.desc}
-            </p>
-            <button onClick={scrollGrid} className="marble-cta-btn">Shop Now</button>
+          <div>
+            <div style={{ fontSize: ".6rem", letterSpacing: ".35em", textTransform: "uppercase", color: "var(--warm)", marginBottom: ".6rem" }}>StyleHub</div>
+            <h1 style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: "clamp(2.5rem,5vw,4rem)", fontWeight: 400, lineHeight: 1, marginBottom: ".8rem", color: "var(--dark)" }}>{BRAND.name}</h1>
+            <p style={{ fontSize: ".8rem", lineHeight: 1.7, color: "#555", maxWidth: 480 }}>{BRAND.desc}</p>
           </div>
         </div>
       </section>
 
       {/* ════════════════════════════════
-          2. SHOP BY MARBLE  (grey bg)
-      ════════════════════════════════ */}
-      <section style={{ background: "#D8D4CE", padding: "4rem 6%", borderTop: "1px solid rgba(26,26,24,.08)", borderBottom: "1px solid rgba(26,26,24,.08)" }}>
-        <h2 style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: "clamp(1.6rem,2.5vw,2.2rem)", fontWeight: 400, textAlign: "center", marginBottom: "2.5rem", letterSpacing: ".04em" }}>
-          Shop by {BRAND.name}
-        </h2>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: "1rem" }}>
-          {allProducts.slice(0, 4).map((p, i) => (
-            <div key={p.id} className={`reveal d${i + 1}`} ref={addRef}
-              style={{ cursor: "pointer", textAlign: "center" }}
-              onClick={() => navigate(`/product/${p.id}`)}>
-              <div style={{ height: SZ.shopCardH, borderRadius: 5, overflow: "hidden", background: "#fff", marginBottom: ".90rem", border: "1px solid var(--border)" }}>
-                <img src={p.img} alt={p.name}
-                  style={{ width: "100%", height: "100%", objectFit: "cover", transition: "transform .5s" }}
-                  onMouseEnter={e => e.target.style.transform = "scale(1.06)"}
-                  onMouseLeave={e => e.target.style.transform = "scale(1)"}
-                  onError={e => e.target.style.display = "none"} />
-              </div>
-              <div style={{ fontSize: ".80rem", fontWeight: 500, marginBottom: ".18rem" }}>{p.name}</div>
-              <div style={{ fontSize: ".72rem", color: "var(--warm)" }}>{p.price}</div>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* ════════════════════════════════
-          3. SEE WHAT'S POPULAR
+          2. SEE WHAT'S POPULAR — text + blob
       ════════════════════════════════ */}
       <section style={{ background: "#ffffff", padding: "5rem 6%", borderBottom: "2px solid rgba(26,26,24,.12)" }}>
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "5rem", alignItems: "center" }}>
 
           {/* LEFT TEXT */}
           <div className="reveal" ref={addRef}>
-            <div style={{ fontSize: ".58rem", letterSpacing: ".3em", textTransform: "uppercase", color: "var(--warm)", marginBottom: "1rem" }}>Marble Collection</div>
+            <div style={{ fontSize: ".58rem", letterSpacing: ".3em", textTransform: "uppercase", color: "var(--warm)", marginBottom: "1rem" }}>Black Closet Collection</div>
             <h2 style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: "clamp(1.9rem,3vw,2.8rem)", fontWeight: 400, lineHeight: 1.2, marginBottom: "1.2rem" }}>See What's Popular</h2>
             <p style={{ fontSize: ".86rem", lineHeight: 1.85, color: "#555252", marginBottom: "2rem", maxWidth: 400 }}>{BRAND.desc}</p>
-            <button onClick={scrollGrid} className="marble-cta-btn">Click Here</button>
+            <button onClick={scrollGrid} className="blackcloset-cta-btn">Click Here</button>
           </div>
 
           {/* RIGHT — decorative dark blob */}
@@ -232,7 +187,7 @@ export default function MarbleBrand({ cart, wish = [], setWish }) {
       </section>
 
       {/* ════════════════════════════════
-          4. ALL PRODUCTS — filters + grid
+          3. ALL PRODUCTS — filters + grid
       ════════════════════════════════ */}
       <div style={{ display: "flex", gap: "2.5rem", padding: "3rem 6%", alignItems: "flex-start", background: "var(--cream)" }}>
 
@@ -258,7 +213,7 @@ export default function MarbleBrand({ cart, wish = [], setWish }) {
               ["jackets", "Jackets"],
               ["t-shirt", "T-Shirt"],
               ["hoodies", "Hoodies"],
-              ["dresses", "Dresses"]
+              ["dresses", "Dresses"],
             ].map(([val, label]) => (
               <CheckRow key={val} label={label} active={selType === val} onClick={() => toggleType(val)} />
             ))}
@@ -295,7 +250,7 @@ export default function MarbleBrand({ cart, wish = [], setWish }) {
         </div>
 
         {/* GRID */}
-        <div id="marble-grid" style={{ flex: 1 }}>
+        <div id="blackcloset-grid" style={{ flex: 1 }}>
           <div style={{ fontSize: ".7rem", color: "var(--warm)", marginBottom: "1rem", letterSpacing: ".04em" }}>
             {filtered.length} product{filtered.length !== 1 ? "s" : ""}
             {totalPages > 1 ? ` — page ${page} of ${totalPages}` : ""}
@@ -358,7 +313,7 @@ const PAGE_CSS = `
   margin-bottom:.65rem;
   color:var(--dark);
 }
-.marble-cta-btn {
+.blackcloset-cta-btn {
   background:var(--dark);
   color:#fff;
   border:none;
@@ -372,5 +327,5 @@ const PAGE_CSS = `
   border-radius:3px;
   transition:background .2s;
 }
-.marble-cta-btn:hover { background:#92A079; }
+.blackcloset-cta-btn:hover { background:#92A079; }
 `;

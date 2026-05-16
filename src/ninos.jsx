@@ -68,9 +68,8 @@ function PCard({ p, wish, toggleWish }) {
 }
 
 // ─── MAIN PAGE ───
-export default function NinosBrand({ cart, wish = [], setWish }) {
+export default function NinosBrand({ cart, wish = [], setWish, products = [] }) {
   const [allProducts, setAllProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [selSizes, setSelSizes] = useState(null);
   const [selColors, setSelColors] = useState(null);
   const [sortBy, setSortBy] = useState("default");
@@ -88,35 +87,22 @@ export default function NinosBrand({ cart, wish = [], setWish }) {
   const toNum = s => parseInt((s || "").toString().replace(/\D/g, "")) || 0;
   const scrollGrid = () => document.getElementById("ninos-grid")?.scrollIntoView({ behavior: "smooth" });
 
-  // Fetch products from backend
   useEffect(() => {
-    setLoading(true);
-    fetch(`${API}/products?brand=Ninos&limit=100`)
-      .then(r => r.json())
-      .then(data => {
-        const prods = (data.data?.products || []).map(p => ({
-          id: p._id,
-          _id: p._id,
-          name: p.name,
-          brand: "Ninos",
-          price: `LE ${p.price?.toLocaleString()}`,
-          oldPrice: p.salePrice ? `LE ${p.salePrice?.toLocaleString()}` : null,
-          img: (p.images && p.images[0]) ? p.images[0] : null,
-          imgs: p.images?.slice(1) || [],
-          colors: p.colors || [],
-          sizes: p.sizes || [],
-          rating: p.avgRating || 0,
-          reviews: p.reviewCount || 0,
-          desc: p.description || "",
-          category: p.category || "kids",
-          type: p.tags?.[0] || "tops",
-          mongoId: p._id,
-        }));
-        setAllProducts(prods);
-      })
-      .catch(() => setAllProducts([]))
-      .finally(() => setLoading(false));
-  }, []);
+    const prods = products
+      .filter(p => ["Ninos", "ninos"].includes(p.brand))
+      .map(p => ({
+        id: p._id, _id: p._id, name: p.name, brand: "Ninos",
+        price: `LE ${p.price?.toLocaleString()}`,
+        oldPrice: p.salePrice ? `LE ${p.salePrice?.toLocaleString()}` : null,
+        img: (p.images && p.images[0]) ? p.images[0] : null,
+        imgs: p.images?.slice(1) || [],
+        colors: p.colors || [], sizes: p.sizes || [],
+        rating: p.avgRating || 0, reviews: p.reviewCount || 0,
+        desc: p.description || "", category: p.category || "kids",
+        type: p.tags?.[0] || "tops", mongoId: p._id,
+      }));
+    setAllProducts(prods);
+  }, [products]);
 
   const ALL_SIZES = [...new Set(allProducts.flatMap(p => p.sizes))];
   const ALL_COLORS = [...new Set(allProducts.flatMap(p => p.colors))];
@@ -132,12 +118,6 @@ export default function NinosBrand({ cart, wish = [], setWish }) {
 
   const totalPages = Math.ceil(filtered.length / PER_PAGE);
   const paginated = filtered.slice((page - 1) * PER_PAGE, page * PER_PAGE);
-
-  if (loading) return (
-    <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "var(--cream)" }}>
-      <div style={{ fontFamily: "'DM Sans',sans-serif", color: "var(--warm)", fontSize: ".9rem" }}>Loading products...</div>
-    </div>
-  );
 
   return (
     <div style={{ minHeight: "100vh", background: "var(--cream)" }}>
