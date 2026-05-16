@@ -147,6 +147,9 @@ body { font-family: var(--font); background: #f5f7f0; }
   position:absolute; right:14px; top:50%; transform:translateY(-50%);
   background:none; border:none; cursor:pointer; color:#888; font-size:.9rem; padding:4px;
 }
+input[type="password"]::-ms-reveal,
+input[type="password"]::-ms-clear { display:none; }
+input[type="password"]::-webkit-credentials-auto-fill-button { visibility:hidden; }
 .sh-mb { margin-bottom:1rem; }
 
 .sh-name-row { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
