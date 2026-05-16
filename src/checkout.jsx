@@ -387,46 +387,9 @@ function StepPayment({ form, setForm, errors, brandGroups, onNext, onBack }) {
               </div>
             ))}
 
-            {/* Card fields inline */}
             {current === "card" && (
-              <div style={{ marginTop: "1rem", padding: "1rem", background: "#fafaf8", border: "1px solid var(--border)" }}>
-                <div className="ck-row full">
-                  <div className="ck-field">
-                    <label className="ck-label">Card Number</label>
-                    <input className="ck-input" placeholder="•••• •••• •••• ••••" maxLength={19}
-                      value={form[`card_num_${brand}`] || ""}
-                      onChange={e => {
-                        const v = e.target.value.replace(/\D/g, "").slice(0, 16);
-                        const fmt = v.match(/.{1,4}/g)?.join(" ") || v;
-                        setForm(f => ({ ...f, [`card_num_${brand}`]: fmt }));
-                      }} />
-                  </div>
-                </div>
-                <div className="ck-row">
-                  <div className="ck-field">
-                    <label className="ck-label">Expiry (MM/YY)</label>
-                    <input className="ck-input" placeholder="MM/YY" maxLength={5}
-                      value={form[`card_exp_${brand}`] || ""}
-                      onChange={e => {
-                        let v = e.target.value.replace(/\D/g, "").slice(0, 4);
-                        if (v.length > 2) v = v.slice(0, 2) + "/" + v.slice(2);
-                        setForm(f => ({ ...f, [`card_exp_${brand}`]: v }));
-                      }} />
-                  </div>
-                  <div className="ck-field">
-                    <label className="ck-label">CVV</label>
-                    <input className="ck-input" placeholder="•••" maxLength={3} type="password"
-                      value={form[`card_cvv_${brand}`] || ""}
-                      onChange={e => setForm(f => ({ ...f, [`card_cvv_${brand}`]: e.target.value.replace(/\D/g, "").slice(0, 3) }))} />
-                  </div>
-                </div>
-                <div className="ck-row full">
-                  <div className="ck-field">
-                    <label className="ck-label">Name on Card</label>
-                    <input className="ck-input" value={form[`card_name_${brand}`] || ""}
-                      onChange={e => setForm(f => ({ ...f, [`card_name_${brand}`]: e.target.value }))} />
-                  </div>
-                </div>
+              <div style={{ marginTop: ".8rem", padding: ".85rem 1rem", background: "#f0f7ff", border: "1px solid #c0d8f0", fontSize: ".76rem", color: "#1a3a5c", lineHeight: 1.6 }}>
+                You'll enter your card details securely on the next step via Paymob.
               </div>
             )}
 
