@@ -754,7 +754,6 @@ function ProductsView() {
   const [loading, setLoading] = useState(true);
   const [editProduct, setEditProduct] = useState(null);   // product being edited
   const [showAdd, setShowAdd] = useState(false);          // show add modal
-  const [saving, setSaving] = useState(false);
   const [msg, setMsg] = useState(null);
 
   // Empty form state
@@ -1373,24 +1372,11 @@ function SettingsView() {
   const [saving, setSaving] = useState(false);
   const [msg, setMsg] = useState("");
 
-  const saveInfo = async () => {
-    setSaving(true);
-    setMsg("");
-    try {
-      const data = await sellerRequest("PUT", "/seller/profile", {
-        brandName: storeName,
-        email: storeEmail,
-        phone,
-      });
-      const updated = { ...seller, brandName: storeName, email: storeEmail, phone };
-      localStorage.setItem("seller", JSON.stringify(updated));
-      setMsg("✓ Saved successfully!");
-    } catch (e) {
-      setMsg("✗ Failed to save. Try again.");
-    } finally {
-      setSaving(false);
-      setTimeout(() => setMsg(""), 3000);
-    }
+  const saveInfo = () => {
+    const updated = { ...seller, brandName: storeName, email: storeEmail, phone };
+    localStorage.setItem("seller", JSON.stringify(updated));
+    setMsg("✓ Saved successfully!");
+    setTimeout(() => setMsg(""), 3000);
   };
 
   return (
