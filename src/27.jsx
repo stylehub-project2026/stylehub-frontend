@@ -79,7 +79,7 @@ const PAGE_CSS = `
 .b27-cta-btn:hover { background:var(--dark); }
 `;
 
-export default function TwentySevenBrand({ cart, wish = [], setWish, products = [] }) {
+export default function TwentySevenBrand({ cart, wish = [], setWish }) {
   const [allProducts, setAllProducts] = useState([]);
   const [selSizes, setSelSizes] = useState(null);
   const [selColors, setSelColors] = useState(null);
@@ -98,20 +98,23 @@ export default function TwentySevenBrand({ cart, wish = [], setWish, products = 
   const scrollGrid = () => document.getElementById("b27-grid")?.scrollIntoView({ behavior: "smooth" });
 
   useEffect(() => {
-    const prods = products
-      .filter(p => ["27", "Twenty Seven", "TwentySeven"].includes(p.brand))
-      .map(p => ({
-        id: p._id, _id: p._id, name: p.name, brand: "27",
-        price: `LE ${p.price?.toLocaleString()}`,
-        oldPrice: p.salePrice ? `LE ${p.salePrice?.toLocaleString()}` : null,
-        img: (p.images && p.images[0]) ? p.images[0] : null,
-        imgs: p.images?.slice(1) || [],
-        colors: p.colors || [], sizes: p.sizes || [],
-        rating: p.avgRating || 0, reviews: p.reviewCount || 0,
-        desc: p.description || "", type: p.tags?.[0] || "tops", mongoId: p._id,
-      }));
-    setAllProducts(prods);
-  }, [products]);
+    fetch(`${API}/products?brand=Twenty seven&limit=100`)
+      .then(r => r.json())
+      .then(data => {
+        const prods = (data.data?.products || []).map(p => ({
+          id: p._id, _id: p._id, name: p.name, brand: "27",
+          price: `LE ${p.price?.toLocaleString()}`,
+          oldPrice: p.salePrice ? `LE ${p.salePrice?.toLocaleString()}` : null,
+          img: (p.images && p.images[0]) ? p.images[0] : null,
+          imgs: p.images?.slice(1) || [],
+          colors: p.colors || [], sizes: p.sizes || [],
+          rating: p.avgRating || 0, reviews: p.reviewCount || 0,
+          desc: p.description || "", type: p.tags?.[0] || "tops", mongoId: p._id,
+        }));
+        setAllProducts(prods);
+      })
+      .catch(() => setAllProducts([]));
+  }, []);
 
   const ALL_SIZES = [...new Set(allProducts.flatMap(p => p.sizes))];
   const ALL_COLORS = [...new Set(allProducts.flatMap(p => p.colors))];
