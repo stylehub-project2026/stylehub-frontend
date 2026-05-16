@@ -127,28 +127,105 @@ export const CATS = [
 
 const API_BASE = "https://stylehub-backend-tau.vercel.app/api";
 
+// ─── SEARCH DRAWER — slides in from right ───
+function SearchOverlay({ open, onClose }) {
+  const [query, setQuery] = useState("");
+  const [results, setResults] = useState([]);
+  const [searching, setSearching] = useState(false);
+  const inputRef = useRef(null);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (open) {
+      setTimeout(() => inputRef.current?.focus(), 150);
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+      setQuery("");
+      setResults([]);
+    }
+    return () => { document.body.style.overflow = ""; };
+  }, [open]);
+
+  useEffect(() => {
+    const handler = e => { if (e.key === "Escape") onClose(); };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, [onClose]);
+
+  useEffect(() => {
+    if (!query.trim()) { setResults([]); return; }
+    const timer = setTimeout(() => {
+      setSearching(true);
+      fetch(`${API_BASE}/products?search=${encodeURIComponent(query.trim())}&limit=8`)
+        .then(r => r.json())
+        .then(data => setResults(data.data?.products || []))
+        .catch(() => setResults([]))
+        .finally(() => setSearching(false));
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [query]);
+
+  return (
+    <>
+      <style>{`.sr-input::placeholder{color:#b0a89a;} .sr-input{outline:none;}`}</style>
+      <div onClick={onClose} style={{ position: "fixed", inset: 0, zIndex: 9998, background: "rgba(10,10,8,0.38)", backdropFilter: "blur(2px)", opacity: open ? 1 : 0, pointerEvents: open ? "auto" : "none", transition: "opacity .3s ease" }} />
+      <div style={{ position: "fixed", top: 0, right: 0, bottom: 0, zIndex: 9999, width: "min(400px, 90vw)", background: "#fff", boxShadow: "-6px 0 32px rgba(0,0,0,.1)", display: "flex", flexDirection: "column", transform: open ? "translateX(0)" : "translateX(100%)", transition: "transform .32s cubic-bezier(.22,.61,.36,1)" }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "1.3rem 1.5rem", borderBottom: "1px solid var(--border)" }}>
+          <span style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: "1.3rem", fontWeight: 400, color: "var(--dark)" }}>Search</span>
+          <button onClick={onClose} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--warm)", padding: 4 }}>
+            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>
+          </button>
+        </div>
+        <div style={{ padding: "1.2rem 1.5rem", borderBottom: "1px solid var(--border)" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: ".7rem", background: "var(--cream)", border: "1px solid var(--border)", padding: ".7rem .95rem" }}>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--warm)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}><circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" /></svg>
+            <input ref={inputRef} className="sr-input" value={query} onChange={e => setQuery(e.target.value)} placeholder="Search products, brands…" style={{ flex: 1, background: "none", border: "none", fontFamily: "'DM Sans',sans-serif", fontSize: ".85rem", color: "var(--dark)" }} />
+            {query && <button onClick={() => setQuery("")} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--warm)", padding: 0 }}><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg></button>}
+          </div>
+        </div>
+        <div style={{ flex: 1, overflowY: "auto" }}>
+          {searching && <div style={{ padding: "1rem 1.5rem", fontSize: ".75rem", color: "var(--warm)" }}>Searching...</div>}
+          {!searching && results.length > 0 && results.map(p => (
+            <div key={p._id} onClick={() => { navigate(`/product/${p._id}`); onClose(); }}
+              style={{ display: "flex", alignItems: "center", gap: "1rem", padding: ".75rem 1.5rem", cursor: "pointer", borderBottom: "1px solid var(--border)" }}
+              onMouseEnter={e => e.currentTarget.style.background = "var(--cream)"}
+              onMouseLeave={e => e.currentTarget.style.background = "#fff"}>
+              <div style={{ width: 48, height: 56, background: "#f0ece6", flexShrink: 0, overflow: "hidden", borderRadius: 6 }}>
+                {p.images?.[0] && <img src={p.images[0]} alt={p.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} onError={e => e.target.style.display = "none"} />}
+              </div>
+              <div style={{ flex: 1 }}>
+                <div style={{ fontSize: ".8rem", fontWeight: 500, color: "var(--dark)" }}>{p.name}</div>
+                <div style={{ fontSize: ".62rem", color: "var(--warm)", marginTop: ".1rem" }}>{p.seller?.brandName || "StyleHub"}</div>
+              </div>
+              <div style={{ fontSize: ".75rem", fontWeight: 600 }}>LE {(p.price)?.toLocaleString()}</div>
+            </div>
+          ))}
+          {!searching && query.trim() && results.length === 0 && (
+            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "3rem 1.5rem", gap: "1rem" }}>
+              <svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="var(--border)" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" /></svg>
+              <p style={{ margin: 0, fontSize: ".78rem", color: "var(--warm)", textAlign: "center" }}>No results for "{query}"</p>
+            </div>
+          )}
+          {!query && (
+            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "3rem 1.5rem", gap: "1rem" }}>
+              <svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="var(--border)" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" /></svg>
+              <p style={{ margin: 0, fontFamily: "'Cormorant Garamond',serif", fontSize: "1.1rem", color: "var(--warm)", textAlign: "center" }}>What are you looking for?</p>
+            </div>
+          )}
+        </div>
+        <div style={{ padding: ".9rem 1.5rem", borderTop: "1px solid var(--border)", textAlign: "center" }}>
+          <span style={{ fontSize: ".6rem", letterSpacing: ".12em", textTransform: "uppercase", color: "#c0b8b0" }}>Press <strong>ESC</strong> or click outside to close</span>
+        </div>
+      </div>
+    </>
+  );
+}
+
 // ─── NAV ───
 export function SHNav({ cart = [], wish = [] }) {
   const navigate = useNavigate();
   const [searchOpen, setSearchOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [searchResults, setSearchResults] = useState([]);
-  const [searching, setSearching] = useState(false);
-
-  useEffect(() => {
-    if (!searchQuery.trim()) { setSearchResults([]); return; }
-    const timer = setTimeout(() => {
-      setSearching(true);
-      fetch(`${API_BASE}/products?search=${encodeURIComponent(searchQuery.trim())}&limit=6`)
-        .then(r => r.json())
-        .then(data => setSearchResults(data.data?.products || []))
-        .catch(() => setSearchResults([]))
-        .finally(() => setSearching(false));
-    }, 300);
-    return () => clearTimeout(timer);
-  }, [searchQuery]);
-
-  const closeSearch = () => { setSearchOpen(false); setSearchQuery(""); setSearchResults([]); };
 
   return (
     <nav className="sh-nav sticky-top d-flex align-items-center justify-content-between px-4" style={{ position: "relative" }}>
@@ -177,36 +254,8 @@ export function SHNav({ cart = [], wish = [] }) {
         ))}
       </ul>
       <div className="d-flex gap-3 align-items-center">
-        <button onClick={() => setSearchOpen(s => !s)} className="nav-icon" style={{ background: "none", border: "none", padding: 0 }}>{I.search}</button>
-        {searchOpen && (
-          <div style={{ position: "fixed", top: "56px", left: 0, right: 0, background: "#fff", borderBottom: "1px solid var(--border)", zIndex: 1000, boxShadow: "0 8px 24px rgba(0,0,0,.08)" }}>
-            <div style={{ display: "flex", alignItems: "center", gap: ".4rem", padding: ".7rem 1.5rem", borderBottom: searchResults.length > 0 || (searchQuery && !searching) ? "1px solid var(--border)" : "none" }}>
-              <input autoFocus value={searchQuery} onChange={e => setSearchQuery(e.target.value)}
-                placeholder="Search products, brands..."
-                style={{ flex: 1, border: "none", outline: "none", fontSize: ".85rem", fontFamily: "'DM Sans',sans-serif", color: "var(--dark)", background: "transparent" }} />
-              {searching && <span style={{ fontSize: ".7rem", color: "var(--warm)" }}>...</span>}
-              <button onClick={closeSearch} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--warm)", fontSize: "1.1rem" }}>✕</button>
-            </div>
-            {searchResults.map(p => (
-              <div key={p._id} onClick={() => { navigate(`/product/${p._id}`); closeSearch(); }}
-                style={{ display: "flex", alignItems: "center", gap: "1rem", padding: ".65rem 1.5rem", cursor: "pointer" }}
-                onMouseEnter={e => e.currentTarget.style.background = "var(--cream)"}
-                onMouseLeave={e => e.currentTarget.style.background = "#fff"}>
-                <div style={{ width: 42, height: 52, background: "#f0ece6", flexShrink: 0, overflow: "hidden", borderRadius: 4 }}>
-                  {p.images?.[0] && <img src={(p.images[0].startsWith('http') ? p.images[0] : `https://stylehub-backend-tau.vercel.app${p.images[0]}`)} alt={p.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} onError={e => e.target.style.display = "none"} />}
-                </div>
-                <div style={{ flex: 1 }}>
-                  <div style={{ fontSize: ".78rem", fontWeight: 500, color: "var(--dark)" }}>{p.name}</div>
-                  <div style={{ fontSize: ".62rem", color: "var(--warm)", marginTop: ".1rem" }}>{p.seller?.brandName || "StyleHub"}</div>
-                </div>
-                <div style={{ fontSize: ".75rem", fontWeight: 600 }}>LE {(p.salePrice || p.price)?.toLocaleString()}</div>
-              </div>
-            ))}
-            {searchQuery.trim() && !searching && searchResults.length === 0 && (
-              <div style={{ padding: "1rem 1.5rem", fontSize: ".78rem", color: "var(--warm)" }}>No results for "{searchQuery}"</div>
-            )}
-          </div>
-        )}
+        <button onClick={() => setSearchOpen(true)} className="nav-icon" style={{ background: "none", border: "none", padding: 0 }}>{I.search}</button>
+        <SearchOverlay open={searchOpen} onClose={() => setSearchOpen(false)} />
         <Link to={localStorage.getItem("token") ? "/profile" : "/signin"} className="nav-icon">{I.user}</Link>
         <Link to="/wishlist" className="nav-icon">
           <Heart on={false} />
