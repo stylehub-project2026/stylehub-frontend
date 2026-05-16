@@ -445,6 +445,7 @@ function SellerSignInForm({ onForgot, onSwitchSignUp, onDone }) {
   const [email, setEmail] = useState("");
   const [pw, setPw] = useState("");
   const [show, setShow] = useState(false);
+  const [showCpw, setShowCpw] = useState(false);
   const [err, setErr] = useState("");
   const [ok, setOk] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -778,13 +779,19 @@ function SellerSignUpForm({ onSwitchSignIn, onDone }) {
           )}
 
           <label className="sh-label">Confirm Password</label>
-          <input
-            className="sh-input"
-            type="password"
-            placeholder="••••••••"
-            value={form.cpw}
-            onChange={set("cpw")}
-          />
+          <div className="sh-input-wrap sh-mb">
+            <input
+              className="sh-input"
+              type={showCpw ? "text" : "password"}
+              style={{ paddingRight: 46 }}
+              placeholder="••••••••"
+              value={form.cpw}
+              onChange={set("cpw")}
+            />
+            <button type="button" className="sh-eye" onClick={() => setShowCpw(v => !v)}>
+              <i className={`far ${showCpw ? "fa-eye-slash" : "fa-eye"}`} />
+            </button>
+          </div>
           <button className="sh-btn" type="submit">
             <i className="fas fa-arrow-right" /> CONTINUE
           </button>

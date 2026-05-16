@@ -392,6 +392,7 @@ function SignInForm({ onForgot, onSwitchSignUp, onDone }) {
   const [email, setEmail] = useState("");
   const [pw, setPw] = useState("");
   const [show, setShow] = useState(false);
+  const [showCpw, setShowCpw] = useState(false);
   const [err, setErr] = useState("");
   const [ok, setOk] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -554,6 +555,7 @@ function SignUpForm({ onSwitchSignIn }) {
   const [pw, setPw] = useState("");
   const [cpw, setCpw] = useState("");
   const [show, setShow] = useState(false);
+  const [showCpw, setShowCpw] = useState(false);
   const [err, setErr] = useState("");
   const [ok, setOk] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -693,16 +695,22 @@ function SignUpForm({ onSwitchSignIn }) {
       )}
 
       <label className="sh-label">Confirm password</label>
-      <input
-        className={`sh-input${cpw && cpw !== pw ? " error" : ""}`}
-        type="password"
-        placeholder="Re-enter password"
-        value={cpw}
-        onChange={(e) => {
-          setCpw(e.target.value);
-          setErr("");
-        }}
-      />
+      <div className="sh-input-wrap sh-mb">
+        <input
+          className={`sh-input${cpw && cpw !== pw ? " error" : ""}`}
+          type={showCpw ? "text" : "password"}
+          style={{ paddingRight: 46 }}
+          placeholder="Re-enter password"
+          value={cpw}
+          onChange={(e) => {
+            setCpw(e.target.value);
+            setErr("");
+          }}
+        />
+        <button type="button" className="sh-eye" onClick={() => setShowCpw(!showCpw)}>
+          <i className={`far ${showCpw ? "fa-eye-slash" : "fa-eye"}`} />
+        </button>
+      </div>
 
       <button className="sh-btn" type="submit" disabled={busy}>
         {busy ? (
@@ -864,6 +872,7 @@ function ForgotNewPw({ onDone }) {
   const [pw, setPw] = useState("");
   const [cpw, setCpw] = useState("");
   const [show, setShow] = useState(false);
+  const [showCpw, setShowCpw] = useState(false);
   const [err, setErr] = useState("");
   const [busy, setBusy] = useState(false);
   const str = pwStrength(pw);
@@ -925,16 +934,22 @@ function ForgotNewPw({ onDone }) {
       )}
 
       <label className="sh-label">Confirm new password</label>
-      <input
-        className={`sh-input${cpw && cpw !== pw ? " error" : ""}`}
-        type="password"
-        placeholder="Re-enter password"
-        value={cpw}
-        onChange={(e) => {
-          setCpw(e.target.value);
-          setErr("");
-        }}
-      />
+      <div className="sh-input-wrap sh-mb">
+        <input
+          className={`sh-input${cpw && cpw !== pw ? " error" : ""}`}
+          type={showCpw ? "text" : "password"}
+          style={{ paddingRight: 46 }}
+          placeholder="Re-enter password"
+          value={cpw}
+          onChange={(e) => {
+            setCpw(e.target.value);
+            setErr("");
+          }}
+        />
+        <button type="button" className="sh-eye" onClick={() => setShowCpw(!showCpw)}>
+          <i className={`far ${showCpw ? "fa-eye-slash" : "fa-eye"}`} />
+        </button>
+      </div>
       {err && <p className="sh-err">{err}</p>}
 
       <button
