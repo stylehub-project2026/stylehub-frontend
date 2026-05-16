@@ -88,27 +88,23 @@ export default function BlackClosetBrand({ cart, wish = [], setWish, products = 
 
   // Map dashboard products to the shape PCard expects
   useEffect(() => {
-    const prods = products
-      .filter(p => p.brand === "Black Closet" || p.brand === "blackcloset")
-      .map(p => ({
-        id: p._id,
-        _id: p._id,
-        name: p.name,
-        brand: "Black Closet",
-        price: `LE ${p.price?.toLocaleString()}`,
-        oldPrice: p.salePrice ? `LE ${p.salePrice?.toLocaleString()}` : null,
-        img: (p.images && p.images[0]) ? p.images[0] : null,
-        imgs: p.images?.slice(1) || [],
-        colors: p.colors || [],
-        sizes: p.sizes || [],
-        rating: p.avgRating || 0,
-        reviews: p.reviewCount || 0,
-        desc: p.description || "",
-        type: p.tags?.[0] || "tops",
-        mongoId: p._id,
-      }));
-    setAllProducts(prods);
-  }, [products]);
+    fetch(`${API}/products?brand=Marble&limit=100`)
+      .then(r => r.json())
+      .then(data => {
+        const prods = (data.data?.products || []).map(p => ({
+          id: p._id, _id: p._id, name: p.name, brand: "Marble",
+          price: `LE ${p.price?.toLocaleString()}`,
+          oldPrice: p.salePrice ? `LE ${p.salePrice?.toLocaleString()}` : null,
+          img: (p.images && p.images[0]) ? p.images[0] : null,
+          imgs: p.images?.slice(1) || [],
+          colors: p.colors || [], sizes: p.sizes || [],
+          rating: p.avgRating || 0, reviews: p.reviewCount || 0,
+          desc: p.description || "", type: p.tags?.[0] || "tops", mongoId: p._id,
+        }));
+        setAllProducts(prods);
+      })
+      .catch(() => setAllProducts([]));
+  }, []);
 
 
   const ALL_SIZES = [...new Set(allProducts.flatMap(p => p.sizes))];
