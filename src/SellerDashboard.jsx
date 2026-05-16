@@ -1362,8 +1362,36 @@ function CustomersView() {
 
 // Settings View
 function SettingsView() {
+  const seller = (() => { try { return JSON.parse(localStorage.getItem("seller") || "{}"); } catch { return {}; } })();
+
+  const [storeName, setStoreName] = useState(seller.brandName || seller.storeName || seller.name || "");
+  const [storeEmail, setStoreEmail] = useState(seller.email || "");
+  const [phone, setPhone] = useState(seller.phone || "");
   const [notifications, setNotifications] = useState(true);
   const [emailUpdates, setEmailUpdates] = useState(true);
+  const [orderAlerts, setOrderAlerts] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [msg, setMsg] = useState("");
+
+  const saveInfo = async () => {
+    setSaving(true);
+    setMsg("");
+    try {
+      const data = await sellerRequest("PUT", "/seller/profile", {
+        brandName: storeName,
+        email: storeEmail,
+        phone,
+      });
+      const updated = { ...seller, brandName: storeName, email: storeEmail, phone };
+      localStorage.setItem("seller", JSON.stringify(updated));
+      setMsg("✓ Saved successfully!");
+    } catch (e) {
+      setMsg("✗ Failed to save. Try again.");
+    } finally {
+      setSaving(false);
+      setTimeout(() => setMsg(""), 3000);
+    }
+  };
 
   return (
     <>
@@ -1373,32 +1401,35 @@ function SettingsView() {
           <h3><i className="fas fa-store" /> Store Information</h3>
           <div className="settings-row">
             <span className="settings-label">Store Name</span>
-            <input className="settings-input" type="text" defaultValue="My Fashion Store" />
+            <input className="settings-input" type="text" value={storeName} onChange={e => setStoreName(e.target.value)} />
           </div>
           <div className="settings-row">
             <span className="settings-label">Store Email</span>
-            <input className="settings-input" type="email" defaultValue="store@example.com" />
+            <input className="settings-input" type="email" value={storeEmail} onChange={e => setStoreEmail(e.target.value)} />
           </div>
           <div className="settings-row">
             <span className="settings-label">Phone</span>
-            <input className="settings-input" type="tel" defaultValue="+20 123 456 7890" />
+            <input className="settings-input" type="tel" value={phone} onChange={e => setPhone(e.target.value)} />
           </div>
-          <button className="settings-btn">Save Changes</button>
+          {msg && <div style={{ fontSize: ".82rem", marginTop: ".5rem", color: msg.startsWith("✓") ? "var(--green-dark)" : "#c0392b" }}>{msg}</div>}
+          <button className="settings-btn" onClick={saveInfo} disabled={saving}>
+            {saving ? "Saving..." : "Save Changes"}
+          </button>
         </div>
 
         <div className="settings-card">
           <h3><i className="fas fa-bell" /> Notifications</h3>
           <div className="settings-row">
             <span className="settings-label">Push Notifications</span>
-            <div className={`settings-toggle ${notifications ? "on" : ""}`} onClick={() => setNotifications(!notifications)} />
+            <div className={`settings-toggle ${notifications ? "on" : ""}`} onClick={() => setNotifications(v => !v)} />
           </div>
           <div className="settings-row">
             <span className="settings-label">Email Updates</span>
-            <div className={`settings-toggle ${emailUpdates ? "on" : ""}`} onClick={() => setEmailUpdates(!emailUpdates)} />
+            <div className={`settings-toggle ${emailUpdates ? "on" : ""}`} onClick={() => setEmailUpdates(v => !v)} />
           </div>
           <div className="settings-row">
             <span className="settings-label">Order Alerts</span>
-            <div className="settings-toggle on" />
+            <div className={`settings-toggle ${orderAlerts ? "on" : ""}`} onClick={() => setOrderAlerts(v => !v)} />
           </div>
         </div>
 
