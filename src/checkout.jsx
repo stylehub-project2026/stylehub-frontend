@@ -630,7 +630,7 @@ export default function Checkout({ cart = [], setCart, wish = [], setWish }) {
               price: `LE ${i.product.salePrice || i.product.price}`,
               rawPrice: i.product.salePrice || i.product.price,
               oldPrice: i.product.salePrice ? `LE ${i.product.price}` : null,
-              img: i.product.images?.[0] ? (i.product.images[0].startsWith('http') ? i.product.images[0] : `https://stylehub-backend-tau.vercel.app${i.product.images[0]}` ) : null,
+              img: i.product.images?.[0] ? (i.product.images[0].startsWith('http') ? i.product.images[0] : `https://stylehub-backend-tau.vercel.app${i.product.images[0]}`) : null,
               brand: "StyleHub",
             }
           }));
@@ -730,6 +730,13 @@ export default function Checkout({ cart = [], setCart, wish = [], setWish }) {
       setCart([]);
     }
   };
+  const res = await fetch('/api/orders/paymob', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+    body: JSON.stringify({ items, shippingAddress })
+  });
+  const { data } = await res.json();
+  window.location.href = `https://accept.paymob.com/api/acceptance/iframes/YOUR_IFRAME_ID?payment_token=${data.paymentKey}`;
 
   // Empty cart redirect
   if (items.length === 0 && step < 4 && !(token && backendItems === null)) {
