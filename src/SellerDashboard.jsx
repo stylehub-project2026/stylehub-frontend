@@ -1361,11 +1361,11 @@ function CustomersView() {
 
 // Settings View
 function SettingsView() {
-  const seller = (() => { try { return JSON.parse(localStorage.getItem("seller") || "{}"); } catch { return {}; } })();
+  const getSeller = () => { try { return JSON.parse(localStorage.getItem("seller") || "{}"); } catch { return {}; } };
 
-  const [storeName, setStoreName] = useState(seller.brandName || seller.storeName || seller.name || "");
-  const [storeEmail, setStoreEmail] = useState(seller.email || "");
-  const [phone, setPhone] = useState(seller.phone || "");
+  const [storeName, setStoreName] = useState(() => { const s = getSeller(); return s.brandName || s.storeName || s.name || ""; });
+  const [storeEmail, setStoreEmail] = useState(() => getSeller().email || "");
+  const [phone, setPhone] = useState(() => getSeller().phone || "");
   const [notifications, setNotifications] = useState(true);
   const [emailUpdates, setEmailUpdates] = useState(true);
   const [orderAlerts, setOrderAlerts] = useState(true);
@@ -1373,6 +1373,7 @@ function SettingsView() {
   const [msg, setMsg] = useState("");
 
   const saveInfo = () => {
+    const seller = getSeller();
     const updated = { ...seller, brandName: storeName, email: storeEmail, phone };
     localStorage.setItem("seller", JSON.stringify(updated));
     setMsg("✓ Saved successfully!");
