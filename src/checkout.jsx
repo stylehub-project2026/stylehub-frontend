@@ -678,14 +678,12 @@ export default function Checkout({ cart = [], setCart, wish = [], setWish }) {
   const handleNext2 = () => setStep(3);
 
   const handlePlace = async () => {
-    // If user is logged in, place order via backend
     if (token) {
       setPlacing(true);
       setPlaceError("");
       try {
         const firstBrand = Object.keys(brandGroups)[0];
         const paymentMethod = form[`payment_${firstBrand}`] || "cod";
-        // Normalize payment: fawry/instapay → cod for backend if needed
         const validPayment = ["cod", "card", "fawry", "instapay"].includes(paymentMethod) ? paymentMethod : "cod";
 
         const orderItems = items.map(item => ({
@@ -695,22 +693,32 @@ export default function Checkout({ cart = [], setCart, wish = [], setWish }) {
           color: item.color,
         }));
 
+        const shippingAddress = {
+          firstName: form.firstName,
+          lastName: form.lastName,
+          street: form.address,
+          city: form.city,
+          governorate: form.governorate,
+          phone: form.phone,
+          email: form.email,
+        };
+
+        if (validPayment === "card") {
+          const pmRes = await fetch(`${API}/orders/paymob`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+            body: JSON.stringify({ items: orderItems, shippingAddress }),
+          });
+          const pmData = await pmRes.json();
+          if (!pmRes.ok) throw new Error(pmData.message || "Payment initiation failed.");
+          window.location.href = `https://accept.paymob.com/api/acceptance/iframes/1043832?payment_token=${pmData.data.paymentKey}`;
+          return;
+        }
+
         const res = await fetch(`${API}/orders`, {
           method: "POST",
           headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-          body: JSON.stringify({
-            items: orderItems,
-            shippingAddress: {
-              firstName: form.firstName,
-              lastName: form.lastName,
-              street: form.address,
-              city: form.city,
-              governorate: form.governorate,
-              phone: form.phone,
-              email: form.email,
-            },
-            paymentMethod: validPayment,
-          }),
+          body: JSON.stringify({ items: orderItems, shippingAddress, paymentMethod: validPayment }),
         });
 
         const data = await res.json();
@@ -725,18 +733,10 @@ export default function Checkout({ cart = [], setCart, wish = [], setWish }) {
         setPlacing(false);
       }
     } else {
-      // Guest: just show success locally
       setStep(4);
       setCart([]);
     }
   };
-  const res = await fetch('/api/orders/paymob', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-    body: JSON.stringify({ items, shippingAddress })
-  });
-  const { data } = await res.json();
-  window.location.href = `https://accept.paymob.com/api/acceptance/iframes/YOUR_IFRAME_ID?payment_token=${data.paymentKey}`;
 
   // Empty cart redirect
   if (items.length === 0 && step < 4 && !(token && backendItems === null)) {
