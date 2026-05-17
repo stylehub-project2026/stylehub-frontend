@@ -1,28 +1,12 @@
 import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { SHNav, SHFooter, SHARED_CSS, useScrollReveal } from "./shared.jsx";
-
-/* ─── Base URL للـ Backend ─────────────────── */
 import { authAPI } from "./api.jsx";
 import { signInWithGoogle, signInWithFacebook } from "./firebase";
-
 import logoImg from "./assets/logo.png";
 
 
 
-
-
-
-
-
-
-
-
-
-
-/* ─────────────────────────────────────────
-   GLOBAL STYLES  (injected once into <head>)
-───────────────────────────────────────── */
 const CSS = `
 @import url('https://fonts.googleapis.com/css2?family=Jost:wght@400;500;600;700;800&display=swap');
 @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css');
