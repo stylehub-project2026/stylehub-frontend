@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { SHNav, SHFooter, SHARED_CSS, useScrollReveal } from "./shared";
 
-// ─── BRAND CONFIG ───
+//  BRAND CONFIG 
 const BRAND = {
   name: "Black Closet",
   desc: "Black Closet is a clothing brand that blends classic, Old Money aesthetics with modern streetwear. The brand focuses on creating stylish everyday pieces such as hoodies, baggy jeans, polos and sweaters — combining comfort with a refined yet edgy look for people who appreciate timeless style with a modern urban twist.",
@@ -13,18 +13,15 @@ const BRAND = {
   heroOverlay: "rgba(255,255,255,.55)",
 };
 
-// ─── SIZE RATIOS ───
+//  SIZE RATIOS — removed fixed px values, now handled via CSS
 const SZ = {
-  heroBanner: 420,
-  heroLogoSize: 200,
-  shopCardH: 220,
   gridCardRatio: "4/4",
 };
 
-// ─── DATA ───
+//  DATA 
 const API = "https://stylehub-backend-tau.vercel.app/api";
 
-// ─── HEART ───
+/* Heart icon */
 const Heart = ({ on }) => (
   <svg width="16" height="16" viewBox="0 0 24 24"
     fill={on ? "currentColor" : "none"} stroke="currentColor"
@@ -33,7 +30,7 @@ const Heart = ({ on }) => (
   </svg>
 );
 
-// ─── PRODUCT CARD ───
+// PRODUCT CARD
 function PCard({ p, wish, toggleWish }) {
   const navigate = useNavigate();
   return (
@@ -67,7 +64,7 @@ function PCard({ p, wish, toggleWish }) {
   );
 }
 
-// ─── MAIN PAGE ───
+// MAIN COMPONENT
 export default function BlackClosetBrand({ cart, wish = [], setWish, products = [] }) {
   const [allProducts, setAllProducts] = useState([]);
   const [selSizes, setSelSizes] = useState(null);
@@ -75,6 +72,7 @@ export default function BlackClosetBrand({ cart, wish = [], setWish, products = 
   const [sortBy, setSortBy] = useState("default");
   const [selType, setSelType] = useState("all");
   const [page, setPage] = useState(1);
+  const [filterOpen, setFilterOpen] = useState(false); // FIX: mobile filter drawer toggle
   const PER_PAGE = 9;
 
   const navigate = useNavigate();
@@ -86,7 +84,6 @@ export default function BlackClosetBrand({ cart, wish = [], setWish, products = 
   const toNum = s => parseInt((s || "").toString().replace(/\D/g, "")) || 0;
   const scrollGrid = () => document.getElementById("blackcloset-grid")?.scrollIntoView({ behavior: "smooth" });
 
-  // Map dashboard products to the shape PCard expects
   useEffect(() => {
     fetch(`${API}/products?brand=Marble&limit=100`)
       .then(r => r.json())
@@ -105,7 +102,6 @@ export default function BlackClosetBrand({ cart, wish = [], setWish, products = 
       })
       .catch(() => setAllProducts([]));
   }, []);
-
 
   const ALL_SIZES = [...new Set(allProducts.flatMap(p => p.sizes))];
   const ALL_COLORS = [...new Set(allProducts.flatMap(p => p.colors))];
@@ -127,25 +123,20 @@ export default function BlackClosetBrand({ cart, wish = [], setWish, products = 
       <SHNav cart={cart} wish={wish} />
 
       {/* ════════════════════════════════
-          1. HERO BANNER — white bg inside border
+          1. HERO BANNER
+          FIX: removed fixed height (420px) → now uses min-height via CSS class
+               removed fixed logo size (200px) → now uses CSS class
+               hero inner flex → stacks on mobile via CSS
       ════════════════════════════════ */}
-      <section style={{
-        position: "relative", height: SZ.heroBanner, overflow: "hidden",
-        background: "#ffffff",
-        display: "flex", alignItems: "center",
-        margin: "1.5rem", borderRadius: 10,
-        border: "2px solid rgba(26,26,24,.2)",
-        boxShadow: "0 4px 24px rgba(26,26,24,.07)"
-      }}>
+      <section className="hero-section">
         <img src={BRAND.heroBg} alt="" aria-hidden
           style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", opacity: .08, borderRadius: 10 }}
           onError={e => e.target.style.display = "none"} />
         <div style={{ position: "absolute", inset: 0, background: BRAND.heroOverlay, borderRadius: 10 }} />
 
-        <div style={{ position: "relative", zIndex: 2, display: "flex", alignItems: "center", gap: "4rem", padding: "0 6%", width: "100%" }}>
-
+        <div className="hero-inner">
           {/* LOGO */}
-          <div style={{ width: SZ.heroLogoSize, height: SZ.heroLogoSize, borderRadius: "50%", overflow: "hidden", flexShrink: 0, border: "3px solid rgba(26,26,24,.15)", boxShadow: "0 8px 32px rgba(26,26,24,.12)", background: "#fff", display: "flex", alignItems: "center", justifyContent: "center" }}>
+          <div className="hero-logo">
             <img src={BRAND.logo} alt={BRAND.name}
               style={{ width: "85%", height: "85%", objectFit: "contain" }}
               onError={e => e.target.style.display = "none"} />
@@ -161,10 +152,11 @@ export default function BlackClosetBrand({ cart, wish = [], setWish, products = 
       </section>
 
       {/* ════════════════════════════════
-          2. SEE WHAT'S POPULAR — text + blob
+          2. SEE WHAT'S POPULAR
+          FIX: removed hard-coded "1fr 1fr" → uses CSS class that stacks on mobile
       ════════════════════════════════ */}
       <section style={{ background: "#ffffff", padding: "5rem 6%", borderBottom: "2px solid rgba(26,26,24,.12)" }}>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "5rem", alignItems: "center" }}>
+        <div className="popular-grid">
 
           {/* LEFT TEXT */}
           <div className="reveal" ref={addRef}>
@@ -184,11 +176,23 @@ export default function BlackClosetBrand({ cart, wish = [], setWish, products = 
 
       {/* ════════════════════════════════
           3. ALL PRODUCTS — filters + grid
+          FIX: removed fixed flex layout → uses CSS class that stacks on mobile
+               added mobile filter toggle button
       ════════════════════════════════ */}
-      <div style={{ display: "flex", gap: "2.5rem", padding: "3rem 6%", alignItems: "flex-start", background: "var(--cream)" }}>
+      <div className="brand-layout">
 
-        {/* SIDEBAR */}
-        <div style={{ width: 185, flexShrink: 0, position: "sticky", top: "70px" }}>
+        {/* MOBILE: Filter toggle button — only visible on small screens */}
+        <button
+          className="filter-toggle-btn"
+          onClick={() => setFilterOpen(o => !o)}>
+          {filterOpen ? "✕ Close Filters" : "⚙ Filters & Sort"}
+        </button>
+
+        {/* SIDEBAR
+            FIX: removed fixed width 185px → uses CSS class
+                 hidden on mobile unless filterOpen is true
+        */}
+        <div className={`brand-sidebar${filterOpen ? " sidebar-open" : ""}`}>
 
           {/* Sort */}
           <div style={{ marginBottom: "1.8rem" }}>
@@ -245,8 +249,10 @@ export default function BlackClosetBrand({ cart, wish = [], setWish, products = 
           )}
         </div>
 
-        {/* GRID */}
-        <div id="blackcloset-grid" style={{ flex: 1 }}>
+        {/* GRID
+            FIX: removed hard-coded repeat(3,1fr) → uses CSS class
+        */}
+        <div id="blackcloset-grid" style={{ flex: 1, minWidth: 0 }}>
           <div style={{ fontSize: ".7rem", color: "var(--warm)", marginBottom: "1rem", letterSpacing: ".04em" }}>
             {filtered.length} product{filtered.length !== 1 ? "s" : ""}
             {totalPages > 1 ? ` — page ${page} of ${totalPages}` : ""}
@@ -254,14 +260,14 @@ export default function BlackClosetBrand({ cart, wish = [], setWish, products = 
 
           {filtered.length === 0
             ? <div style={{ textAlign: "center", padding: "4rem 0", color: "var(--warm)", fontSize: ".85rem" }}>No products match your filters.</div>
-            : <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: "1.4rem" }}>
-              {paginated.map(p => <PCard key={p.id} p={p} wish={wish} toggleWish={toggleWish} />)}
-            </div>
+            : <div className="product-grid">
+                {paginated.map(p => <PCard key={p.id} p={p} wish={wish} toggleWish={toggleWish} />)}
+              </div>
           }
 
           {/* PAGINATION */}
           {totalPages > 1 && (
-            <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: ".45rem", padding: "2.5rem 0" }}>
+            <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: ".45rem", padding: "2.5rem 0", flexWrap: "wrap" }}>
               <PagBtn onClick={() => { setPage(p => Math.max(1, p - 1)); scrollGrid(); }} disabled={page === 1}>‹</PagBtn>
               {Array.from({ length: totalPages }, (_, i) => i + 1).map(n => (
                 <PagBtn key={n} onClick={() => { setPage(n); scrollGrid(); }} active={page === n}>{n}</PagBtn>
@@ -277,7 +283,6 @@ export default function BlackClosetBrand({ cart, wish = [], setWish, products = 
   );
 }
 
-// ─── SMALL HELPERS ───
 const FilterSection = ({ title, children }) => (
   <div style={{ borderTop: "1px solid var(--border)", paddingTop: "1.3rem", marginBottom: "1.6rem" }}>
     <div className="filter-label">{title}</div>
@@ -299,7 +304,7 @@ const PagBtn = ({ children, onClick, disabled, active }) => (
   </button>
 );
 
-// ─── PAGE CSS ───
+
 const PAGE_CSS = `
 .filter-label {
   font-size:.6rem;
@@ -324,4 +329,183 @@ const PAGE_CSS = `
   transition:background .2s;
 }
 .blackcloset-cta-btn:hover { background:#92A079; }
+
+/* ── HERO ── */
+.hero-section {
+  position: relative;
+  min-height: 420px;
+  overflow: hidden;
+  background: #ffffff;
+  display: flex;
+  align-items: center;
+  margin: 1.5rem;
+  border-radius: 10px;
+  border: 2px solid rgba(26,26,24,.2);
+  box-shadow: 0 4px 24px rgba(26,26,24,.07);
+  padding: 2rem 0;
+}
+.hero-inner {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 4rem;
+  padding: 0 6%;
+  width: 100%;
+}
+.hero-logo {
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0;
+  border: 3px solid rgba(26,26,24,.15);
+  box-shadow: 0 8px 32px rgba(26,26,24,.12);
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ── POPULAR SECTION ── */
+.popular-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 5rem;
+  align-items: center;
+}
+
+/* ── BRAND LAYOUT (sidebar + grid) ── */
+.brand-layout {
+  display: flex;
+  gap: 2.5rem;
+  padding: 3rem 6%;
+  align-items: flex-start;
+  background: var(--cream);
+}
+.brand-sidebar {
+  width: 185px;
+  flex-shrink: 0;
+  position: sticky;
+  top: 70px;
+}
+
+/* ── PRODUCT GRID ── */
+.product-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.4rem;
+}
+
+/* ── FILTER TOGGLE (mobile only) ── */
+.filter-toggle-btn {
+  display: none;
+}
+
+/* ════════════════════════════════
+   TABLET  (≤ 1024px)
+════════════════════════════════ */
+@media (max-width: 1024px) {
+  .product-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .hero-logo {
+    width: 150px;
+    height: 150px;
+  }
+  .hero-inner {
+    gap: 2.5rem;
+  }
+}
+
+/* ════════════════════════════════
+   MOBILE  (≤ 768px)
+════════════════════════════════ */
+@media (max-width: 768px) {
+
+  /* Hero stacks vertically */
+  .hero-section {
+    min-height: unset;
+    margin: 1rem;
+    padding: 2rem 1.5rem;
+  }
+  .hero-inner {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 1.5rem;
+    padding: 0;
+  }
+  .hero-logo {
+    width: 120px;
+    height: 120px;
+  }
+
+  /* Popular section stacks vertically */
+  .popular-grid {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+
+  /* Brand layout stacks vertically */
+  .brand-layout {
+    flex-direction: column;
+    padding: 1.5rem 4%;
+    gap: 0;
+  }
+
+  /* Sidebar hidden by default on mobile, shown when filterOpen */
+  .brand-sidebar {
+    width: 100%;
+    position: static;
+    display: none;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 1.5rem;
+  }
+  .brand-sidebar.sidebar-open {
+    display: block;
+  }
+
+  /* Show the filter toggle button on mobile */
+  .filter-toggle-btn {
+    display: block;
+    width: 100%;
+    padding: .65rem 1rem;
+    margin-bottom: 1rem;
+    background: var(--dark);
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    font-size: .75rem;
+    font-family: 'DM Sans', sans-serif;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    cursor: pointer;
+    font-weight: 600;
+  }
+
+  /* 2 columns on mobile */
+  .product-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: .8rem;
+  }
+}
+
+/* ════════════════════════════════
+   SMALL MOBILE  (≤ 480px)
+════════════════════════════════ */
+@media (max-width: 480px) {
+  .product-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: .6rem;
+  }
+  .hero-logo {
+    width: 90px;
+    height: 90px;
+  }
+  .brand-layout {
+    padding: 1rem 3%;
+  }
+}
 `;
