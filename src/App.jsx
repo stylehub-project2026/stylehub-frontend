@@ -148,10 +148,10 @@ body { font-family:'DM Sans',sans-serif; background:var(--cream); color:var(--da
 .pc-wish:hover { transform:scale(1.15); } .pc-wish.on { color:var(--red); }
 .pc-qv { position:absolute; bottom:.8rem; left:50%; transform:translateX(-50%) translateY(12px); opacity:0; transition:all .28s; white-space:nowrap; padding:.4rem 1rem; font-size:.66rem; letter-spacing:.1em; text-transform:uppercase; background:#fff; color:var(--dark); border:none; cursor:pointer; font-family:'DM Sans',sans-serif; box-shadow:0 2px 12px rgba(0,0,0,.15); }
 .pc:hover .pc-qv { opacity:1; transform:translateX(-50%) translateY(0); }
-.pc-brand { font-size:.68rem; letter-spacing:.15em; text-transform:uppercase; color:var(--warm); }
-.pc-name { font-size:.86rem; font-weight:500; line-height:1.3; }
-.p-old { font-size:.72rem; color:var(--warm); text-decoration:line-through; }
-.p-new { font-size:.78rem; font-weight:600; color:var(--red); } .p-reg { font-size:.78rem; font-weight:500; }
+.pc-brand { font-size:.93rem; letter-spacing:.15em; text-transform:uppercase; color:var(--warm); }
+.pc-name { font-size:.99rem; font-weight:500; line-height:1.3; }
+.p-old { font-size:.85rem; color:var(--warm); text-decoration:line-through; }
+.p-new { font-size:.84rem; font-weight:600; color:var(--red); } .p-reg { font-size:.78rem; font-weight:500; }
 
 /* TRENDING CARD */
 .tc { background:#fff; border:1px solid var(--border); transition:box-shadow .25s; }
