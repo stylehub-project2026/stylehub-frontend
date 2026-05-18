@@ -26,10 +26,10 @@ import ContactPage from "./ContactPage";
 
 import { saveCart, saveWishlist, sellerSignOut } from "./api";
 
-// Check if seller is logged in using the new token/seller keys
 function isSellerLoggedIn() {
   return !!localStorage.getItem("token") && !!localStorage.getItem("seller");
 }
+
 // ─── SCROLL REVEAL ───
 function useScrollReveal() {
   const refs = useRef([]);
@@ -70,7 +70,7 @@ const Stars = ({ n }) => <>{[1, 2, 3, 4, 5].map(i => <span key={i} style={{ colo
 const CSS = `
 @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap');
 :root { --cream:#F8F6F2; --dark:#1a1a18; --sage:#92A079; --deep:#728060; --warm:#8c8880; --border:#e4e0da; --gold:#c8a96e; --red:#e63946; }
-body { font-family:'DM Sans',sans-serif; background:var(--cream); color:var(--dark); }
+body { font-family:'DM Sans',sans-serif; background:var(--cream); color:var(--dark); overflow-x:hidden; }
 
 /* REVEAL */
 .reveal { opacity:0; transform:translateY(24px); transition:opacity .7s,transform .7s; }
@@ -247,10 +247,88 @@ body { font-family:'DM Sans',sans-serif; background:var(--cream); color:var(--da
 .sh-toast.on { opacity:1; transform:translateX(-50%) translateY(0); }
 @keyframes fi { from{opacity:0} to{opacity:1} }
 @keyframes su { from{opacity:0;transform:translateY(26px) scale(.98)} to{opacity:1;transform:none} }
+
+/* ─── RESPONSIVE ─── */
+
+/* Tablet: 768px - 1024px */
+@media(max-width:1024px) {
+  .sh-hero { height:420px; }
+  /* Products section: keep 7rem top/bottom, reduce sides */
+  .products-section { padding-top:7rem !important; padding-bottom:7rem !important; padding-left:2rem !important; padding-right:2rem !important; }
+  .section-spacer-lg { margin-top:6rem !important; }
+  .section-spacer-xl { margin-top:7rem !important; }
+  .section-spacer-editorial { margin-top:7rem !important; margin-bottom:9rem !important; }
+}
+
+/* Mobile: up to 768px */
 @media(max-width:768px) {
-  .sh-hero { height:360px; }
+  body { overflow-x:hidden; }
+  .sh-hero { height:300px; }
+  .hero-title { font-size:clamp(1.5rem,5vw,2.2rem) !important; }
+  .hero-sub { font-size:.75rem; margin-bottom:1rem; }
+  .hero-ct { max-width:90%; }
+
+  /* Products section: KEEP 7rem top/bottom, only tighten left/right on mobile */
+  .products-section { padding-top:7rem !important; padding-bottom:7rem !important; padding-left:1rem !important; padding-right:1rem !important; }
+
+  /* Section spacing: reduce top margins only (not the internal padding) */
+  .section-spacer-lg { margin-top:4rem !important; }
+  .section-spacer-xl { margin-top:5rem !important; }
+  .section-spacer-editorial { margin-top:5rem !important; margin-bottom:6rem !important; }
+
+  /* Modal stacks vertically */
   .sh-modal { grid-template-columns:1fr; }
   .m-img { min-height:220px; position:relative; }
+  .m-ph { min-height:220px; }
+
+  /* Brands: show 2 at a time */
+  .brand-slide { min-width:50%; width:50%; }
+  .brands-wrap { width:85%; }
+
+  /* Who we are */
+  .who-left { padding:2.5rem 1.5rem !important; }
+  .who-right { min-height:240px; }
+
+  /* Join section */
+  .sh-join { margin-left:1rem !important; margin-right:1rem !important; }
+  .sh-join h3 { font-size:1.4rem; }
+
+  /* Section titles */
+  .sec-title { font-size:1.5rem; }
+
+  /* Editorial */
+  .sh-ed { height:220px; }
+  .ed-title { font-size:1.2rem; }
+
+  /* Category cards */
+  .cat-name { font-size:1.1rem; }
+
+  /* Trending carousel horizontal padding */
+  .trending-section { padding-left:1rem !important; padding-right:1rem !important; }
+  .toppicks-section { padding-left:1rem !important; padding-right:1rem !important; }
+  .categories-section { padding-left:1rem !important; padding-right:1rem !important; }
+  .editorial-section { padding-left:1rem !important; padding-right:1rem !important; }
+  .join-section { margin-left:1rem !important; margin-right:1rem !important; }
+  .who-section { margin-left:1rem !important; margin-right:1rem !important; }
+
+  /* Trust bar */
+  .trust-bar { gap:1.5rem !important; padding-left:1rem; padding-right:1rem; }
+}
+
+/* Small mobile: up to 480px */
+@media(max-width:480px) {
+  .sh-hero { height:240px; }
+  .hero-title { font-size:1.4rem !important; }
+  .hero-sub { display:none; }
+  .sh-btn { padding:.6rem 1.2rem; font-size:.65rem; }
+  .sh-tabs { gap:1.2rem; }
+  .sh-tab { font-size:.75rem; }
+  .products-section { padding-top:7rem !important; padding-bottom:7rem !important; padding-left:.75rem !important; padding-right:.75rem !important; }
+  .brands-wrap { width:100%; }
+  .brand-slide { min-width:50%; width:50%; }
+  .sec-title { font-size:1.3rem; }
+  .sh-join h3 { font-size:1.2rem; }
+  .trust-bar { flex-direction:column; align-items:center; gap:2rem !important; }
 }
 `;
 
@@ -303,11 +381,26 @@ function TCard({ p, onOpen, addRef, d = 1, wish, toggleWish, onAdd }) {
   );
 }
 
-// ─── TRENDING CAROUSEL ───
+// ─── TRENDING CAROUSEL (responsive visible count) ───
 function TrendingCarousel({ products, onOpen, wish, toggleWish, onAdd }) {
   const [cur, setCur] = useState(0);
-  const visible = 4;
-  const max = products.length - visible;
+  const [visibleCount, setVisibleCount] = useState(4);
+
+  useEffect(() => {
+    const update = () => {
+      if (window.innerWidth < 480) setVisibleCount(2);
+      else if (window.innerWidth < 768) setVisibleCount(2);
+      else if (window.innerWidth < 1024) setVisibleCount(3);
+      else setVisibleCount(4);
+    };
+    update();
+    window.addEventListener("resize", update);
+    return () => window.removeEventListener("resize", update);
+  }, []);
+
+  const max = Math.max(0, products.length - visibleCount);
+
+  useEffect(() => { setCur(c => Math.min(c, max)); }, [max]);
 
   useEffect(() => {
     const t = setInterval(() => setCur(c => c >= max ? 0 : c + 1), 3000);
@@ -318,9 +411,9 @@ function TrendingCarousel({ products, onOpen, wish, toggleWish, onAdd }) {
   return (
     <div style={{ position: "relative" }}>
       <div style={{ overflow: "hidden" }}>
-        <div style={{ display: "flex", transition: "transform .2s ease", transform: `translateX(-${cur * (100 / visible)}%)` }}>
+        <div style={{ display: "flex", transition: "transform .4s cubic-bezier(.22,1,.36,1)", transform: `translateX(-${cur * (100 / visibleCount)}%)` }}>
           {products.map((p, i) => (
-            <div key={p.id} style={{ minWidth: `${100 / visible}%`, padding: "0 .5rem", boxSizing: "border-box" }}>
+            <div key={p.id} style={{ minWidth: `${100 / visibleCount}%`, padding: "0 .5rem", boxSizing: "border-box" }}>
               <TCard p={p} onOpen={onOpen} addRef={() => { }} d={(i % 4) + 1} wish={wish} toggleWish={toggleWish} onAdd={onAdd} />
             </div>
           ))}
@@ -369,17 +462,30 @@ function Modal({ p, onClose, onAdd }) {
 // ─── BRANDS CAROUSEL ───
 function BrandsCarousel() {
   const [idx, setIdx] = useState(0);
-  const max = BRANDS.length - 4;
+  const [slidesVisible, setSlidesVisible] = useState(4);
+
+  useEffect(() => {
+    const update = () => {
+      if (window.innerWidth < 576) setSlidesVisible(2);
+      else setSlidesVisible(4);
+    };
+    update();
+    window.addEventListener("resize", update);
+    return () => window.removeEventListener("resize", update);
+  }, []);
+
+  const max = Math.max(0, BRANDS.length - slidesVisible);
   useEffect(() => { const t = setInterval(() => setIdx(i => i >= max ? 0 : i + 1), 2500); return () => clearInterval(t); }, [max]);
+
   return (
     <section className="py-4 border-bottom bg-white">
       <p className="brands-label text-center mb-3">Featured Brands</p>
       <div className="d-flex align-items-center justify-content-center gap-2">
         <button className="brand-arrow" onClick={() => setIdx(i => i <= 0 ? max : i - 1)}>‹</button>
         <div className="brands-wrap">
-          <div className="brands-track" style={{ transform: `translateX(-${idx * 25}%)` }}>
+          <div className="brands-track" style={{ transform: `translateX(-${idx * (100 / slidesVisible)}%)` }}>
             {BRANDS.map((b, i) => (
-              <div key={i} className="brand-slide">
+              <div key={i} className="brand-slide" style={{ minWidth: `${100 / slidesVisible}%`, width: `${100 / slidesVisible}%` }}>
                 <a href={b.href} style={{ textDecoration: "none", color: "inherit" }}>
                   {b.logo ? <img src={b.logo} alt={b.name} style={{ height: "50px", width: "130px", objectFit: "contain" }} /> : <span className="brand-txt">{b.name}</span>}
                 </a>
@@ -397,7 +503,7 @@ function BrandsCarousel() {
 const SLIDES = [
   { img: "/12.jpg", title: "Discover Local Fashion,\nAll in One Place", sub: "Shop the finest Egyptian designers. Curated collections, exclusive drops.", btn: "Shop Now", href: "#" },
   { img: "/sec.jpg", title: "Build Your\nPerfect Outfit", sub: "Mix and match pieces from Egypt's top local designers — all in one place.", btn: "Build an Outfit", href: "#" },
-]
+];
 function HeroCarousel() {
   const [cur, setCur] = useState(0);
   useEffect(() => { const t = setInterval(() => setCur(c => c === 0 ? 1 : 0), 4000); return () => clearInterval(t); }, []);
@@ -448,7 +554,7 @@ export default function App() {
   const handleSellerLogin = () => setSellerLoggedIn(true);
   const handleSellerLogout = () => { sellerSignOut(); setSellerLoggedIn(false); };
 
-  // ─── BACKEND PRODUCTS — fetched once, passed to all brand pages ───
+  // ─── BACKEND PRODUCTS ───
   const [backendProducts, setBackendProducts] = useState([]);
   useEffect(() => {
     fetch("https://stylehub-backend-tau.vercel.app/api/products?limit=200")
@@ -459,7 +565,7 @@ export default function App() {
 
   const [toast, setToast] = useState("");
 
-  // ─── HOMEPAGE PRODUCTS — hardcoded, shuffled once on mount ───
+  // ─── HOMEPAGE PRODUCTS ───
   const [homeProducts] = useState(() => ({
     best: shuffle(PRODUCTS.filter(p => p.tab === "best")),
     new: shuffle(PRODUCTS.filter(p => p.tab === "new")),
@@ -519,8 +625,11 @@ export default function App() {
           {/* BRANDS */}
           <BrandsCarousel />
 
-          {/* PRODUCTS */}
-          <section style={{ padding: " 7rem" }} className="py-3 my-5">
+          {/* PRODUCTS — 7rem top/bottom always, only left/right shrinks on mobile */}
+          <section
+            className="products-section py-3 my-5"
+            style={{ paddingTop: "7rem", paddingBottom: "7rem", paddingLeft: "7rem", paddingRight: "7rem" }}
+          >
             <div className="sh-tabs reveal" ref={addRef}>
               {[["best", "Best Sellers"], ["new", "New Arrivals"], ["sale", "Sale"]].map(([key, label]) => (
                 <div key={key} className={`sh-tab${tab === key ? " on" : ""}`} onClick={() => setTab(key)}>{label}</div>
@@ -536,13 +645,21 @@ export default function App() {
           </section>
 
           {/* JOIN */}
-          <div className="sh-join text-center reveal py-5 mx-4" ref={addRef} style={{ marginTop: "7rem" }}>
+          <div
+            className="sh-join join-section text-center reveal py-5"
+            ref={addRef}
+            style={{ marginTop: "7rem", marginLeft: "1rem", marginRight: "1rem" }}
+          >
             <h3 className="mb-2">Join Style Hub</h3>
             <a href="/seller">Sell with us ›</a>
           </div>
 
           {/* WHO WE ARE */}
-          <div className="row g-0 mx-4 reveal" ref={addRef} style={{ marginTop: "8rem" }}>
+          <div
+            className="row g-0 who-section reveal"
+            ref={addRef}
+            style={{ marginTop: "8rem", marginLeft: "1rem", marginRight: "1rem" }}
+          >
             <div className="col-md-6 who-left p-5 d-flex flex-column justify-content-center">
               <h3 className="mb-3">Who We Are?</h3>
               <p className="mb-4">We support local Egyptian fashion brands and help them reach customers across Egypt — all in one place.</p>
@@ -554,7 +671,10 @@ export default function App() {
           </div>
 
           {/* CATEGORIES */}
-          <section className="px-4 py-4" style={{ marginTop: "8rem" }}>
+          <section
+            className="categories-section py-4"
+            style={{ marginTop: "8rem", paddingLeft: "1.5rem", paddingRight: "1.5rem" }}
+          >
             <div className="sec-title reveal" ref={addRef}>Shop By Categories</div>
             <div className="row g-3">
               {CATS.map((c, i) => (
@@ -570,13 +690,19 @@ export default function App() {
           </section>
 
           {/* TRENDING */}
-          <section className="px-4 py-4" style={{ marginTop: "6rem" }}>
+          <section
+            className="trending-section py-4"
+            style={{ marginTop: "6rem", paddingLeft: "1.5rem", paddingRight: "1.5rem" }}
+          >
             <div className="sec-title reveal" ref={addRef}>Trending Now</div>
             <TrendingCarousel products={homeProducts.trend} onOpen={setModal} wish={wish} toggleWish={toggleWish} onAdd={addToCart} />
           </section>
 
           {/* TOP PICKS */}
-          <section className="px-4 py-4" style={{ marginTop: "6rem" }}>
+          <section
+            className="toppicks-section py-4"
+            style={{ marginTop: "6rem", paddingLeft: "1.5rem", paddingRight: "1.5rem" }}
+          >
             <div className="sec-title reveal" ref={addRef}>Top Picks</div>
             <div className="row row-cols-2 row-cols-md-4 g-3">
               {homeProducts.picks.map((p, i) => (
@@ -588,7 +714,11 @@ export default function App() {
           </section>
 
           {/* EDITORIAL */}
-          <div className="row g-3 px-4 pt-3 reveal" ref={addRef} style={{ marginTop: "8rem", marginBottom: "12rem" }}>
+          <div
+            className="row g-3 editorial-section pt-3 reveal"
+            ref={addRef}
+            style={{ marginTop: "8rem", marginBottom: "12rem", paddingLeft: "1.5rem", paddingRight: "1.5rem" }}
+          >
             {[
               { tag: "Editorial", title: "Discover Latest in Fashion", gradient: "145deg,#8a9a7a,#4a5c40", img: "/edit.png", href: "#" },
               { tag: "Explore", title: "Explore Fashion New Era", gradient: "145deg,#c4a882,#8a7060", img: "/ban.jpg", href: "#" },
@@ -604,7 +734,7 @@ export default function App() {
           </div>
 
           {/* TRUST */}
-          <div className="d-flex justify-content-center gap-5 py-4 border-top reveal flex-wrap" ref={addRef}>
+          <div className="trust-bar d-flex justify-content-center gap-5 py-4 border-top reveal flex-wrap" ref={addRef}>
             {[
               { icon: "🚚", label: "100% Free Shipping", sub: "Free shipping on all orders" },
               { icon: "↩", label: "Easy Returns", sub: "30-day hassle-free returns" },
