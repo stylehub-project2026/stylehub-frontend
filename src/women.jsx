@@ -11,7 +11,7 @@ const HERO_SLIDES = [
     h1: "Elegant Styles\nMade for You!",
     sub: "Discover the latest women's looks from Egypt's top local brands.",
     btn: "Shop Now",
-    img: "/images/women_hero1.jpg",
+    img: "/Fashion_Retail_Website_in_White__Green__and_Blue_Photographic_Style.jpg",
     bg: "#f5ede8",
   },
   {
@@ -19,7 +19,7 @@ const HERO_SLIDES = [
     h1: "Refined Grace\nAt Lower Prices",
     sub: "Up to 50% off selected abayas and dresses from local designers.",
     btn: "Explore Sale",
-    img: "/images/women_hero2.jpg",
+    img: "/Summer.jpg",
     bg: "#ede9e0",
   },
   {
@@ -27,15 +27,15 @@ const HERO_SLIDES = [
     h1: "Wear What\nDefines You",
     sub: "Support Egyptian creators — every purchase matters.",
     btn: "Meet the Brands",
-    img: "/cms.jpg",
+    img: "/cover1.jpg",
     bg: "#eeeae6",
   },
 ];
 
 const CATEGORIES = [
-  { name: "Abayas", img: "/images/women_cat_abaya.png", count: "32 styles" },
-  { name: "Dresses", img: "/images/women_cat_dress.png", count: "21 styles" },
-  { name: "Sets", img: "/images/women_cat_sets.png", count: "15 styles" },
+  { name: "Abayas", img: "/abayas2.jpg", count: "32 styles" },
+  { name: "Dresses", img: "/dress2.jpg", count: "21 styles" },
+  { name: "Sets", img: "/sets2.jpg", count: "15 styles" },
 ];
 
 
