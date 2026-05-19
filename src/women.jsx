@@ -7,6 +7,11 @@ import { SHNav, SHFooter, useScrollReveal, SHARED_CSS, PRODUCTS, shuffle } from 
 /* ══════════════════════════════════════════ DATA ══════════════════════════════════════════ */
 const HERO_SLIDES = [
   {
+    fullBanner: true,
+    img: "/cover1.jpg",
+    btn: "Discover",
+  },
+  {
     ey: "New Collection 2026",
     h1: "Elegant Styles\nMade for You!",
     sub: "Discover the latest women's looks from Egypt's top local brands.",
@@ -22,20 +27,12 @@ const HERO_SLIDES = [
     img: "/Summer.jpg",
     bg: "#ede9e0",
   },
-  {
-    ey: "Local Brands Spotlight",
-    h1: "Wear What\nDefines You",
-    sub: "Support Egyptian creators — every purchase matters.",
-    btn: "Meet the Brands",
-    img: "/cover1.jpg",
-    bg: "#eeeae6",
-  },
 ];
 
 const CATEGORIES = [
   { name: "Abayas", img: "/abayas2.jpg", count: "32 styles" },
   { name: "Dresses", img: "/dress2.jpg", count: "21 styles" },
-  { name: "Sets", img: "/sets2.jpg", count: "15 styles" },
+  { name: "Sets", img: "/set1.jpg", count: "15 styles" },
 ];
 
 
