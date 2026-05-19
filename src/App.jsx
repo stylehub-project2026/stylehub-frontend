@@ -698,21 +698,6 @@ export default function App() {
             <TrendingCarousel products={homeProducts.trend} onOpen={setModal} wish={wish} toggleWish={toggleWish} onAdd={addToCart} />
           </section>
 
-          {/* TOP PICKS */}
-          <section
-            className="toppicks-section py-4"
-            style={{ marginTop: "6rem", paddingLeft: "1.5rem", paddingRight: "1.5rem" }}
-          >
-            <div className="sec-title reveal" ref={addRef}>Top Picks</div>
-            <div className="row row-cols-2 row-cols-md-4 g-3">
-              {homeProducts.picks.map((p, i) => (
-                <div className="col" key={p.id}>
-                  <TCard p={p} onOpen={setModal} addRef={addRef} d={(i % 4) + 1} wish={wish} toggleWish={toggleWish} onAdd={addToCart} />
-                </div>
-              ))}
-            </div>
-          </section>
-
           {/* EDITORIAL */}
           <div
             className="row g-3 editorial-section pt-3 reveal"
