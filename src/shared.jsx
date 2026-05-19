@@ -253,6 +253,7 @@ function SearchOverlay({ open, onClose }) {
 export function SHNav({ cart = [], wish = [] }) {
   const navigate = useNavigate();
   const [searchOpen, setSearchOpen] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   return (
     <nav className="sh-nav sticky-top d-flex align-items-center justify-content-between px-4" style={{ position: "relative" }}>
@@ -292,7 +293,34 @@ export function SHNav({ cart = [], wish = [] }) {
           {I.cart}
           {cart.length > 0 && <span className="sh-badge">{cart.reduce((s, x) => s + x.qty, 0)}</span>}
         </Link>
+        {/* Hamburger */}
+        <button className="d-lg-none nav-icon" onClick={() => setMenuOpen(m => !m)} style={{ background: "none", border: "none", padding: 0, flexDirection: "column", gap: 5 }}>
+          <span style={{ display: "block", width: 22, height: 2, background: "var(--dark)", transition: "all .3s", transform: menuOpen ? "rotate(45deg) translate(5px,5px)" : "none" }} />
+          <span style={{ display: "block", width: 22, height: 2, background: "var(--dark)", transition: "all .3s", opacity: menuOpen ? 0 : 1 }} />
+          <span style={{ display: "block", width: 22, height: 2, background: "var(--dark)", transition: "all .3s", transform: menuOpen ? "rotate(-45deg) translate(5px,-5px)" : "none" }} />
+        </button>
       </div>
+      {/* Mobile Menu */}
+      {menuOpen && (
+        <div style={{ position: "absolute", top: "56px", left: 0, right: 0, background: "#fff", borderTop: "1px solid var(--border)", zIndex: 999, padding: "1rem 1.5rem", boxShadow: "0 8px 24px rgba(0,0,0,.08)" }}>
+          {NAV_LINKS.map(l => (
+            <div key={l.label}>
+              <a href={l.href} onClick={() => setMenuOpen(false)} style={{ display: "block", padding: ".6rem 0", color: "var(--dark)", textDecoration: "none", fontSize: ".85rem", letterSpacing: ".04em", borderBottom: "1px solid var(--border)" }}>
+                {l.label}
+              </a>
+              {l.dropdown && (
+                <div style={{ paddingLeft: "1rem" }}>
+                  {BRANDS.map(b => (
+                    <a key={b.name} href={b.href || "#"} onClick={() => setMenuOpen(false)} style={{ display: "block", padding: ".45rem 0", color: "var(--warm)", textDecoration: "none", fontSize: ".78rem" }}>
+                      {b.name}
+                    </a>
+                  ))}
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
     </nav>
   );
 }
