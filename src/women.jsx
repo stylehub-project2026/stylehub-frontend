@@ -32,7 +32,7 @@ const HERO_SLIDES = [
 const CATEGORIES = [
   { name: "Abayas", img: "/abayas2.jpg", count: "32 styles" },
   { name: "Dresses", img: "/dress2.jpg", count: "21 styles" },
-  { name: "Sets", img: "/set1.jpg", count: "15 styles" },
+  { name: "Sets", img: "/sets2.jpg", count: "15 styles" },
 ];
 
 
@@ -40,6 +40,11 @@ const CATEGORIES = [
 const PAGE_CSS = `
 /* ── Hero ── */
 .w-hero { position:relative; overflow:hidden; min-height:520px; display:flex; align-items:center; }
+.w-hero-banner { position:relative; width:100%; }
+.w-hero-banner img { width:100%; height:520px; object-fit:cover; object-position:center top; display:block; }
+.w-hero-banner-overlay { position:absolute; inset:0; background:rgba(0,0,0,0.18); display:flex; align-items:center; justify-content:center; }
+.w-hero-banner-btn { background:#fff; color:var(--dark); border:none; padding:.75rem 2.8rem; font-size:.85rem; letter-spacing:.18em; text-transform:uppercase; cursor:pointer; font-weight:600; transition:all .2s; border-radius:2px; }
+.w-hero-banner-btn:hover { background:var(--dark); color:#fff; }
 .w-hero-slide { display:flex; align-items:center; justify-content:space-between; width:100%; padding:60px 7%; gap:32px; animation:wSlideIn .55s ease both; }
 @keyframes wSlideIn { from{opacity:0;transform:translateX(28px)} to{opacity:1;transform:none} }
 .w-hero-txt { flex:1; max-width:480px; }
@@ -357,45 +362,47 @@ function HeroCarousel() {
   const s = HERO_SLIDES[cur];
 
   return (
-    <div className="w-hero" style={{ background: s.bg }}>
-      <div className="w-hero-slide active" key={key}>
-        <div className="w-hero-txt">
-          <div className="w-hero-ey">{s.ey}</div>
-          <h1 className="w-hero-h1">
-            {s.h1.split("\n").map((l, i) => (
-              <span key={i}>{l}<br /></span>
-            ))}
-          </h1>
-          <p className="w-hero-sub">{s.sub}</p>
-          <div className="d-flex gap-3 flex-wrap">
-            <button className="btn-dk">{s.btn}</button>
-
+    <div style={{ position: "relative" }}>
+      {s.fullBanner ? (
+        <div className="w-hero-banner" key={key}>
+          <img src={s.img} alt="StyleHub Women" onError={e => { e.target.src = "https://placehold.co/1400x520?text=Banner"; }} />
+          <div className="w-hero-banner-overlay">
+            <button className="w-hero-banner-btn">{s.btn}</button>
           </div>
         </div>
-        <div className="w-hero-img">
-          <img
-            src={s.img}
-            alt={s.h1}
-            onError={(e) => { e.target.src = "https://placehold.co/480x520?text=Hero"; }}
-          />
+      ) : (
+        <div className="w-hero" style={{ background: s.bg }}>
+          <div className="w-hero-slide active" key={key}>
+            <div className="w-hero-txt">
+              <div className="w-hero-ey">{s.ey}</div>
+              <h1 className="w-hero-h1">
+                {s.h1.split("\n").map((l, i) => (
+                  <span key={i}>{l}<br /></span>
+                ))}
+              </h1>
+              <p className="w-hero-sub">{s.sub}</p>
+              <div className="d-flex gap-3 flex-wrap">
+                <button className="btn-dk">{s.btn}</button>
+              </div>
+            </div>
+            <div className="w-hero-img">
+              <img src={s.img} alt={s.h1} onError={(e) => { e.target.src = "https://placehold.co/480x520?text=Hero"; }} />
+            </div>
+          </div>
         </div>
-      </div>
-      <button className="w-hero-arrow p" onClick={() => go(-1)}>
+      )}
+      <button className="w-hero-arrow p" onClick={() => go(-1)} style={{ top: "50%", left: 18, position: "absolute", transform: "translateY(-50%)", background: "rgba(255,255,255,.85)", border: "1px solid var(--border)", borderRadius: "50%", width: 38, height: 38, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", zIndex: 5 }}>
         <i className="bi bi-chevron-left" />
       </button>
-      <button className="w-hero-arrow n" onClick={() => go(1)}>
+      <button className="w-hero-arrow n" onClick={() => go(1)} style={{ top: "50%", right: 18, position: "absolute", transform: "translateY(-50%)", background: "rgba(255,255,255,.85)", border: "1px solid var(--border)", borderRadius: "50%", width: 38, height: 38, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", zIndex: 5 }}>
         <i className="bi bi-chevron-right" />
       </button>
-      <div className="w-hero-dots">
+      <div style={{ position: "absolute", bottom: 20, left: "50%", transform: "translateX(-50%)", display: "flex", gap: 6 }}>
         {HERO_SLIDES.map((_, i) => (
-          <button
-            key={i}
-            className={`w-hero-dot ${i === cur ? "on" : ""}`}
-            onClick={() => { setCur(i); setKey((k) => k + 1); }}
-          />
+          <button key={i} className={`w-hero-dot ${i === cur ? "on" : ""}`} onClick={() => { setCur(i); setKey(k => k + 1); }} />
         ))}
       </div>
-      <div className="w-hero-counter">
+      <div style={{ position: "absolute", bottom: 22, right: 28, fontSize: ".7rem", letterSpacing: ".1em", color: cur === 0 ? "rgba(255,255,255,.7)" : "var(--warm)" }}>
         <span>{String(cur + 1).padStart(2, "0")}</span>
         <span style={{ opacity: 0.4 }}> / </span>
         <span style={{ opacity: 0.4 }}>{String(HERO_SLIDES.length).padStart(2, "0")}</span>
