@@ -155,17 +155,44 @@ function SearchOverlay({ open, onClose }) {
 
   useEffect(() => {
     if (!query.trim()) { setResults([]); return; }
+    const q = query.trim().toLowerCase();
     const timer = setTimeout(() => {
       setSearching(true);
-      fetch(`${API_BASE}/products?search=${encodeURIComponent(query.trim())}&limit=8`)
+
+      // Search hardcoded PRODUCTS locally
+      const localMatches = PRODUCTS
+        .filter(p => p.name.toLowerCase().includes(q) || p.brand.toLowerCase().includes(q) || (p.type || "").toLowerCase().includes(q))
+        .slice(0, 8)
+        .map(p => ({
+          _id: String(p.id),
+          name: p.name,
+          price: parseInt((p.price || "0").replace(/[^0-9]/g, ""), 10),
+          images: p.img ? [p.img] : [],
+          seller: { brandName: p.brand },
+          _source: "local",
+        }));
+
+      // Also search backend
+      fetch(`${API_BASE}/products?search=${encodeURIComponent(q)}&limit=8`)
         .then(r => r.json())
-        .then(data => setResults(data.data?.products || []))
-        .catch(() => setResults([]))
+        .then(data => {
+          const backendResults = (data.data?.products || [])
+            .filter(p => p.seller?.brandName)
+            .map(p => ({ ...p, _source: "backend" }));
+
+          // Merge: backend first, then local, deduplicate by name
+          const seen = new Set(backendResults.map(p => p.name.toLowerCase()));
+          const merged = [
+            ...backendResults,
+            ...localMatches.filter(p => !seen.has(p.name.toLowerCase())),
+          ].slice(0, 10);
+          setResults(merged);
+        })
+        .catch(() => setResults(localMatches))
         .finally(() => setSearching(false));
     }, 300);
     return () => clearTimeout(timer);
   }, [query]);
-
   return (
     <>
       <style>{`.sr-input::placeholder{color:#b0a89a;} .sr-input{outline:none;}`}</style>
@@ -196,7 +223,7 @@ function SearchOverlay({ open, onClose }) {
               </div>
               <div style={{ flex: 1 }}>
                 <div style={{ fontSize: ".8rem", fontWeight: 500, color: "var(--dark)" }}>{p.name}</div>
-                <div style={{ fontSize: ".62rem", color: "var(--warm)", marginTop: ".1rem" }}>{p.seller?.brandName || "StyleHub"}</div>
+                <div style={{ fontSize: ".62rem", color: "var(--warm)", marginTop: ".1rem" }}>{p.seller?.brandName}</div>
               </div>
               <div style={{ fontSize: ".75rem", fontWeight: 600 }}>LE {(p.price)?.toLocaleString()}</div>
             </div>
