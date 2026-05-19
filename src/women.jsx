@@ -12,12 +12,12 @@ const HERO_SLIDES = [
     btn: "Discover",
   },
   {
-    ey: "New Collection 2026",
-    h1: "Elegant Styles\nMade for You!",
-    sub: "Discover the latest women's looks from Egypt's top local brands.",
-    btn: "Shop Now",
-    img: "/Fashion_Retail_Website_in_White__Green__and_Blue_Photographic_Style.jpg",
-    bg: "#f5ede8",
+    ey: "Most Wanted · Most Loved",
+    h1: "Style That\nSpeaks for You",
+    sub: "The most coveted pieces from Egypt's boldest local designers.",
+    btn: "Shop the Edit",
+    img: "/cover2.jpg",
+    bg: "#f0ece6",
   },
   {
     ey: "End of Season Deals",
@@ -32,7 +32,7 @@ const HERO_SLIDES = [
 const CATEGORIES = [
   { name: "Abayas", img: "/abayas2.jpg", count: "32 styles" },
   { name: "Dresses", img: "/dress2.jpg", count: "21 styles" },
-  { name: "Sets", img: "/set1.jpg", count: "15 styles" },
+  { name: "Sets", img: "/sets2.jpg", count: "15 styles" },
 ];
 
 
@@ -376,7 +376,7 @@ function HeroCarousel() {
             <div className="w-hero-txt">
               <div className="w-hero-ey">{s.ey}</div>
               <h1 className="w-hero-h1">
-                {s.h1.split("\n").map((l, i) => (
+                {(s.h1 || '').split("\n").map((l, i) => (
                   <span key={i}>{l}<br /></span>
                 ))}
               </h1>
@@ -386,7 +386,7 @@ function HeroCarousel() {
               </div>
             </div>
             <div className="w-hero-img">
-              <img src={s.img} alt={s.h1} onError={(e) => { e.target.src = "https://placehold.co/480x520?text=Hero"; }} />
+              <img src={s.img} alt={s.h1 || ''} onError={(e) => { e.target.src = "https://placehold.co/480x520?text=Hero"; }} />
             </div>
           </div>
         </div>
@@ -402,7 +402,7 @@ function HeroCarousel() {
           <button key={i} className={`w-hero-dot ${i === cur ? "on" : ""}`} onClick={() => { setCur(i); setKey(k => k + 1); }} />
         ))}
       </div>
-      <div style={{ position: "absolute", bottom: 22, right: 28, fontSize: ".7rem", letterSpacing: ".1em", color: cur === 0 ? "rgba(255,255,255,.7)" : "var(--warm)" }}>
+      <div style={{ position: "absolute", bottom: 22, right: 28, fontSize: ".7rem", letterSpacing: ".1em", color: s.fullBanner ? "rgba(255,255,255,.7)" : "var(--warm)" }}>
         <span>{String(cur + 1).padStart(2, "0")}</span>
         <span style={{ opacity: 0.4 }}> / </span>
         <span style={{ opacity: 0.4 }}>{String(HERO_SLIDES.length).padStart(2, "0")}</span>
