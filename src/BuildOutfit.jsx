@@ -81,7 +81,7 @@ function ThreeBodyModel({ body, gender }) {
     let renderer;
     let label;
 
-    import("https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js").then((THREE) => {
+    const runThree = (THREE) => {
       if (!mountRef.current) return;
 
       const W = mount.clientWidth || 330;
@@ -244,7 +244,16 @@ function ThreeBodyModel({ body, gender }) {
         renderer.render(scene, camera);
       };
       animate();
-    });
+    };
+
+    if (window.THREE) {
+      runThree(window.THREE);
+    } else {
+      // fallback: wait for script to load
+      const interval = setInterval(() => {
+        if (window.THREE) { clearInterval(interval); runThree(window.THREE); }
+      }, 50);
+    }
 
     return () => {
       cancelAnimationFrame(animId);
