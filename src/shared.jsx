@@ -161,7 +161,7 @@ function SearchOverlay({ open, onClose }) {
 
       // Search hardcoded PRODUCTS locally
       const localMatches = PRODUCTS
-        .filter(p => p.name.toLowerCase().includes(q) || p.brand.toLowerCase().includes(q) || (p.type || "").toLowerCase().includes(q))
+        .filter(p => p.name.toLowerCase().includes(q) || p.brand.toLowerCase().includes(q) || (p.type || "").toLowerCase().includes(q) || (p.desc || "").toLowerCase().includes(q))
         .slice(0, 8)
         .map(p => ({
           _id: String(p.id),
