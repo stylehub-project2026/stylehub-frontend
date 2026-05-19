@@ -501,7 +501,7 @@ export default function WomenPage() {
       {/* SALE BANNER */}
       <section className="w-sale-ban reveal" ref={addRef}>
         <div className="w-sale-ban-inner">
-          <img src="/111.png" alt="End of Season Sale" onError={(e) => { e.target.src = "https://placehold.co/700x260?text=Sale"; }} />
+          <img src="/sale.jpg" alt="End of Season Sale" onError={(e) => { e.target.src = "https://placehold.co/700x260?text=Sale"; }} />
           <div className="w-sale-ban-text">
             <p className="w-sale-sub">Limited Time Only</p>
             <h2>END OF SEASON SALE</h2>
