@@ -19,13 +19,11 @@ const HERO_SLIDES = [
     btn: "Shop the Edit",
     img: "/cover2.jpg",
   },
+
   {
-    ey: "End of Season Deals",
-    h1: "Refined Grace\nAt Lower Prices",
-    sub: "Up to 50% off selected abayas and dresses from local designers.",
-    btn: "Explore Sale",
-    img: "/Summer.jpg",
-    bg: "#ede9e0",
+    fullSale: true,
+    img: "/final_cover.jpg",
+    btn: "Shop the Sale",
   },
 ];
 
