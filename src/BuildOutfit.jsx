@@ -1,5 +1,4 @@
 import { useMemo, useState, useEffect, useRef } from "react";
-import * as THREE from "three";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { SHARED_CSS, SHFooter, SHNav } from "./shared";
 
@@ -78,180 +77,182 @@ function ThreeBodyModel({ body, gender }) {
     const mount = mountRef.current;
     if (!mount) return;
 
-    const W = mount.clientWidth || 330;
-    const H = mount.clientHeight || 520;
-
-    const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x2c2b28);
-    scene.fog = new THREE.Fog(0x2c2b28, 10, 22);
-
-    const camera = new THREE.PerspectiveCamera(42, W / H, 0.1, 100);
-    camera.position.set(0, 1.4, 5.2);
-    camera.lookAt(0, 1.2, 0);
-
-    const renderer = new THREE.WebGLRenderer({ antialias: true });
-    renderer.setSize(W, H);
-    renderer.shadowMap.enabled = true;
-    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-    mount.appendChild(renderer.domElement);
-
-    // Lights
-    scene.add(new THREE.AmbientLight(0xfff3e0, 0.65));
-    const sun = new THREE.DirectionalLight(0xffffff, 1.3);
-    sun.position.set(3, 7, 5);
-    sun.castShadow = true;
-    scene.add(sun);
-    const fill = new THREE.DirectionalLight(0xa7b08a, 0.45);
-    fill.position.set(-4, 2, -3);
-    scene.add(fill);
-    const rim = new THREE.DirectionalLight(0x7090ff, 0.2);
-    rim.position.set(0, 5, -5);
-    scene.add(rim);
-
-    // Floor
-    const floor = new THREE.Mesh(
-      new THREE.CircleGeometry(2.5, 36),
-      new THREE.MeshLambertMaterial({ color: 0x222120 })
-    );
-    floor.rotation.x = -Math.PI / 2;
-    floor.receiveShadow = true;
-    scene.add(floor);
-
-    // ── Measurements ──
-    const h = body.height || 170;
-    const w = body.weight || 70;
-    const ch = body.chest || 88;
-    const wa = body.waist || 70;
-    const hi = body.hips || 96;
-    const isFemale = gender === "female";
-
-    const hS = 0.82 + ((h - 140) / 55) * 0.36;   // height scale
-    const wS = Math.min(1.5, Math.max(0.72,
-      0.76 + ((w - 45) / 85) * 0.55 + ((ch - 75) / 50) * 0.08 + ((hi - 80) / 50) * 0.07
-    ));
-
-    // Materials
-    const skinMat = new THREE.MeshLambertMaterial({ color: 0xd4a07a });
-    const topMat = new THREE.MeshLambertMaterial({ color: isFemale ? 0x8a7b9c : 0x4a5568 });
-    const btmMat = new THREE.MeshLambertMaterial({ color: isFemale ? 0x7a6b5a : 0x2d3748 });
-    const hairMat = new THREE.MeshLambertMaterial({ color: 0x3d2b1a });
-    const shoeMat = new THREE.MeshLambertMaterial({ color: 0x1a1816 });
-
-    const group = new THREE.Group();
-
-    // Helper: add mesh to group
-    const add = (geo, mat, pos, rot) => {
-      const m = new THREE.Mesh(geo, mat);
-      m.castShadow = true;
-      if (pos) m.position.set(...pos);
-      if (rot) m.rotation.set(...rot);
-      group.add(m);
-      return m;
-    };
-
-    // HEAD
-    const headY = 2.38 * hS;
-    add(new THREE.SphereGeometry(0.22, 18, 14), skinMat, [0, headY, 0]);
-
-    // Hair
-    if (isFemale) {
-      add(new THREE.SphereGeometry(0.232, 16, 10, 0, Math.PI * 2, 0, Math.PI * 0.52), hairMat, [0, headY, 0]);
-      add(new THREE.CylinderGeometry(0.21, 0.14, 0.55, 14), hairMat, [0, headY - 0.32, -0.04]);
-    } else {
-      add(new THREE.SphereGeometry(0.228, 16, 8, 0, Math.PI * 2, 0, Math.PI * 0.42), hairMat, [0, headY, 0]);
-    }
-
-    // Neck
-    const neckY = headY - 0.22 - 0.09;
-    add(new THREE.CylinderGeometry(0.09, 0.1, 0.18, 12), skinMat, [0, neckY, 0]);
-
-    // TORSO
-    const torsoTopR = (ch / 88) * (isFemale ? 0.27 : 0.31) * wS;
-    const torsoMidR = (wa / 70) * (isFemale ? 0.21 : 0.26) * wS;
-    const torsoH = 0.7 * hS;
-    const torsoY = neckY - 0.09 - torsoH / 2;
-    add(new THREE.CylinderGeometry(torsoTopR, torsoMidR, torsoH, 16), topMat, [0, torsoY, 0]);
-
-    // Bust (female)
-    if (isFemale && ch > 80) {
-      const bR = (ch / 88) * 0.085 * wS;
-      [-0.1, 0.1].forEach(x => add(new THREE.SphereGeometry(bR, 12, 10), topMat, [x, torsoY + torsoH * 0.18, torsoTopR * 0.88]));
-    }
-
-    // HIPS
-    const hipsR = (hi / 96) * (isFemale ? 0.3 : 0.27) * wS;
-    const hipsH = 0.24 * hS;
-    const hipsY = torsoY - torsoH / 2 - hipsH / 2 + 0.05;
-    add(new THREE.CylinderGeometry(hipsR, hipsR * 0.9, hipsH, 16), btmMat, [0, hipsY, 0]);
-
-    // Female skirt
-    if (isFemale) {
-      const skirtGeo = new THREE.CylinderGeometry(hipsR * 1.12, hipsR * 1.38, hipsH * 1.05, 18, 1, true);
-      const skirtMesh = new THREE.Mesh(skirtGeo, new THREE.MeshLambertMaterial({ color: 0x8a7b9c, side: THREE.DoubleSide, transparent: true, opacity: 0.82 }));
-      skirtMesh.position.set(0, hipsY, 0);
-      group.add(skirtMesh);
-    }
-
-    // ARMS
-    const armR = wS * 0.072;
-    const upArmH = 0.56 * hS;
-    const foreH = 0.46 * hS;
-    const armY = torsoY + torsoH * 0.28;
-    const armX = torsoTopR + armR + 0.015;
-
-    [-1, 1].forEach(s => {
-      add(new THREE.CylinderGeometry(armR, armR * 0.86, upArmH, 10), skinMat, [s * armX, armY - upArmH / 2, 0], [0, 0, s * 0.1]);
-      const foreX = s * (armX + Math.sin(0.1) * upArmH * 0.55);
-      const foreY = armY - upArmH - foreH / 2 + 0.03;
-      add(new THREE.CylinderGeometry(armR * 0.76, armR * 0.62, foreH, 10), skinMat, [foreX, foreY, 0]);
-      add(new THREE.SphereGeometry(armR * 0.68, 10, 8), skinMat, [foreX, foreY - foreH / 2 - 0.035, 0]);
-    });
-
-    // LEGS
-    const legR = wS * (isFemale ? 0.105 : 0.1) * Math.sqrt(hi / 96);
-    const thighH = 0.6 * hS;
-    const calfH = 0.54 * hS;
-    const legX = hipsR * 0.54;
-    const legTopY = hipsY - hipsH / 2 + 0.04;
-
-    [-1, 1].forEach(s => {
-      add(new THREE.CylinderGeometry(legR, legR * 0.8, thighH, 12), btmMat, [s * legX, legTopY - thighH / 2, 0]);
-      add(new THREE.CylinderGeometry(legR * 0.7, legR * 0.54, calfH, 12), btmMat, [s * legX, legTopY - thighH - calfH / 2 + 0.02, 0]);
-      // Shoe
-      const shoeGeo = new THREE.CylinderGeometry(legR * 0.55, legR * 0.5, 0.1, 10);
-      const shoe = new THREE.Mesh(shoeGeo, shoeMat);
-      shoe.position.set(s * legX, legTopY - thighH - calfH + 0.01, 0.07);
-      shoe.rotation.x = 0.28;
-      group.add(shoe);
-    });
-
-    // Center group vertically
-    const bbox = new THREE.Box3().setFromObject(group);
-    group.position.y = -bbox.min.y * 0.42;
-
-    scene.add(group);
-
-    // Label
-    const label = document.createElement("div");
-    label.textContent = isFemale ? "♀ Female Model" : "♂ Male Model";
-    label.style.cssText = "position:absolute;top:12px;left:0;right:0;text-align:center;font-size:.52rem;letter-spacing:.2em;text-transform:uppercase;color:rgba(255,255,255,.32);pointer-events:none";
-    mount.style.position = "relative";
-    mount.appendChild(label);
-
-    // Animate
     let animId;
-    const animate = () => {
-      animId = requestAnimationFrame(animate);
-      group.rotation.y += 0.005;
-      renderer.render(scene, camera);
-    };
-    animate();
+    let renderer;
+    let label;
+
+    import("three").then((THREE) => {
+      if (!mountRef.current) return;
+
+      const W = mount.clientWidth || 330;
+      const H = mount.clientHeight || 520;
+
+      const scene = new THREE.Scene();
+      scene.background = new THREE.Color(0x2c2b28);
+      scene.fog = new THREE.Fog(0x2c2b28, 10, 22);
+
+      const camera = new THREE.PerspectiveCamera(42, W / H, 0.1, 100);
+      camera.position.set(0, 1.4, 5.2);
+      camera.lookAt(0, 1.2, 0);
+
+      renderer = new THREE.WebGLRenderer({ antialias: true });
+      renderer.setSize(W, H);
+      renderer.shadowMap.enabled = true;
+      renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+      mount.appendChild(renderer.domElement);
+
+      // Lights
+      scene.add(new THREE.AmbientLight(0xfff3e0, 0.65));
+      const sun = new THREE.DirectionalLight(0xffffff, 1.3);
+      sun.position.set(3, 7, 5);
+      sun.castShadow = true;
+      scene.add(sun);
+      const fill = new THREE.DirectionalLight(0xa7b08a, 0.45);
+      fill.position.set(-4, 2, -3);
+      scene.add(fill);
+      const rim = new THREE.DirectionalLight(0x7090ff, 0.2);
+      rim.position.set(0, 5, -5);
+      scene.add(rim);
+
+      // Floor
+      const floor = new THREE.Mesh(
+        new THREE.CircleGeometry(2.5, 36),
+        new THREE.MeshLambertMaterial({ color: 0x222120 })
+      );
+      floor.rotation.x = -Math.PI / 2;
+      floor.receiveShadow = true;
+      scene.add(floor);
+
+      // ── Measurements ──
+      const h = body.height || 170;
+      const w = body.weight || 70;
+      const ch = body.chest || 88;
+      const wa = body.waist || 70;
+      const hi = body.hips || 96;
+      const isFemale = gender === "female";
+
+      const hS = 0.82 + ((h - 140) / 55) * 0.36;
+      const wS = Math.min(1.5, Math.max(0.72,
+        0.76 + ((w - 45) / 85) * 0.55 + ((ch - 75) / 50) * 0.08 + ((hi - 80) / 50) * 0.07
+      ));
+
+      // Materials
+      const skinMat = new THREE.MeshLambertMaterial({ color: 0xd4a07a });
+      const topMat = new THREE.MeshLambertMaterial({ color: isFemale ? 0x8a7b9c : 0x4a5568 });
+      const btmMat = new THREE.MeshLambertMaterial({ color: isFemale ? 0x7a6b5a : 0x2d3748 });
+      const hairMat = new THREE.MeshLambertMaterial({ color: 0x3d2b1a });
+      const shoeMat = new THREE.MeshLambertMaterial({ color: 0x1a1816 });
+
+      const group = new THREE.Group();
+
+      const add = (geo, mat, pos, rot) => {
+        const m = new THREE.Mesh(geo, mat);
+        m.castShadow = true;
+        if (pos) m.position.set(...pos);
+        if (rot) m.rotation.set(...rot);
+        group.add(m);
+        return m;
+      };
+
+      // HEAD
+      const headY = 2.38 * hS;
+      add(new THREE.SphereGeometry(0.22, 18, 14), skinMat, [0, headY, 0]);
+
+      // Hair
+      if (isFemale) {
+        add(new THREE.SphereGeometry(0.232, 16, 10, 0, Math.PI * 2, 0, Math.PI * 0.52), hairMat, [0, headY, 0]);
+        add(new THREE.CylinderGeometry(0.21, 0.14, 0.55, 14), hairMat, [0, headY - 0.32, -0.04]);
+      } else {
+        add(new THREE.SphereGeometry(0.228, 16, 8, 0, Math.PI * 2, 0, Math.PI * 0.42), hairMat, [0, headY, 0]);
+      }
+
+      // Neck
+      const neckY = headY - 0.22 - 0.09;
+      add(new THREE.CylinderGeometry(0.09, 0.1, 0.18, 12), skinMat, [0, neckY, 0]);
+
+      // TORSO
+      const torsoTopR = (ch / 88) * (isFemale ? 0.27 : 0.31) * wS;
+      const torsoMidR = (wa / 70) * (isFemale ? 0.21 : 0.26) * wS;
+      const torsoH = 0.7 * hS;
+      const torsoY = neckY - 0.09 - torsoH / 2;
+      add(new THREE.CylinderGeometry(torsoTopR, torsoMidR, torsoH, 16), topMat, [0, torsoY, 0]);
+
+      if (isFemale && ch > 80) {
+        const bR = (ch / 88) * 0.085 * wS;
+        [-0.1, 0.1].forEach(x => add(new THREE.SphereGeometry(bR, 12, 10), topMat, [x, torsoY + torsoH * 0.18, torsoTopR * 0.88]));
+      }
+
+      // HIPS
+      const hipsR = (hi / 96) * (isFemale ? 0.3 : 0.27) * wS;
+      const hipsH = 0.24 * hS;
+      const hipsY = torsoY - torsoH / 2 - hipsH / 2 + 0.05;
+      add(new THREE.CylinderGeometry(hipsR, hipsR * 0.9, hipsH, 16), btmMat, [0, hipsY, 0]);
+
+      if (isFemale) {
+        const skirtGeo = new THREE.CylinderGeometry(hipsR * 1.12, hipsR * 1.38, hipsH * 1.05, 18, 1, true);
+        const skirtMesh = new THREE.Mesh(skirtGeo, new THREE.MeshLambertMaterial({ color: 0x8a7b9c, side: THREE.DoubleSide, transparent: true, opacity: 0.82 }));
+        skirtMesh.position.set(0, hipsY, 0);
+        group.add(skirtMesh);
+      }
+
+      // ARMS
+      const armR = wS * 0.072;
+      const upArmH = 0.56 * hS;
+      const foreH = 0.46 * hS;
+      const armY = torsoY + torsoH * 0.28;
+      const armX = torsoTopR + armR + 0.015;
+
+      [-1, 1].forEach(s => {
+        add(new THREE.CylinderGeometry(armR, armR * 0.86, upArmH, 10), skinMat, [s * armX, armY - upArmH / 2, 0], [0, 0, s * 0.1]);
+        const foreX = s * (armX + Math.sin(0.1) * upArmH * 0.55);
+        const foreY = armY - upArmH - foreH / 2 + 0.03;
+        add(new THREE.CylinderGeometry(armR * 0.76, armR * 0.62, foreH, 10), skinMat, [foreX, foreY, 0]);
+        add(new THREE.SphereGeometry(armR * 0.68, 10, 8), skinMat, [foreX, foreY - foreH / 2 - 0.035, 0]);
+      });
+
+      // LEGS
+      const legR = wS * (isFemale ? 0.105 : 0.1) * Math.sqrt(hi / 96);
+      const thighH = 0.6 * hS;
+      const calfH = 0.54 * hS;
+      const legX = hipsR * 0.54;
+      const legTopY = hipsY - hipsH / 2 + 0.04;
+
+      [-1, 1].forEach(s => {
+        add(new THREE.CylinderGeometry(legR, legR * 0.8, thighH, 12), btmMat, [s * legX, legTopY - thighH / 2, 0]);
+        add(new THREE.CylinderGeometry(legR * 0.7, legR * 0.54, calfH, 12), btmMat, [s * legX, legTopY - thighH - calfH / 2 + 0.02, 0]);
+        const shoeGeo = new THREE.CylinderGeometry(legR * 0.55, legR * 0.5, 0.1, 10);
+        const shoe = new THREE.Mesh(shoeGeo, shoeMat);
+        shoe.position.set(s * legX, legTopY - thighH - calfH + 0.01, 0.07);
+        shoe.rotation.x = 0.28;
+        group.add(shoe);
+      });
+
+      const bbox = new THREE.Box3().setFromObject(group);
+      group.position.y = -bbox.min.y * 0.42;
+      scene.add(group);
+
+      // Label
+      label = document.createElement("div");
+      label.textContent = isFemale ? "♀ Female Model" : "♂ Male Model";
+      label.style.cssText = "position:absolute;top:12px;left:0;right:0;text-align:center;font-size:.52rem;letter-spacing:.2em;text-transform:uppercase;color:rgba(255,255,255,.32);pointer-events:none";
+      mount.style.position = "relative";
+      mount.appendChild(label);
+
+      const animate = () => {
+        animId = requestAnimationFrame(animate);
+        group.rotation.y += 0.005;
+        renderer.render(scene, camera);
+      };
+      animate();
+    });
 
     return () => {
       cancelAnimationFrame(animId);
-      if (mount.contains(renderer.domElement)) mount.removeChild(renderer.domElement);
-      if (mount.contains(label)) mount.removeChild(label);
-      renderer.dispose();
+      if (renderer) {
+        if (mount.contains(renderer.domElement)) mount.removeChild(renderer.domElement);
+        renderer.dispose();
+      }
+      if (label && mount.contains(label)) mount.removeChild(label);
     };
   }, [body, gender]);
 
