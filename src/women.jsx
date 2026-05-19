@@ -450,7 +450,6 @@ export default function WomenPage() {
 
   const NEW_ARRIVALS = products.slice(0, 6);
   const TRENDING = products.slice(0, 6);
-  const TOP_PICKS = products.slice(0, 4);
 
   const showToast = (msg) => {
     setToast(msg);
@@ -569,31 +568,6 @@ export default function WomenPage() {
                 key={p.id}
                 p={p}
                 d={(i % 3) + 1}
-                addRef={addRef}
-                onQuickView={setQuickView}
-                onWish={toggleWish}
-                wishlisted={wishlist.includes(p.id)}
-              />
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* TOP PICKS */}
-      <section className="w-sp bg-white">
-        <div className="container">
-          <h2 className="w-sec-title reveal" ref={addRef}>Top Picks</h2>
-          <p className="text-center mb-1 reveal" ref={addRef}
-            style={{ fontSize: ".82rem", color: "var(--warm)" }}>
-            The most loved pieces from Egypt's finest women's brands.
-          </p>
-          <div className="w-sec-line reveal" ref={addRef} />
-          <div className="w-picks-g">
-            {TOP_PICKS.map((p, i) => (
-              <PickCard
-                key={p.id}
-                p={p}
-                d={(i % 4) + 1}
                 addRef={addRef}
                 onQuickView={setQuickView}
                 onWish={toggleWish}

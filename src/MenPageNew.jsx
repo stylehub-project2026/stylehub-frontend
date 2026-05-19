@@ -417,7 +417,8 @@ export default function MenPage({ cart = [], setCart, wish = [], setWish }) {
                     type: (p.tags?.[0] || "").toLowerCase(),
                     brandLogo: p.seller?.logo ? (p.seller.logo.startsWith('http') ? p.seller.logo : `https://stylehub-backend-tau.vercel.app${p.seller.logo}`) : null,
                 }));
-                setMenProducts(list);
+                const shuffled = [...list].sort(() => Math.random() - 0.5);
+                setMenProducts(shuffled);
             })
             .catch(() => { })
             .finally(() => setLoading(false));
@@ -756,40 +757,6 @@ export default function MenPage({ cart = [], setCart, wish = [], setWish }) {
                                 key={p.id}
                                 p={p}
                                 d={(i % 3) + 1}
-                                addRef={addRef}
-                                onQuickView={setQuickView}
-                                onWish={toggleWish}
-                                wishlisted={wishlist.includes(p.id)}
-                            />
-                        ))}
-                    </div>
-                </div>
-            </section>
-
-            {/* TOP PICKS */}
-            <section className="sp bg-white">
-                <div className="container">
-                    <h2 className="sec-title reveal" ref={addRef}>
-                        Top Picks
-                    </h2>
-                    <p
-                        className="text-center mb-1 reveal"
-                        ref={addRef}
-                        style={{ fontSize: ".82rem", color: "var(--c-gray)" }}
-                    >
-                        Discover the most popular pieces from different brands.
-                    </p>
-                    <div className="sec-line reveal" ref={addRef} />
-                    <div className="picks-g">
-                        {loading ? (
-                            <div style={{ padding: "2rem", color: "#888", fontSize: ".85rem", gridColumn: "1/-1" }}>Loading...</div>
-                        ) : menProducts.length === 0 ? (
-                            <div style={{ padding: "2rem", color: "#888", fontSize: ".85rem", gridColumn: "1/-1" }}>No products available yet.</div>
-                        ) : menProducts.slice(0, 4).map((p, i) => (
-                            <PickCard
-                                key={p.id}
-                                p={p}
-                                d={(i % 4) + 1}
                                 addRef={addRef}
                                 onQuickView={setQuickView}
                                 onWish={toggleWish}
