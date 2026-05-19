@@ -2,13 +2,13 @@ import { initializeApp } from "firebase/app";
 import { getAuth, GoogleAuthProvider, FacebookAuthProvider, signInWithPopup } from "firebase/auth";
 
 const firebaseConfig = {
-    apiKey: "AIzaSyDkjCqlSPnwTbcY2uq_KoZXIws4XeJB1gw",
-    authDomain: "stylehub-4d407.firebaseapp.com",
-    projectId: "stylehub-4d407",
-    storageBucket: "stylehub-4d407.firebasestorage.app",
-    messagingSenderId: "1028038834629",
-    appId: "1:1028038834629:web:e2f799db37fbf3ec2373ac",
-    measurementId: "G-3W6MBJGWVP"
+    apiKey: "AIzaSyALETSPylzXEcYgg__jC4URI0MekZhvJEM",
+    authDomain: "stylehub-4c8aa.firebaseapp.com",
+    projectId: "stylehub-4c8aa",
+    storageBucket: "stylehub-4c8aa.firebasestorage.app",
+    messagingSenderId: "174890568563",
+    appId: "1:174890568563:web:a2f5261f5f262d8e055306",
+    measurementId: "G-23SXYF0CYW"
 };
 
 const app = initializeApp(firebaseConfig);
