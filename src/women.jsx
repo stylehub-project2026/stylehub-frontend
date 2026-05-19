@@ -425,27 +425,33 @@ export default function WomenPage() {
 
   // ── Women products — hardcoded from shared.jsx, shuffled ────────────────
   useEffect(() => {
-    const list = shuffle(
-      PRODUCTS
-        .filter(p => p.gender === "women" || p.gender === "unisex")
-        .map(p => ({
-          id: p.id,
-          name: p.name,
-          price: parseInt(p.price.replace(/[^0-9]/g, ""), 10),
-          old: p.oldPrice ? parseInt(p.oldPrice.replace(/[^0-9]/g, ""), 10) : null,
-          brand: p.brand,
-          img: p.img || null,
-          sizes: p.sizes || [],
-          colors: p.colors || [],
-          rating: p.rating || 0,
-          reviews: p.reviews || 0,
-          tag: p.oldPrice ? "Sale" : null,
-          type: (p.type || "").toLowerCase(),
-          brandLogo: null,
-          category: "women",
-        }))
-    );
-    setProducts(list);
+    const mapped = PRODUCTS
+      .filter(p => p.gender === "women" || p.gender === "unisex")
+      .map(p => ({
+        id: p.id,
+        name: p.name,
+        price: parseInt(p.price.replace(/[^0-9]/g, ""), 10),
+        old: p.oldPrice ? parseInt(p.oldPrice.replace(/[^0-9]/g, ""), 10) : null,
+        brand: p.brand,
+        img: p.img || null,
+        sizes: p.sizes || [],
+        colors: p.colors || [],
+        rating: p.rating || 0,
+        reviews: p.reviews || 0,
+        tag: p.oldPrice ? "Sale" : null,
+        type: (p.type || "").toLowerCase(),
+        brandLogo: null,
+        category: "women",
+      }));
+    // Interleave by brand
+    const byBrand = {};
+    mapped.forEach(p => { if (!byBrand[p.brand]) byBrand[p.brand] = []; byBrand[p.brand].push(p); });
+    Object.values(byBrand).forEach(arr => arr.sort(() => Math.random() - 0.5));
+    const brands = Object.values(byBrand).sort(() => Math.random() - 0.5);
+    const interleaved = [];
+    const maxLen = Math.max(...brands.map(b => b.length));
+    for (let i = 0; i < maxLen; i++) { brands.forEach(arr => { if (arr[i]) interleaved.push(arr[i]); }); }
+    setProducts(interleaved);
   }, []);
 
   const NEW_ARRIVALS = products.slice(0, 6);

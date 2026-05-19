@@ -59,24 +59,30 @@ export default function Kids({ cart, setCart, wish, setWish }) {
 
   // ── Kids products — hardcoded from shared.jsx, shuffled ─────────────────
   useEffect(() => {
-    const list = shuffle(
-      PRODUCTS
-        .filter(p => p.category === "boys" || p.category === "girls" || p.category === "kids")
-        .map(p => ({
-          id: p.id,
-          name: p.name,
-          price: p.price,
-          oldPrice: p.oldPrice || null,
-          brand: p.brand,
-          img: p.img || null,
-          sizes: p.sizes || [],
-          colors: p.colors || [],
-          type: (p.type || "").toLowerCase(),
-          category: p.category || "",
-          subcategory: p.category || "",
-        }))
-    );
-    setAllProducts(list);
+    const mapped = PRODUCTS
+      .filter(p => p.category === "boys" || p.category === "girls" || p.category === "kids")
+      .map(p => ({
+        id: p.id,
+        name: p.name,
+        price: p.price,
+        oldPrice: p.oldPrice || null,
+        brand: p.brand,
+        img: p.img || null,
+        sizes: p.sizes || [],
+        colors: p.colors || [],
+        type: (p.type || "").toLowerCase(),
+        category: p.category || "",
+        subcategory: p.category || "",
+      }));
+    // Interleave by brand
+    const byBrand = {};
+    mapped.forEach(p => { if (!byBrand[p.brand]) byBrand[p.brand] = []; byBrand[p.brand].push(p); });
+    Object.values(byBrand).forEach(arr => arr.sort(() => Math.random() - 0.5));
+    const brands = Object.values(byBrand).sort(() => Math.random() - 0.5);
+    const interleaved = [];
+    const maxLen = Math.max(...brands.map(b => b.length));
+    for (let i = 0; i < maxLen; i++) { brands.forEach(arr => { if (arr[i]) interleaved.push(arr[i]); }); }
+    setAllProducts(interleaved);
   }, []);
 
   const ALL_SIZES = [...new Set(allProducts.flatMap(p => p.sizes))].sort();

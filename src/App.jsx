@@ -566,13 +566,25 @@ export default function App() {
   const [toast, setToast] = useState("");
 
   // ─── HOMEPAGE PRODUCTS ───
-  const [homeProducts] = useState(() => ({
-    best: shuffle(PRODUCTS.filter(p => p.tab === "best")),
-    new: shuffle(PRODUCTS.filter(p => p.tab === "new")),
-    sale: shuffle(PRODUCTS.filter(p => p.tab === "sale")),
-    trend: shuffle(PRODUCTS.filter(p => p.tab === "trend")),
-    picks: shuffle(PRODUCTS.filter(p => p.tab === "picks")),
-  }));
+  const [homeProducts] = useState(() => {
+    const interleaveByBrand = (arr) => {
+      const byBrand = {};
+      arr.forEach(p => { if (!byBrand[p.brand]) byBrand[p.brand] = []; byBrand[p.brand].push(p); });
+      Object.values(byBrand).forEach(a => a.sort(() => Math.random() - 0.5));
+      const brands = Object.values(byBrand).sort(() => Math.random() - 0.5);
+      const result = [];
+      const maxLen = Math.max(...brands.map(b => b.length));
+      for (let i = 0; i < maxLen; i++) { brands.forEach(a => { if (a[i]) result.push(a[i]); }); }
+      return result;
+    };
+    return {
+      best: interleaveByBrand(PRODUCTS.filter(p => p.tab === "best")),
+      new: interleaveByBrand(PRODUCTS.filter(p => p.tab === "new")),
+      sale: interleaveByBrand(PRODUCTS.filter(p => p.tab === "sale")),
+      trend: interleaveByBrand(PRODUCTS.filter(p => p.tab === "trend")),
+      picks: interleaveByBrand(PRODUCTS.filter(p => p.tab === "picks")),
+    };
+  });
   const addRef = useScrollReveal();
   const location = useLocation();
 

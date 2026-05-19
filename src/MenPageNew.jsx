@@ -417,8 +417,15 @@ export default function MenPage({ cart = [], setCart, wish = [], setWish }) {
                     type: (p.tags?.[0] || "").toLowerCase(),
                     brandLogo: p.seller?.logo ? (p.seller.logo.startsWith('http') ? p.seller.logo : `https://stylehub-backend-tau.vercel.app${p.seller.logo}`) : null,
                 }));
-                const shuffled = [...list].sort(() => Math.random() - 0.5);
-                setMenProducts(shuffled);
+                // Interleave by brand
+                const byBrand = {};
+                list.forEach(p => { if (!byBrand[p.brand]) byBrand[p.brand] = []; byBrand[p.brand].push(p); });
+                Object.values(byBrand).forEach(arr => arr.sort(() => Math.random() - 0.5));
+                const brands = Object.values(byBrand).sort(() => Math.random() - 0.5);
+                const interleaved = [];
+                const maxLen = Math.max(...brands.map(b => b.length));
+                for (let i = 0; i < maxLen; i++) { brands.forEach(arr => { if (arr[i]) interleaved.push(arr[i]); }); }
+                setMenProducts(interleaved);
             })
             .catch(() => { })
             .finally(() => setLoading(false));
