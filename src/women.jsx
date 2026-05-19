@@ -12,12 +12,12 @@ const HERO_SLIDES = [
     btn: "Discover",
   },
   {
+    fullOverlay: true,
     ey: "Most Wanted · Most Loved",
     h1: "Style That\nSpeaks for You",
     sub: "The most coveted pieces from Egypt's boldest local designers.",
     btn: "Shop the Edit",
     img: "/cover2.jpg",
-    bg: "#f0ece6",
   },
   {
     ey: "End of Season Deals",
@@ -42,9 +42,17 @@ const PAGE_CSS = `
 .w-hero { position:relative; overflow:hidden; min-height:520px; display:flex; align-items:center; }
 .w-hero-banner { position:relative; width:100%; }
 .w-hero-banner img { width:100%; height:520px; object-fit:cover; object-position:center top; display:block; }
-.w-hero-banner-overlay { position:absolute; inset:0; background:rgba(0,0,0,0.18); display:flex; align-items:center; justify-content:center; }
+.w-hero-banner-overlay { position:absolute; inset:0; background:rgba(0,0,0,0.32); display:flex; align-items:center; justify-content:center; }
 .w-hero-banner-btn { background:#fff; color:var(--dark); border:none; padding:.75rem 2.8rem; font-size:.85rem; letter-spacing:.18em; text-transform:uppercase; cursor:pointer; font-weight:600; transition:all .2s; border-radius:2px; }
 .w-hero-banner-btn:hover { background:var(--dark); color:#fff; }
+.w-hero-overlay { position:relative; width:100%; }
+.w-hero-overlay img { width:100%; height:520px; object-fit:cover; object-position:center top; display:block; }
+.w-hero-overlay-content { position:absolute; inset:0; background:rgba(0,0,0,0.38); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:14px; text-align:center; padding:2rem; }
+.w-hero-overlay-ey { font-size:.72rem; letter-spacing:.22em; text-transform:uppercase; color:rgba(255,255,255,.75); font-weight:500; }
+.w-hero-overlay-h1 { font-family:'Cormorant Garamond',serif; font-size:clamp(2rem,5vw,3.6rem); font-weight:600; color:#fff; line-height:1.1; margin:0; }
+.w-hero-overlay-sub { font-size:.88rem; color:rgba(255,255,255,.8); max-width:440px; line-height:1.7; margin:0; }
+.w-hero-overlay-btn { background:#fff; color:var(--dark); border:none; padding:.7rem 2.2rem; font-size:.78rem; letter-spacing:.15em; text-transform:uppercase; cursor:pointer; font-weight:600; transition:all .2s; border-radius:2px; margin-top:6px; }
+.w-hero-overlay-btn:hover { background:var(--dark); color:#fff; }
 .w-hero-slide { display:flex; align-items:center; justify-content:space-between; width:100%; padding:60px 7%; gap:32px; animation:wSlideIn .55s ease both; }
 @keyframes wSlideIn { from{opacity:0;transform:translateX(28px)} to{opacity:1;transform:none} }
 .w-hero-txt { flex:1; max-width:480px; }
@@ -370,6 +378,18 @@ function HeroCarousel() {
             <button className="w-hero-banner-btn">{s.btn}</button>
           </div>
         </div>
+      ) : s.fullOverlay ? (
+        <div className="w-hero-overlay" key={key}>
+          <img src={s.img} alt={s.h1 || ''} onError={e => { e.target.src = "https://placehold.co/1400x520?text=Hero"; }} />
+          <div className="w-hero-overlay-content">
+            {s.ey && <div className="w-hero-overlay-ey">{s.ey}</div>}
+            <h1 className="w-hero-overlay-h1">
+              {(s.h1 || '').split("\n").map((l, i) => <span key={i}>{l}<br /></span>)}
+            </h1>
+            {s.sub && <p className="w-hero-overlay-sub">{s.sub}</p>}
+            <button className="w-hero-overlay-btn">{s.btn}</button>
+          </div>
+        </div>
       ) : (
         <div className="w-hero" style={{ background: s.bg }}>
           <div className="w-hero-slide active" key={key}>
@@ -402,7 +422,7 @@ function HeroCarousel() {
           <button key={i} className={`w-hero-dot ${i === cur ? "on" : ""}`} onClick={() => { setCur(i); setKey(k => k + 1); }} />
         ))}
       </div>
-      <div style={{ position: "absolute", bottom: 22, right: 28, fontSize: ".7rem", letterSpacing: ".1em", color: s.fullBanner ? "rgba(255,255,255,.7)" : "var(--warm)" }}>
+      <div style={{ position: "absolute", bottom: 22, right: 28, fontSize: ".7rem", letterSpacing: ".1em", color: (s.fullBanner || s.fullOverlay) ? "rgba(255,255,255,.7)" : "var(--warm)" }}>
         <span>{String(cur + 1).padStart(2, "0")}</span>
         <span style={{ opacity: 0.4 }}> / </span>
         <span style={{ opacity: 0.4 }}>{String(HERO_SLIDES.length).padStart(2, "0")}</span>
