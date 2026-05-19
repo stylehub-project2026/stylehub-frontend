@@ -34,19 +34,9 @@ const PAGE_CSS = `
 .bo-divider span { font-family:'Cormorant Garamond',serif; font-size:1.9rem; color:#2b261f; white-space:nowrap; }
 .bo-divider::after { content:""; height:1px; background:rgba(40,34,27,.28); flex:1; }
 .bo-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:1rem; }
-.bo-product { padding:.9rem; border-radius:25px; background:rgba(255,255,255,.76); border:1px solid rgba(86,76,60,.12); box-shadow:0 12px 28px rgba(37,31,23,.05); transition:transform .18s,box-shadow .18s,border-color .18s; cursor:grab; }
-.bo-product:active { cursor:grabbing; }
+.bo-product { padding:.9rem; border-radius:25px; background:rgba(255,255,255,.76); border:1px solid rgba(86,76,60,.12); box-shadow:0 12px 28px rgba(37,31,23,.05); transition:transform .18s,box-shadow .18s,border-color .18s; }
 .bo-product:hover { transform:translateY(-2px); box-shadow:0 18px 32px rgba(37,31,23,.08); }
 .bo-product.on { border-color:rgba(123,132,91,.7); box-shadow:0 18px 34px rgba(123,132,91,.18); }
-.bo-drop-zone { position:relative; transition:box-shadow .2s; }
-.bo-drop-zone.drag-over { box-shadow:0 0 0 3px #a7b08a, 0 18px 42px rgba(37,31,23,.12) !important; }
-.bo-drop-hint { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); background:rgba(167,176,138,.92); color:#fff; padding:.5rem 1rem; border-radius:12px; font-size:.7rem; letter-spacing:.1em; text-transform:uppercase; pointer-events:none; white-space:nowrap; opacity:0; transition:opacity .2s; z-index:20; }
-.bo-drop-zone.drag-over .bo-drop-hint { opacity:1; }
-.bo-outfit-overlay { position:absolute; inset:0; pointer-events:none; z-index:10; display:flex; flex-direction:column; }
-.bo-outfit-top { flex:0 0 50%; display:flex; align-items:flex-end; justify-content:center; padding-bottom:4px; }
-.bo-outfit-btm { flex:0 0 50%; display:flex; align-items:flex-start; justify-content:center; padding-top:4px; }
-.bo-outfit-img { max-width:58%; max-height:100%; object-fit:contain; filter:drop-shadow(0 4px 16px rgba(0,0,0,.5)); animation:boFadeIn .3s ease; border-radius:4px; }
-@keyframes boFadeIn { from{opacity:0;transform:scale(.9)} to{opacity:1;transform:none} }
 .bo-thumb { position:relative; overflow:hidden; border-radius:20px; aspect-ratio:.82; background:#ece7df; margin-bottom:.8rem; }
 .bo-thumb img { width:100%; height:100%; object-fit:cover; object-position:top center; }
 .bo-heart { position:absolute; left:.6rem; bottom:.6rem; width:28px; height:28px; border:none; border-radius:50%; background:rgba(255,255,255,.96); color:#df5e59; font-size:.88rem; box-shadow:0 8px 18px rgba(0,0,0,.12); cursor:pointer; }
@@ -91,7 +81,7 @@ function ThreeBodyModel({ body, gender }) {
     let renderer;
     let label;
 
-    import("three").then((THREE) => {
+    import("https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js").then((THREE) => {
       if (!mountRef.current) return;
 
       const W = mount.clientWidth || 330;
@@ -269,16 +259,9 @@ function ThreeBodyModel({ body, gender }) {
   return <div ref={mountRef} style={{ width: "100%", height: "100%" }} />;
 }
 
-function ProductCard({ item, selected, onSelect, onDragStart }) {
+function ProductCard({ item, selected, onSelect }) {
   return (
-    <article
-      className={`bo-product bo-soft${selected ? " on" : ""}`}
-      draggable
-      onDragStart={e => {
-        e.dataTransfer.setData("item", JSON.stringify(item));
-        if (onDragStart) onDragStart(item);
-      }}
-    >
+    <article className={`bo-product bo-soft${selected ? " on" : ""}`}>
       <div className="bo-thumb">
         {item.img ? <img src={item.img} alt={item.name} onError={e => { e.target.style.display = "none"; }} /> : <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "2rem" }}>👗</div>}
         <button className="bo-heart" type="button">&#10084;</button>
@@ -319,7 +302,6 @@ export default function BuildOutfit({ cart = [], setCart, wish = [] }) {
   const [loading, setLoading] = useState(true);
   const [aiRec, setAiRec] = useState("");
   const [aiLoading, setAiLoading] = useState(false);
-  const [dragOver, setDragOver] = useState(false);
 
   useEffect(() => {
     fetch(`${API}/products?limit=100`)
@@ -431,53 +413,9 @@ Give a warm, specific style tip about this outfit for their body measurements.`;
               <button className={`bo-gender-btn${gender === "male" ? " active" : ""}`} onClick={() => setGender("male")}>♂ Male</button>
             </div>
 
-            {/* 3D Model — Drop Zone */}
-            <div
-              className={`bo-stage bo-soft bo-drop-zone${dragOver ? " drag-over" : ""}`}
-              style={{ position: "relative" }}
-              onDragOver={e => { e.preventDefault(); setDragOver(true); }}
-              onDragLeave={() => setDragOver(false)}
-              onDrop={e => {
-                e.preventDefault();
-                setDragOver(false);
-                try {
-                  const item = JSON.parse(e.dataTransfer.getData("item"));
-                  // Detect top/bottom by type
-                  const t = (item.type || "").toLowerCase();
-                  const isBottom = t.includes("bottom") || t.includes("pant") || t.includes("jean") || t.includes("skirt");
-                  selectProduct(item, isBottom ? "bottom" : "top");
-                } catch { }
-              }}
-            >
+            {/* 3D Model */}
+            <div className="bo-stage bo-soft">
               <ThreeBodyModel body={body} gender={gender} />
-
-              {/* Outfit overlay on 3D model */}
-              <div className="bo-outfit-overlay">
-                <div className="bo-outfit-top">
-                  {selectedTop?.img && (
-                    <img
-                      key={selectedTop.id}
-                      src={selectedTop.img}
-                      alt={selectedTop.name}
-                      className="bo-outfit-img"
-                      onError={e => e.target.style.display = "none"}
-                    />
-                  )}
-                </div>
-                <div className="bo-outfit-btm">
-                  {selectedBottom?.img && (
-                    <img
-                      key={selectedBottom.id}
-                      src={selectedBottom.img}
-                      alt={selectedBottom.name}
-                      className="bo-outfit-img"
-                      onError={e => e.target.style.display = "none"}
-                    />
-                  )}
-                </div>
-              </div>
-
-              <div className="bo-drop-hint">Drop here to try on</div>
             </div>
 
             {/* Measurements */}
@@ -535,7 +473,7 @@ Give a warm, specific style tip about this outfit for their body measurements.`;
               ) : topProducts.length ? (
                 <div className="bo-grid">
                   {topProducts.map(item => (
-                    <ProductCard key={item.id} item={item} selected={selectedTop?.id === item.id} onSelect={() => selectProduct(item, "top")} onDragStart={() => { }} />
+                    <ProductCard key={item.id} item={item} selected={selectedTop?.id === item.id} onSelect={() => selectProduct(item, "top")} />
                   ))}
                 </div>
               ) : (
@@ -551,7 +489,7 @@ Give a warm, specific style tip about this outfit for their body measurements.`;
               ) : bottomProducts.length ? (
                 <div className="bo-grid">
                   {bottomProducts.map(item => (
-                    <ProductCard key={item.id} item={item} selected={selectedBottom?.id === item.id} onSelect={() => selectProduct(item, "bottom")} onDragStart={() => { }} />
+                    <ProductCard key={item.id} item={item} selected={selectedBottom?.id === item.id} onSelect={() => selectProduct(item, "bottom")} />
                   ))}
                 </div>
               ) : (
