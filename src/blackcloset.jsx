@@ -7,10 +7,10 @@ import { SHNav, SHFooter, SHARED_CSS, useScrollReveal } from "./shared";
 const BRAND = {
   name: "Black Closet",
   desc: "Black Closet is a clothing brand that blends classic, Old Money aesthetics with modern streetwear. The brand focuses on creating stylish everyday pieces such as hoodies, baggy jeans, polos and sweaters — combining comfort with a refined yet edgy look for people who appreciate timeless style with a modern urban twist.",
-  logo: "/images/blackcloset%20logo.jpg",
-  heroBg: "/blackcloset-hero.jpg",
+  logo: "/bb.jpg",
+  heroBg: "/bb.jpg",
   accentColor: "#92A079",
-  heroOverlay: "rgba(255,255,255,.55)",
+  heroOverlay: "rgba(0,0,0,.35)",
 };
 
 // ─── SIZE RATIOS ───
@@ -130,21 +130,21 @@ export default function BlackClosetBrand({ cart, wish = [], setWish }) {
       ════════════════════════════════ */}
       <section style={{
         position: "relative", height: SZ.heroBanner, overflow: "hidden",
-        background: "#ffffff",
+        background: "#0a0a0a",
         display: "flex", alignItems: "center",
         margin: "1.5rem", borderRadius: 10,
         border: "2px solid rgba(26,26,24,.2)",
         boxShadow: "0 4px 24px rgba(26,26,24,.07)"
       }}>
         <img src={BRAND.heroBg} alt="" aria-hidden
-          style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", opacity: .08, borderRadius: 10 }}
+          style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", opacity: .18, borderRadius: 10 }}
           onError={e => e.target.style.display = "none"} />
         <div style={{ position: "absolute", inset: 0, background: BRAND.heroOverlay, borderRadius: 10 }} />
 
         <div style={{ position: "relative", zIndex: 2, display: "flex", alignItems: "center", gap: "4rem", padding: "0 6%", width: "100%" }}>
 
           {/* LOGO */}
-          <div style={{ width: SZ.heroLogoSize, height: SZ.heroLogoSize, borderRadius: "50%", overflow: "hidden", flexShrink: 0, border: "3px solid rgba(26,26,24,.15)", boxShadow: "0 8px 32px rgba(26,26,24,.12)", background: "#fff", display: "flex", alignItems: "center", justifyContent: "center" }}>
+          <div style={{ width: SZ.heroLogoSize, height: SZ.heroLogoSize, borderRadius: "50%", overflow: "hidden", flexShrink: 0, border: "3px solid rgba(255,255,255,.25)", boxShadow: "0 8px 32px rgba(0,0,0,.4)", background: "#111", display: "flex", alignItems: "center", justifyContent: "center" }}>
             <img src={BRAND.logo} alt={BRAND.name}
               style={{ width: "85%", height: "85%", objectFit: "contain" }}
               onError={e => e.target.style.display = "none"} />
@@ -152,9 +152,9 @@ export default function BlackClosetBrand({ cart, wish = [], setWish }) {
 
           {/* TEXT */}
           <div>
-            <div style={{ fontSize: ".6rem", letterSpacing: ".35em", textTransform: "uppercase", color: "var(--warm)", marginBottom: ".6rem" }}>StyleHub</div>
-            <h1 style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: "clamp(2.5rem,5vw,4rem)", fontWeight: 400, lineHeight: 1, marginBottom: ".8rem", color: "var(--dark)" }}>{BRAND.name}</h1>
-            <p style={{ fontSize: ".8rem", lineHeight: 1.7, color: "#555", maxWidth: 480 }}>{BRAND.desc}</p>
+            <div style={{ fontSize: ".6rem", letterSpacing: ".35em", textTransform: "uppercase", color: "rgba(255,255,255,.6)", marginBottom: ".6rem" }}>StyleHub</div>
+            <h1 style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: "clamp(2.5rem,5vw,4rem)", fontWeight: 400, lineHeight: 1, marginBottom: ".8rem", color: "#ffffff" }}>{BRAND.name}</h1>
+            <p style={{ fontSize: ".8rem", lineHeight: 1.7, color: "rgba(255,255,255,.75)", maxWidth: 480 }}>{BRAND.desc}</p>
           </div>
         </div>
       </section>
