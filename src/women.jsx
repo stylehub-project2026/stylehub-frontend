@@ -22,7 +22,7 @@ const HERO_SLIDES = [
 
   {
     fullSale: true,
-    img: "/final_cover.jpg",
+    img: "/finalcover.jpg",
     btn: "Shop the Sale",
   },
 ];
