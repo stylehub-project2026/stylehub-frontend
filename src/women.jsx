@@ -21,7 +21,7 @@ const HERO_SLIDES = [
   },
   {
     fullSale: true,
-    img: "/1779201755205_finalcover2.jpg",
+    img: "/finalcover2.jpg",
     btn: "Shop the Sale",
   },
 ];
@@ -37,6 +37,23 @@ const CATEGORIES = [
 const PAGE_CSS = `
 /* ── Hero ── */
 .w-hero { position:relative; overflow:hidden; min-height:520px; display:flex; align-items:center; }
+.w-hero-banner { position:relative; width:100%; }
+.w-hero-banner img { width:100%; height:520px; object-fit:cover; object-position:center top; display:block; }
+.w-hero-banner-overlay { position:absolute; inset:0; background:rgba(0,0,0,0.32); display:flex; align-items:center; justify-content:center; }
+.w-hero-banner-btn { background:#fff; color:var(--dark); border:none; padding:.75rem 2.8rem; font-size:.85rem; letter-spacing:.18em; text-transform:uppercase; cursor:pointer; font-weight:600; transition:all .2s; border-radius:2px; }
+.w-hero-banner-btn:hover { background:var(--dark); color:#fff; }
+.w-hero-overlay { position:relative; width:100%; }
+.w-hero-overlay img { width:100%; height:520px; object-fit:cover; object-position:center top; display:block; }
+.w-hero-overlay-content { position:absolute; inset:0; background:rgba(0,0,0,0.38); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:14px; text-align:center; padding:2rem; }
+.w-hero-overlay-ey { font-size:.72rem; letter-spacing:.22em; text-transform:uppercase; color:rgba(255,255,255,.75); font-weight:500; }
+.w-hero-overlay-h1 { font-family:'Cormorant Garamond',serif; font-size:clamp(2rem,5vw,3.6rem); font-weight:600; color:#fff; line-height:1.1; margin:0; }
+.w-hero-overlay-sub { font-size:.88rem; color:rgba(255,255,255,.8); max-width:440px; line-height:1.7; margin:0; }
+.w-hero-overlay-btn { background:#fff; color:var(--dark); border:none; padding:.7rem 2.2rem; font-size:.78rem; letter-spacing:.15em; text-transform:uppercase; cursor:pointer; font-weight:600; transition:all .2s; border-radius:2px; margin-top:6px; }
+.w-hero-overlay-btn:hover { background:var(--dark); color:#fff; }
+.w-hero-sale { background:#111; display:flex; align-items:center; justify-content:center; min-height:520px; overflow:hidden; position:relative; }
+.w-hero-sale img { height:520px; width:auto; max-width:100%; object-fit:contain; display:block; }
+.w-hero-sale-btn { position:absolute; bottom:36px; left:50%; transform:translateX(-50%); background:#fff; color:#111; border:none; padding:.7rem 2.4rem; font-size:.8rem; letter-spacing:.18em; text-transform:uppercase; cursor:pointer; font-weight:700; transition:all .2s; border-radius:2px; white-space:nowrap; }
+.w-hero-sale-btn:hover { background:var(--dark); color:#fff; }
 .w-hero-slide { display:flex; align-items:center; justify-content:space-between; width:100%; padding:60px 7%; gap:32px; animation:wSlideIn .55s ease both; }
 @keyframes wSlideIn { from{opacity:0;transform:translateX(28px)} to{opacity:1;transform:none} }
 .w-hero-txt { flex:1; max-width:480px; }
@@ -191,12 +208,7 @@ function QuickViewModal({ p, onClose, onAddToCart }) {
   return (
     <div className="w-qv-backdrop" onClick={onClose}>
       <div className="w-qv-modal" onClick={(e) => e.stopPropagation()} style={{ position: "relative" }}>
-        <img
-          className="w-qv-img"
-          src={p.img}
-          alt={p.name}
-          onError={(e) => { e.target.src = "https://placehold.co/360x480?text=No+Image"; }}
-        />
+        <img className="w-qv-img" src={p.img} alt={p.name} onError={(e) => { e.target.src = "https://placehold.co/360x480?text=No+Image"; }} />
         <div className="w-qv-body">
           <button className="w-qv-close" onClick={onClose}>×</button>
           {p.tag && <span className="w-qv-tag-badge">{p.tag}</span>}
@@ -207,47 +219,32 @@ function QuickViewModal({ p, onClose, onAddToCart }) {
             {p.old && <span className="w-qv-old">LE {p.old.toLocaleString()}</span>}
           </div>
           <div className="d-flex align-items-center gap-2 mb-3">
-            {p.rating > 0 && <><Stars n={p.rating} />
-              <span style={{ fontSize: ".7rem", color: "var(--warm)" }}>({p.reviews})</span></>}
+            {p.rating > 0 && <><Stars n={p.rating} /><span style={{ fontSize: ".7rem", color: "var(--warm)" }}>({p.reviews})</span></>}
           </div>
-          {/* Colors */}
           <div className="mb-3">
             <div style={{ fontSize: ".72rem", letterSpacing: ".1em", textTransform: "uppercase", marginBottom: "8px", color: "var(--warm)" }}>Color</div>
             <div className="d-flex gap-2">
               {p.colors.map((c, i) => (
-                <button
-                  key={i}
-                  className={`w-color-dot ${selColor === i ? "sel" : ""}`}
-                  style={{ background: c }}
-                  onClick={() => setSelColor(i)}
-                />
+                <button key={i} className={`w-color-dot ${selColor === i ? "sel" : ""}`} style={{ background: c }} onClick={() => setSelColor(i)} />
               ))}
             </div>
           </div>
-          {/* Sizes */}
           <div className="mb-4">
             <div style={{ fontSize: ".72rem", letterSpacing: ".1em", textTransform: "uppercase", marginBottom: "8px", color: "var(--warm)" }}>Size</div>
             <div className="d-flex flex-wrap gap-2">
               {p.sizes.map((s) => (
-                <button
-                  key={s}
-                  className={`w-size-btn ${selSize === s ? "sel" : ""}`}
-                  onClick={() => { setSelSize(s); setSizeErr(false); }}
-                >{s}</button>
+                <button key={s} className={`w-size-btn ${selSize === s ? "sel" : ""}`} onClick={() => { setSelSize(s); setSizeErr(false); }}>{s}</button>
               ))}
             </div>
             {sizeErr && <div className="w-size-err">Please select a size</div>}
           </div>
-          {/* Qty */}
           <div className="d-flex align-items-center gap-2 mb-4">
             <button className="w-qty-btn" onClick={() => setQty((q) => Math.max(1, q - 1))}>−</button>
             <span className="w-qty-num">{qty}</span>
             <button className="w-qty-btn" onClick={() => setQty((q) => q + 1)}>+</button>
           </div>
           <div className="d-flex gap-2">
-            <button className={`w-add-btn ${added ? "added" : ""}`} onClick={handleAdd}>
-              {added ? "✓ Added!" : "Add to Cart"}
-            </button>
+            <button className={`w-add-btn ${added ? "added" : ""}`} onClick={handleAdd}>{added ? "✓ Added!" : "Add to Cart"}</button>
             <button className="w-view-btn" onClick={() => navigate(`/product/${p.id}`)}>View</button>
           </div>
         </div>
@@ -262,21 +259,12 @@ function ProdCard({ p, d, addRef, onQuickView, onWish, wishlisted }) {
   return (
     <div className={`w-pc revealed d${d}`} ref={addRef} style={{ scrollSnapAlign: "start" }}>
       <div className="w-pc-img-wrap">
-        <img
-          src={p.img}
-          alt={p.name}
-          onError={(e) => { e.target.src = "https://placehold.co/220x293?text=No+Image"; }}
-        />
+        <img src={p.img} alt={p.name} onError={(e) => { e.target.src = "https://placehold.co/220x293?text=No+Image"; }} />
         {p.tag && <span className="w-pc-tag">{p.tag}</span>}
         <div className="w-pc-hover-ov">
-          <button className="w-pc-qv-btn" onClick={(e) => { e.stopPropagation(); onQuickView(p); }}>
-            <i className="bi bi-eye me-1" /> Quick View
-          </button>
+          <button className="w-pc-qv-btn" onClick={(e) => { e.stopPropagation(); onQuickView(p); }}><i className="bi bi-eye me-1" /> Quick View</button>
         </div>
-        <button
-          className={`w-wish-btn ${wishlisted ? "liked" : ""}`}
-          onClick={(e) => { e.stopPropagation(); onWish(p.id); }}
-        >
+        <button className={`w-wish-btn ${wishlisted ? "liked" : ""}`} onClick={(e) => { e.stopPropagation(); onWish(p.id); }}>
           <i className={`bi ${wishlisted ? "bi-heart-fill" : "bi-heart"}`} />
         </button>
       </div>
@@ -298,23 +286,11 @@ function PickCard({ p, d, addRef, onQuickView, onWish, wishlisted }) {
   return (
     <div className={`w-pick-card reveal d${d}`} ref={addRef}>
       <div className="w-pick-img-wrap">
-        <img
-          src={p.img}
-          alt={p.name}
-          onError={(e) => { e.target.src = "https://placehold.co/260x347?text=No+Image"; }}
-        />
+        <img src={p.img} alt={p.name} onError={(e) => { e.target.src = "https://placehold.co/260x347?text=No+Image"; }} />
         <div className="w-pc-hover-ov2">
-          <button
-            className="w-pc-qv-btn"
-            onClick={(e) => { e.stopPropagation(); onQuickView(p); }}
-          >
-            <i className="bi bi-eye me-1" /> Quick View
-          </button>
+          <button className="w-pc-qv-btn" onClick={(e) => { e.stopPropagation(); onQuickView(p); }}><i className="bi bi-eye me-1" /> Quick View</button>
         </div>
-        <button
-          className={`w-wish-btn ${wishlisted ? "liked" : ""}`}
-          onClick={(e) => { e.stopPropagation(); onWish(p.id); }}
-        >
+        <button className={`w-wish-btn ${wishlisted ? "liked" : ""}`} onClick={(e) => { e.stopPropagation(); onWish(p.id); }}>
           <i className={`bi ${wishlisted ? "bi-heart-fill" : "bi-heart"}`} />
         </button>
       </div>
@@ -323,14 +299,7 @@ function PickCard({ p, d, addRef, onQuickView, onWish, wishlisted }) {
           <div className="w-prod-name">{p.name}</div>
           <div className="w-prod-price"> {p.price.toLocaleString()}</div>
         </div>
-        {p.brandLogo && (
-          <img
-            src={p.brandLogo}
-            alt={p.brand}
-            className="w-pick-brand-logo"
-            onError={(e) => { e.target.style.display = "none"; }}
-          />
-        )}
+        {p.brandLogo && <img src={p.brandLogo} alt={p.brand} className="w-pick-brand-logo" onError={(e) => { e.target.style.display = "none"; }} />}
       </div>
     </div>
   );
@@ -434,7 +403,6 @@ export default function WomenPage() {
   const [filterPage, setFilterPage] = useState(1);
   const FILTER_PER_PAGE = 9;
 
-  // ── Women products — hardcoded from shared.jsx, shuffled ────────────────
   useEffect(() => {
     const mapped = PRODUCTS
       .filter(p => p.gender === "women" || p.gender === "unisex")
@@ -454,7 +422,6 @@ export default function WomenPage() {
         brandLogo: null,
         category: "women",
       }));
-    // Interleave by brand
     const byBrand = {};
     mapped.forEach(p => { if (!byBrand[p.brand]) byBrand[p.brand] = []; byBrand[p.brand].push(p); });
     Object.values(byBrand).forEach(arr => arr.sort(() => Math.random() - 0.5));
@@ -468,14 +435,8 @@ export default function WomenPage() {
   const NEW_ARRIVALS = products.slice(0, 6);
   const TRENDING = products.slice(0, 6);
 
-  const showToast = (msg) => {
-    setToast(msg);
-    setTimeout(() => setToast(""), 2200);
-  };
-  const addToCart = () => {
-    setCartCount((c) => c + 1);
-    showToast("✓  Added to cart");
-  };
+  const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(""), 2200); };
+  const addToCart = () => { setCartCount((c) => c + 1); showToast("✓  Added to cart"); };
   const toggleWish = (id) => {
     setWishlist((prev) => {
       const isIn = prev.includes(id);
@@ -485,8 +446,7 @@ export default function WomenPage() {
   };
 
   const newArrRef = useRef(null);
-  const scroll = (ref, dir) =>
-    ref.current?.scrollBy({ left: dir * 250, behavior: "smooth" });
+  const scroll = (ref, dir) => ref.current?.scrollBy({ left: dir * 250, behavior: "smooth" });
 
   useEffect(() => {
     document.title = `StyleHub — Women${cartCount > 0 ? ` (${cartCount})` : ""}`;
@@ -494,12 +454,9 @@ export default function WomenPage() {
 
   return (
     <div>
-      {/* Inject CSS */}
       <style>{SHARED_CSS}</style>
       <style>{PAGE_CSS}</style>
-
       <SHNav cart={cartCount} wish={wishlist} />
-
       <HeroCarousel />
 
       {/* CATEGORIES */}
@@ -511,12 +468,7 @@ export default function WomenPage() {
             {CATEGORIES.map((c, i) => (
               <div className="col-12 col-md-4" key={i}>
                 <div className={`w-cat-card reveal d${i + 1}`} ref={addRef}>
-                  <img
-                    src={c.img}
-                    alt={c.name}
-                    onError={(e) => { e.target.src = "https://placehold.co/400x533?text=" + c.name; }}
-                    style={{ objectPosition: "top" }}
-                  />
+                  <img src={c.img} alt={c.name} onError={(e) => { e.target.src = "https://placehold.co/400x533?text=" + c.name; }} style={{ objectPosition: "top" }} />
                   <div className="w-cat-ov">
                     <div className="w-cat-name">{c.name}</div>
                     <div className="w-cat-count">{c.count}</div>
@@ -535,25 +487,13 @@ export default function WomenPage() {
           <h2 className="w-sec-title reveal" ref={addRef}>New Arrivals</h2>
           <div className="w-sec-line reveal" ref={addRef} />
           <div className="w-sc-wrap">
-            <button className="w-sc-btn l" onClick={() => scroll(newArrRef, -1)}>
-              <i className="bi bi-chevron-left" />
-            </button>
+            <button className="w-sc-btn l" onClick={() => scroll(newArrRef, -1)}><i className="bi bi-chevron-left" /></button>
             <div className="w-sc-track" ref={newArrRef}>
               {NEW_ARRIVALS.map((p, i) => (
-                <ProdCard
-                  key={p.id}
-                  p={p}
-                  d={(i % 3) + 1}
-                  addRef={addRef}
-                  onQuickView={setQuickView}
-                  onWish={toggleWish}
-                  wishlisted={wishlist.includes(p.id)}
-                />
+                <ProdCard key={p.id} p={p} d={(i % 3) + 1} addRef={addRef} onQuickView={setQuickView} onWish={toggleWish} wishlisted={wishlist.includes(p.id)} />
               ))}
             </div>
-            <button className="w-sc-btn r" onClick={() => scroll(newArrRef, 1)}>
-              <i className="bi bi-chevron-right" />
-            </button>
+            <button className="w-sc-btn r" onClick={() => scroll(newArrRef, 1)}><i className="bi bi-chevron-right" /></button>
           </div>
         </div>
       </section>
@@ -561,11 +501,7 @@ export default function WomenPage() {
       {/* SALE BANNER */}
       <section className="w-sale-ban reveal" ref={addRef}>
         <div className="w-sale-ban-inner">
-          <img
-            src="/111.png"
-            alt="End of Season Sale"
-            onError={(e) => { e.target.src = "https://placehold.co/700x260?text=Sale"; }}
-          />
+          <img src="/111.png" alt="End of Season Sale" onError={(e) => { e.target.src = "https://placehold.co/700x260?text=Sale"; }} />
           <div className="w-sale-ban-text">
             <p className="w-sale-sub">Limited Time Only</p>
             <h2>END OF SEASON SALE</h2>
@@ -581,27 +517,13 @@ export default function WomenPage() {
           <div className="w-sec-line reveal" ref={addRef} />
           <div className="w-trend-g">
             {TRENDING.map((p, i) => (
-              <ProdCard
-                key={p.id}
-                p={p}
-                d={(i % 3) + 1}
-                addRef={addRef}
-                onQuickView={setQuickView}
-                onWish={toggleWish}
-                wishlisted={wishlist.includes(p.id)}
-              />
+              <ProdCard key={p.id} p={p} d={(i % 3) + 1} addRef={addRef} onQuickView={setQuickView} onWish={toggleWish} wishlisted={wishlist.includes(p.id)} />
             ))}
           </div>
         </div>
       </section>
 
-      {quickView && (
-        <QuickViewModal
-          p={quickView}
-          onClose={() => setQuickView(null)}
-          onAddToCart={addToCart}
-        />
-      )}
+      {quickView && <QuickViewModal p={quickView} onClose={() => setQuickView(null)} onAddToCart={addToCart} />}
 
       {/* ALL PRODUCTS + FILTERS */}
       {(() => {
@@ -628,18 +550,13 @@ export default function WomenPage() {
             <h2 className="w-sec-title reveal" ref={addRef}>All Products</h2>
             <div className="w-sec-line reveal" ref={addRef} />
             <div style={{ display: "flex", gap: "2.5rem", alignItems: "flex-start" }}>
-
-              {/* SIDEBAR */}
               <div style={{ width: 185, flexShrink: 0, position: "sticky", top: 70 }}>
-                {/* Sort */}
                 <div style={{ marginBottom: "1.8rem" }}>
                   <div style={{ fontSize: ".6rem", letterSpacing: ".2em", textTransform: "uppercase", fontWeight: 600, marginBottom: ".65rem", color: "var(--dark)" }}>Sort By</div>
                   {[["default", "Default"], ["low", "Price: Low → High"], ["high", "Price: High → Low"], ["sale", "On Sale"]].map(([val, label]) => (
                     <div key={val} onClick={() => setSortBy(val)} style={{ fontSize: ".75rem", padding: ".28rem 0", cursor: "pointer", color: sortBy === val ? "var(--dark)" : "var(--warm)", fontWeight: sortBy === val ? 600 : 400, transition: "color .2s" }}>{label}</div>
                   ))}
                 </div>
-
-                {/* Brand */}
                 {ALL_BRANDS.length > 0 && (
                   <div style={{ borderTop: "1px solid var(--border)", paddingTop: "1.3rem", marginBottom: "1.6rem" }}>
                     <div style={{ fontSize: ".6rem", letterSpacing: ".2em", textTransform: "uppercase", fontWeight: 600, marginBottom: ".65rem", color: "var(--dark)" }}>Brand</div>
@@ -651,8 +568,6 @@ export default function WomenPage() {
                     ))}
                   </div>
                 )}
-
-                {/* Type */}
                 {ALL_TYPES.length > 0 && (
                   <div style={{ borderTop: "1px solid var(--border)", paddingTop: "1.3rem", marginBottom: "1.6rem" }}>
                     <div style={{ fontSize: ".6rem", letterSpacing: ".2em", textTransform: "uppercase", fontWeight: 600, marginBottom: ".65rem", color: "var(--dark)" }}>Type</div>
@@ -664,8 +579,6 @@ export default function WomenPage() {
                     ))}
                   </div>
                 )}
-
-                {/* Size */}
                 {ALL_SIZES.length > 0 && (
                   <div style={{ borderTop: "1px solid var(--border)", paddingTop: "1.3rem", marginBottom: "1.6rem" }}>
                     <div style={{ fontSize: ".6rem", letterSpacing: ".2em", textTransform: "uppercase", fontWeight: 600, marginBottom: ".65rem", color: "var(--dark)" }}>Size</div>
@@ -676,8 +589,6 @@ export default function WomenPage() {
                     </div>
                   </div>
                 )}
-
-                {/* Color */}
                 {ALL_COLORS.length > 0 && (
                   <div style={{ borderTop: "1px solid var(--border)", paddingTop: "1.3rem", marginBottom: "1.6rem" }}>
                     <div style={{ fontSize: ".6rem", letterSpacing: ".2em", textTransform: "uppercase", fontWeight: 600, marginBottom: ".65rem", color: "var(--dark)" }}>Color</div>
@@ -688,13 +599,10 @@ export default function WomenPage() {
                     </div>
                   </div>
                 )}
-
                 {hasFilters && (
                   <button onClick={() => { setSelSizes(null); setSelColors(null); setSelType("all"); setSelBrands([]); setFilterPage(1); }} style={{ fontSize: ".61rem", letterSpacing: ".1em", textTransform: "uppercase", background: "none", border: "1px solid var(--border)", padding: ".36rem .8rem", cursor: "pointer", color: "var(--warm)", fontFamily: "'DM Sans',sans-serif", width: "100%", borderRadius: 3 }}>Clear Filters</button>
                 )}
               </div>
-
-              {/* GRID */}
               <div style={{ flex: 1 }}>
                 <div style={{ fontSize: ".7rem", color: "var(--warm)", marginBottom: "1rem", letterSpacing: ".04em" }}>
                   {filtered.length} product{filtered.length !== 1 ? "s" : ""}{totalPages > 1 ? ` — page ${filterPage} of ${totalPages}` : ""}
@@ -736,7 +644,6 @@ export default function WomenPage() {
       })()}
 
       <div className={`w-toast ${toast ? "on" : ""}`}>{toast}</div>
-
       <SHFooter addRef={addRef} />
     </div>
   );
