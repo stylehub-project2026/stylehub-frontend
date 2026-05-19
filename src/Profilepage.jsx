@@ -107,9 +107,8 @@ export default function ProfilePage({ cart, wish = [], setWish }) {
     const [saving, setSaving] = useState(false);
     const [saveMsg, setSaveMsg] = useState("");
 
-    const token = localStorage.getItem("token");
-
     useEffect(() => {
+        const token = localStorage.getItem("token");
         if (!token) { navigate("/signin"); return; }
 
         // تحميل بيانات المستخدم من localStorage فوراً
@@ -119,7 +118,6 @@ export default function ProfilePage({ cart, wish = [], setWish }) {
             setUser(u);
             setEditForm({ firstName: u.firstName || "", lastName: u.lastName || "", phone: u.phone || "" });
         }
-
 
         fetch(`${API}/orders/my-orders`, { headers: { Authorization: `Bearer ${token}` } })
             .then(r => r.json())
@@ -131,7 +129,7 @@ export default function ProfilePage({ cart, wish = [], setWish }) {
             .then(r => r.json())
             .then(data => { if (data.success) setPoints(data.data?.points || 0); })
             .catch(() => { });
-    }, [token]);
+    }, []);
 
     // جلب منتجات الـ wishlist
     useEffect(() => {
@@ -146,6 +144,7 @@ export default function ProfilePage({ cart, wish = [], setWish }) {
     }, [wish]);
 
     const handleCancelOrder = async (orderId) => {
+        const token = localStorage.getItem("token");
         try {
             const res = await fetch(`${API}/orders/${orderId}/cancel`, {
                 method: "PATCH", headers: { Authorization: `Bearer ${token}` },
@@ -156,6 +155,7 @@ export default function ProfilePage({ cart, wish = [], setWish }) {
     };
 
     const handleSaveProfile = async () => {
+        const token = localStorage.getItem("token");
         setSaving(true); setSaveMsg("");
         try {
             const res = await fetch(`${API}/users/me`, {
