@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { SHNav, SHFooter, SHARED_CSS, useScrollReveal } from "./shared.jsx";
 import { authAPI } from "./api.jsx";
-import { signInWithGoogle, signInWithFacebook } from "./firebase";
+import { signInWithGoogle } from "./firebase";
 import logoImg from "./assets/logo.png";
 
 
@@ -381,7 +381,6 @@ function SignInForm({ onForgot, onSwitchSignUp, onDone }) {
   const [ok, setOk] = useState(false);
   const [busy, setBusy] = useState(false);
   const [gBusy, setGBusy] = useState(false);
-  const [fBusy, setFBusy] = useState(false);
 
   const handleGoogle = async () => {
     setErr(""); setGBusy(true);
@@ -397,19 +396,6 @@ function SignInForm({ onForgot, onSwitchSignUp, onDone }) {
     } finally { setGBusy(false); }
   };
 
-  const handleFacebook = async () => {
-    setErr(""); setFBusy(true);
-    try {
-      const idToken = await signInWithFacebook();
-      const { data } = await authAPI.googleAuth(idToken);
-      localStorage.setItem("token", data.data.token);
-      localStorage.setItem("user", JSON.stringify(data.data.user));
-      setOk(true);
-      setTimeout(() => onDone && onDone(), 900);
-    } catch (error) {
-      setErr(error.response?.data?.message || "Facebook sign-in failed.");
-    } finally { setFBusy(false); }
-  };
 
   const submit = async (e) => {
     e.preventDefault();
@@ -504,7 +490,7 @@ function SignInForm({ onForgot, onSwitchSignUp, onDone }) {
       </div>
 
       <div className="sh-social">
-        <button type="button" className="sh-social-btn" onClick={handleGoogle} disabled={gBusy || fBusy || busy}>
+        <button type="button" className="sh-social-btn" onClick={handleGoogle} disabled={gBusy || busy}>
           {gBusy ? <i className="fas fa-circle-notch fa-spin" /> : <svg width="16" height="16" viewBox="0 0 24 24">
             <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />
             <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853" />
@@ -512,10 +498,6 @@ function SignInForm({ onForgot, onSwitchSignUp, onDone }) {
             <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335" />
           </svg>}
           {gBusy ? "Connecting…" : "Google"}
-        </button>
-        <button type="button" className="sh-social-btn" onClick={handleFacebook} disabled={fBusy || gBusy || busy}>
-          {fBusy ? <i className="fas fa-circle-notch fa-spin" /> : <i className="fab fa-facebook-f" style={{ color: "#1877f2" }} />}
-          {fBusy ? "Connecting…" : "Facebook"}
         </button>
       </div>
 
@@ -544,7 +526,6 @@ function SignUpForm({ onSwitchSignIn }) {
   const [ok, setOk] = useState(false);
   const [busy, setBusy] = useState(false);
   const [gBusy, setGBusy] = useState(false);
-  const [fBusy, setFBusy] = useState(false);
   const str = pwStrength(pw);
   const meta = STR_META[str];
 
@@ -562,19 +543,6 @@ function SignUpForm({ onSwitchSignIn }) {
     } finally { setGBusy(false); }
   };
 
-  const handleFacebook = async () => {
-    setErr(""); setFBusy(true);
-    try {
-      const idToken = await signInWithFacebook();
-      const { data } = await authAPI.googleAuth(idToken);
-      localStorage.setItem("token", data.data.token);
-      localStorage.setItem("user", JSON.stringify(data.data.user));
-      setOk(true);
-      setTimeout(() => onDone && onDone(), 900);
-    } catch (error) {
-      setErr(error.response?.data?.message || "Facebook sign-in failed.");
-    } finally { setFBusy(false); }
-  };
 
   const submit = async (e) => {
     e.preventDefault();
@@ -714,7 +682,7 @@ function SignUpForm({ onSwitchSignIn }) {
       </div>
 
       <div className="sh-social">
-        <button type="button" className="sh-social-btn" onClick={handleGoogle} disabled={gBusy || fBusy || busy}>
+        <button type="button" className="sh-social-btn" onClick={handleGoogle} disabled={gBusy || busy}>
           {gBusy ? <i className="fas fa-circle-notch fa-spin" /> : <svg width="16" height="16" viewBox="0 0 24 24">
             <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />
             <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853" />
@@ -722,10 +690,6 @@ function SignUpForm({ onSwitchSignIn }) {
             <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335" />
           </svg>}
           {gBusy ? "Connecting…" : "Google"}
-        </button>
-        <button type="button" className="sh-social-btn" onClick={handleFacebook} disabled={fBusy || gBusy || busy}>
-          {fBusy ? <i className="fas fa-circle-notch fa-spin" /> : <i className="fab fa-facebook-f" style={{ color: "#1877f2" }} />}
-          {fBusy ? "Connecting…" : "Facebook"}
         </button>
       </div>
 
