@@ -591,6 +591,7 @@ function SellerSignUpForm({ onSwitchSignIn, onDone }) {
     bio: "",
   });
   const [show, setShow] = useState(false);
+  const [showCpw, setShowCpw] = useState(false);
   const [err, setErr] = useState("");
   const [ok, setOk] = useState(false);
   const [busy, setBusy] = useState(false);
