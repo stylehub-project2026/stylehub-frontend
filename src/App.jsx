@@ -6,6 +6,7 @@ import { PRODUCTS, BRANDS, CATS, NAV_LINKS, FOOTER_COLS, SHNav, SHFooter, shuffl
 import Salty from "./salty";
 import MarbleBrand from "./Marble";
 import Ninos from "./ninos";
+import BlackCloset from "./blackcloset";
 import TwentySeven from "./27";
 import SellerBrandPage from "./SellerBrandPage";
 import ProfilePage from "./Profilepage";
@@ -613,6 +614,7 @@ export default function App() {
       <Route path="/brand/ninos" element={<Ninos cart={cart} setCart={setCart} wish={wish} setWish={setWish} products={backendProducts} />} />
       <Route path="/brand/27" element={<TwentySeven cart={cart} setCart={setCart} wish={wish} setWish={setWish} products={backendProducts} />} />
       <Route path="/brand/:brandSlug" element={<SellerBrandPage cart={cart} wish={wish} setWish={setWish} />} />
+      <Route path="/brand/blackcloset" element={<BlackCloset cart={cart} setCart={setCart} wish={wish} setWish={setWish} products={backendProducts} />} />
       <Route path="/wishlist" element={<Wishlist cart={cart} setCart={setCart} wish={wish} setWish={setWish} />} />
       <Route path="/profile" element={<ProfilePage cart={cart} wish={wish} />} />
       <Route path="/men" element={<MenPage cart={cart} setCart={setCart} wish={wish} setWish={setWish} />} />
