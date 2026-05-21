@@ -376,7 +376,6 @@ function SignInForm({ onForgot, onSwitchSignUp, onDone }) {
   const [email, setEmail] = useState("");
   const [pw, setPw] = useState("");
   const [show, setShow] = useState(false);
-  const [showCpw, setShowCpw] = useState(false);
   const [err, setErr] = useState("");
   const [ok, setOk] = useState(false);
   const [busy, setBusy] = useState(false);
