@@ -41,7 +41,7 @@ export const BRANDS = [
   { name: "أنتيكا", logo: "/antika.jpg", href: "/brand/antika" },
   { name: "salty", logo: "/saltyy.jpg", href: "/brand/salty" },
   { name: "Ninos", logo: "/ninos.jpg", href: "/brand/ninos" },
-  { name: "Black closet", logo: "/bb.jpg", href: "/brand/black-closet" },
+  { name: "Black closet", logo: "/bb.jpg", href: "/brand/blackcloset" },
 ];
 
 export const NAV_LINKS = [
