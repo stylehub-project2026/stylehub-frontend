@@ -19,7 +19,7 @@ const HERO_SLIDES = [
         h1: "Men",
         sub: "Up to 50% off selected items from local designers.",
         btn: "Explore Sale",
-        img: "https://img.freepik.com/free-photo/young-man-wearing-blue-shirt-holding-white-shirt_1262-10349.jpg?semt=ais_hybrid&w=740&q=80",
+        img: "https://www.shutterstock.com/image-photo/two-stylish-multicultural-men-strike-260nw-2465189379.jpg",
         bg: "#ede9e0",
         fullBg: true,
     },
@@ -28,16 +28,16 @@ const HERO_SLIDES = [
         h1: "Wear What\nMakes You Bold",
         sub: "Support Egyptian creators — every purchase matters.",
         btn: "Meet the Brands",
-        img: "https://img.freepik.com/free-photo/young-woman-wearing-blue-shirt-holding-white-shirt_1262-10350.jpg?semt=ais_hybrid&w=740&q=80",
+        img: "https://www.shutterstock.com/image-photo/two-stylish-multicultural-men-strike-260nw-2465189379.jpg",
         bg: "#f0ece8",
         fullBg: true,
     },
 ];
 
 const CATEGORIES = [
-    { name: "Pants", img: "/images/men_cat1.webp", count: "24 styles" },
-    { name: "Hoodies", img: "/images/men_cat2.webp", count: "18 styles" },
-    { name: "Jackets", img: "/images/men-jacket.png", count: "12 styles" },
+    { name: "Pants", img: "https://twentysevenegy.myshopify.com/cdn/shop/files/022A2473.jpg?v=1768003189&width=980", count: "24 styles" },
+    { name: "Hoodies", img: "https://m.media-amazon.com/images/I/61pyF5Fn+qL._AC_SY445_SX342_QL70_ML2_.jpg", count: "18 styles" },
+    { name: "Jackets", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTtGWEsZvzeQ6zJL-0wsuiw6mKMZryONXoHyw&s", count: "12 styles" },
 ];
 
 /* ══════════════════════════════════════════ HELPERS ══════════════════════════════════════════ */
