@@ -102,7 +102,7 @@ export default function BlackClosetBrand({ cart, wish = [], setWish }) {
   const scrollGrid = () => document.getElementById("blackcloset-grid")?.scrollIntoView({ behavior: "smooth" });
 
   useEffect(() => {
-    fetch(`${API}/products?brand=Black Closet&limit=100`)
+    fetch(`${API}/products?brand=Blackcloset&limit=100`)
       .then(r => r.json())
       .then(data => {
         const prods = (data.data?.products || []).map(p => ({
