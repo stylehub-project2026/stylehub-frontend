@@ -7,7 +7,7 @@ import { SHNav, SHFooter, SHARED_CSS, useScrollReveal } from "./shared";
 const BRAND = {
   name: "Marble",
   desc: "Marble is an Egyptian streetwear brand crafting bold, graphic-driven pieces for those who wear their personality. From oversized hoodies to statement tees, every drop is designed to stand out.",
-  logo: "/images/marble-logo.png",
+  logo: "/marble.jpg",
   heroBg: "/images/marble-hero.jpg",
   accentColor: "#92A079",
   heroOverlay: "rgba(255,255,255,.55)",
