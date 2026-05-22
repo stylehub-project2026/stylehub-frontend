@@ -8,7 +8,7 @@ import { SHNav, SHFooter, useScrollReveal, SHARED_CSS, PRODUCTS, shuffle } from 
 const HERO_SLIDES = [
   {
     fullBanner: true,
-    img: "/cover1.jpg",
+    img: "/wo.jpg",
     btn: "Discover",
   },
   {
