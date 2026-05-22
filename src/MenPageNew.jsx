@@ -10,7 +10,7 @@ const HERO_SLIDES = [
         h1: "Find Your Favorite\nTrendy Outfits!",
         sub: "Discover the latest looks from Egypt's top local brands.",
         btn: "Shop Now",
-        img: "https://img.freepik.com/free-photo/indecisive-man-casual-clothes-making-choice-pointing-fingers-sideways-looking-pensive-standin_1258-159022.jpg?semt=ais_hybrid&w=740&q=80",
+        img: "/men_slider.avif",
         bg: "#eaeaea",
         fullBg: true,
     },
