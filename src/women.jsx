@@ -28,7 +28,7 @@ const HERO_SLIDES = [
 
 const CATEGORIES = [
   { name: "Tops", img: "/tops.jpg", count: "28 styles" },
-  { name: "Dresses", img: "/dress2.jpg", count: "21 styles" },
+  { name: "Dresses", img: "/.jpg", count: "21 styles" },
   { name: "Pants", img: "/pants.jpg", count: "18 styles" },
 ];
 
