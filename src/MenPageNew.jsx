@@ -24,8 +24,6 @@ const HERO_SLIDES = [
         fullBg: true,
     },
     {
-        ey: "Local Brands Spotlight",
-        btn: "Meet the Brands",
         img: "/men-banner-3.jpg",
         bg: "#f0ece8",
         fullBg: true,
