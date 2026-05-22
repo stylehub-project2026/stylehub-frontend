@@ -19,7 +19,7 @@ const HERO_SLIDES = [
         h1: "Men",
         sub: "Up to 50% off selected items from local designers.",
         btn: "Explore Sale",
-        img: "https://www.shutterstock.com/image-photo/two-stylish-multicultural-men-strike-260nw-2465189379.jpg",
+        img: "https://img.freepik.com/free-photo/surprised-redhead-man-stretch-out-hands-with-shopping-bags-give-you-gifts-standing-pink-backgro_1258-161714.jpg?semt=ais_hybrid&w=740&q=80",
         bg: "#ede9e0",
         fullBg: true,
     },
