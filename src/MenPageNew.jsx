@@ -24,6 +24,10 @@ const HERO_SLIDES = [
         fullBg: true,
     },
     {
+        ey: "End of Season Deals",
+        h1: "Men",
+        sub: "Up to 50% off selected items from local designers.",
+        btn: "Explore Sale",
         img: "/men-banner-3.jpg",
         bg: "#f0ece8",
         fullBg: true,
