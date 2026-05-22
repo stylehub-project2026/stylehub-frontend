@@ -1364,47 +1364,159 @@ function CustomersView() {
 function SettingsView() {
   const getSeller = () => { try { return JSON.parse(localStorage.getItem("seller") || "{}"); } catch { return {}; } };
 
-  const [storeName, setStoreName] = useState(() => { const s = getSeller(); return s.brandName || s.storeName || s.name || ""; });
-  const [storeEmail, setStoreEmail] = useState(() => getSeller().email || "");
-  const [phone, setPhone] = useState(() => getSeller().phone || "");
+  // ── Brand Profile ──
+  const [brandName, setBrandName] = useState(() => { const s = getSeller(); return s.brandName || s.storeName || s.name || ""; });
+  const [description, setDescription] = useState(() => getSeller().description || "");
+  const [logoFile, setLogoFile] = useState(null);
+  const [logoPreview, setLogoPreview] = useState(() => { const s = getSeller(); return s.logo ? (s.logo.startsWith("http") ? s.logo : `https://stylehub-backend-tau.vercel.app${s.logo}`) : null; });
+  const [profileMsg, setProfileMsg] = useState("");
+  const [profileSaving, setProfileSaving] = useState(false);
+
+  const handleLogoChange = e => {
+    const file = e.target.files[0];
+    if (!file) return;
+    setLogoFile(file);
+    setLogoPreview(URL.createObjectURL(file));
+  };
+
+  const saveProfile = async () => {
+    setProfileSaving(true);
+    setProfileMsg("");
+    try {
+      const formData = new FormData();
+      formData.append("brandName", brandName);
+      formData.append("description", description);
+      if (logoFile) formData.append("logo", logoFile);
+
+      const token = localStorage.getItem("token");
+      const res = await fetch(`https://stylehub-backend-tau.vercel.app/api/sellers/profile`, {
+        method: "PUT",
+        headers: { Authorization: `Bearer ${token}` },
+        body: formData,
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || "Failed");
+
+      // update localStorage
+      const seller = getSeller();
+      const updated = { ...seller, brandName, description, ...(data.data?.logo ? { logo: data.data.logo } : {}) };
+      localStorage.setItem("seller", JSON.stringify(updated));
+      setProfileMsg("✓ Brand profile updated!");
+    } catch (err) {
+      setProfileMsg("✗ " + err.message);
+    } finally {
+      setProfileSaving(false);
+      setTimeout(() => setProfileMsg(""), 4000);
+    }
+  };
+
+  // ── Change Password ──
+  const [currentPw, setCurrentPw] = useState("");
+  const [newPw, setNewPw] = useState("");
+  const [confirmPw, setConfirmPw] = useState("");
+  const [pwMsg, setPwMsg] = useState("");
+  const [pwSaving, setPwSaving] = useState(false);
+
+  const changePassword = async () => {
+    if (!currentPw || !newPw || !confirmPw) { setPwMsg("✗ Fill all fields."); return; }
+    if (newPw !== confirmPw) { setPwMsg("✗ Passwords don't match."); return; }
+    if (newPw.length < 6) { setPwMsg("✗ Min 6 characters."); return; }
+    setPwSaving(true);
+    setPwMsg("");
+    try {
+      await sellerRequest("PUT", "/sellers/change-password", { currentPassword: currentPw, newPassword: newPw });
+      setPwMsg("✓ Password changed!");
+      setCurrentPw(""); setNewPw(""); setConfirmPw("");
+    } catch (err) {
+      setPwMsg("✗ " + err.message);
+    } finally {
+      setPwSaving(false);
+      setTimeout(() => setPwMsg(""), 4000);
+    }
+  };
+
+  // ── Notifications ──
   const [notifications, setNotifications] = useState(true);
   const [emailUpdates, setEmailUpdates] = useState(true);
   const [orderAlerts, setOrderAlerts] = useState(true);
-  const [saving, setSaving] = useState(false);
-  const [msg, setMsg] = useState("");
-
-  const saveInfo = () => {
-    const seller = getSeller();
-    const updated = { ...seller, brandName: storeName, email: storeEmail, phone };
-    localStorage.setItem("seller", JSON.stringify(updated));
-    setMsg("✓ Saved successfully!");
-    setTimeout(() => setMsg(""), 3000);
-  };
 
   return (
     <>
       <h2 className="page-title">Settings</h2>
       <div className="settings-grid">
-        <div className="settings-card">
-          <h3><i className="fas fa-store" /> Store Information</h3>
-          <div className="settings-row">
-            <span className="settings-label">Store Name</span>
-            <input className="settings-input" type="text" value={storeName} onChange={e => setStoreName(e.target.value)} />
+
+        {/* ── BRAND PROFILE ── */}
+        <div className="settings-card" style={{ gridColumn: "1 / -1" }}>
+          <h3><i className="fas fa-store" /> Brand Profile</h3>
+          <p style={{ fontSize: ".8rem", color: "var(--gray-text)", marginBottom: "1.2rem" }}>
+            This info appears on your public brand page — logo, name, and description.
+          </p>
+
+          {/* Logo upload */}
+          <div style={{ display: "flex", alignItems: "center", gap: "1.5rem", marginBottom: "1.2rem" }}>
+            <div style={{ width: 90, height: 90, borderRadius: "50%", overflow: "hidden", background: "var(--green-light)", border: "2px solid var(--border)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+              {logoPreview
+                ? <img src={logoPreview} alt="logo" style={{ width: "100%", height: "100%", objectFit: "contain" }} />
+                : <i className="fas fa-image" style={{ fontSize: "1.8rem", color: "var(--green)" }} />}
+            </div>
+            <div>
+              <div style={{ fontSize: ".82rem", fontWeight: 600, marginBottom: ".4rem" }}>Brand Logo</div>
+              <label style={{ display: "inline-block", padding: ".45rem 1rem", background: "var(--green-light)", border: "1px solid var(--green-mid)", borderRadius: 8, fontSize: ".78rem", fontWeight: 600, color: "var(--green-dark)", cursor: "pointer" }}>
+                <i className="fas fa-upload" style={{ marginRight: 6 }} /> Upload Logo
+                <input type="file" accept="image/*" onChange={handleLogoChange} style={{ display: "none" }} />
+              </label>
+              <div style={{ fontSize: ".72rem", color: "var(--gray-text)", marginTop: ".3rem" }}>JPG, PNG, WEBP — max 2MB</div>
+            </div>
           </div>
+
+          {/* Brand Name */}
           <div className="settings-row">
-            <span className="settings-label">Store Email</span>
-            <input className="settings-input" type="email" value={storeEmail} onChange={e => setStoreEmail(e.target.value)} />
+            <span className="settings-label">Brand Name</span>
+            <input className="settings-input" type="text" value={brandName} onChange={e => setBrandName(e.target.value)} placeholder="Your brand name" />
           </div>
-          <div className="settings-row">
-            <span className="settings-label">Phone</span>
-            <input className="settings-input" type="tel" value={phone} onChange={e => setPhone(e.target.value)} />
+
+          {/* Description */}
+          <div style={{ padding: ".8rem 0", borderBottom: "1px solid var(--border)" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+              <span className="settings-label">Brand Description</span>
+              <textarea
+                value={description}
+                onChange={e => setDescription(e.target.value)}
+                placeholder="Tell customers about your brand..."
+                rows={3}
+                style={{ padding: ".6rem 1rem", border: "1px solid var(--border)", borderRadius: 8, fontSize: ".85rem", fontFamily: "var(--font)", width: 300, resize: "vertical" }}
+              />
+            </div>
           </div>
-          {msg && <div style={{ fontSize: ".82rem", marginTop: ".5rem", color: msg.startsWith("✓") ? "var(--green-dark)" : "#c0392b" }}>{msg}</div>}
-          <button className="settings-btn" onClick={saveInfo} disabled={saving}>
-            {saving ? "Saving..." : "Save Changes"}
+
+          {profileMsg && <div style={{ fontSize: ".82rem", marginTop: ".6rem", color: profileMsg.startsWith("✓") ? "var(--green-dark)" : "#c0392b" }}>{profileMsg}</div>}
+          <button className="settings-btn" onClick={saveProfile} disabled={profileSaving}>
+            {profileSaving ? "Saving..." : "Save Brand Profile"}
           </button>
         </div>
 
+        {/* ── CHANGE PASSWORD ── */}
+        <div className="settings-card">
+          <h3><i className="fas fa-lock" /> Change Password</h3>
+          <div className="settings-row">
+            <span className="settings-label">Current Password</span>
+            <input className="settings-input" type="password" value={currentPw} onChange={e => setCurrentPw(e.target.value)} placeholder="••••••••" />
+          </div>
+          <div className="settings-row">
+            <span className="settings-label">New Password</span>
+            <input className="settings-input" type="password" value={newPw} onChange={e => setNewPw(e.target.value)} placeholder="••••••••" />
+          </div>
+          <div className="settings-row">
+            <span className="settings-label">Confirm Password</span>
+            <input className="settings-input" type="password" value={confirmPw} onChange={e => setConfirmPw(e.target.value)} placeholder="••••••••" />
+          </div>
+          {pwMsg && <div style={{ fontSize: ".82rem", marginTop: ".6rem", color: pwMsg.startsWith("✓") ? "var(--green-dark)" : "#c0392b" }}>{pwMsg}</div>}
+          <button className="settings-btn" onClick={changePassword} disabled={pwSaving}>
+            {pwSaving ? "Saving..." : "Change Password"}
+          </button>
+        </div>
+
+        {/* ── NOTIFICATIONS ── */}
         <div className="settings-card">
           <h3><i className="fas fa-bell" /> Notifications</h3>
           <div className="settings-row">
@@ -1421,6 +1533,7 @@ function SettingsView() {
           </div>
         </div>
 
+        {/* ── SHIPPING ── */}
         <div className="settings-card">
           <h3><i className="fas fa-truck" /> Shipping</h3>
           <div className="settings-row">
@@ -1434,6 +1547,7 @@ function SettingsView() {
           <button className="settings-btn">Update Shipping</button>
         </div>
 
+        {/* ── PAYMENT ── */}
         <div className="settings-card">
           <h3><i className="fas fa-credit-card" /> Payment</h3>
           <div className="settings-row">
@@ -1449,6 +1563,7 @@ function SettingsView() {
             <span className="settings-value">8%</span>
           </div>
         </div>
+
       </div>
     </>
   );
