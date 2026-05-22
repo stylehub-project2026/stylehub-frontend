@@ -43,6 +43,7 @@ function KidCard({ p, wish, toggleWish }) {
     </div>
   );
 }
+
 // ── MAIN PAGE ──
 export default function Kids({ cart, setCart, wish, setWish }) {
   const [allProducts, setAllProducts] = useState([]);
@@ -53,6 +54,7 @@ export default function Kids({ cart, setCart, wish, setWish }) {
   const [selBrands, setSelBrands] = useState([]);
   const [selType, setSelType] = useState("all");
   const [page, setPage] = useState(1);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const PER_PAGE = 9;
 
   const addRef = useScrollReveal();
@@ -110,35 +112,37 @@ export default function Kids({ cart, setCart, wish, setWish }) {
   const totalPages = Math.ceil(filtered.length / PER_PAGE);
   const paginated = filtered.slice((page - 1) * PER_PAGE, page * PER_PAGE);
 
+  const hasActiveFilters = selSizes.length > 0 || selColors.length > 0 || selBrands.length > 0 || selCategory !== "all" || selType !== "all";
+
+  const scrollToGrid = () => document.getElementById("products-grid")?.scrollIntoView({ behavior: "smooth" });
+
   return (
     <div style={{ minHeight: "100vh", background: "var(--cream)" }}>
-      <style>{SHARED_CSS}</style>
+      <style>{SHARED_CSS + KIDS_CSS}</style>
 
       {/* NAV */}
       <SHNav cart={cart} wish={wish} />
 
       {/* HERO BANNER */}
-      <div style={{ position: "relative", height: 390, overflow: "hidden", background: "linear-gradient(135deg,#6b8aad,#3a5878)", display: "flex", alignItems: "center" }}>
+      <div className="kids-hero" style={{ position: "relative", height: 390, overflow: "hidden", background: "linear-gradient(135deg,#6b8aad,#3a5878)", display: "flex", alignItems: "center" }}>
         <img src="/2.jpg" alt="kids" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", opacity: .5 }}
           onError={e => e.target.style.display = "none"} />
-        <div style={{ position: "relative", zIndex: 2, padding: "0 5%" }}>
+        <div className="kids-hero-text" style={{ position: "relative", zIndex: 2, padding: "0 5%" }}>
           <div style={{ fontSize: ".7rem", letterSpacing: ".25em", textTransform: "uppercase", color: "rgba(255,255,255,.7)", marginBottom: ".8rem" }}>StyleHub</div>
           <h1 style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: "clamp(2.5rem,5vw,4rem)", fontWeight: 400, color: "#fff", lineHeight: 1.1, marginBottom: "1rem" }}>Kids Collection</h1>
-          <p style={{ fontSize: ".85rem", color: "rgba(255,255,255,.75)", maxWidth: 400, lineHeight: 1.8 }}>Curated styles for little ones from Egypt's top local brands.</p>
+          <p className="kids-hero-desc" style={{ fontSize: ".85rem", color: "rgba(255,255,255,.75)", maxWidth: 400, lineHeight: 1.8 }}>Curated styles for little ones from Egypt's top local brands.</p>
         </div>
       </div>
 
       {/* SUB CATEGORIES */}
       <section style={{ padding: "2.5rem 2rem", borderBottom: "1px solid var(--border)" }}>
-        <div style={{ display: "flex", gap: "1rem", justifyContent: "center", flexWrap: "wrap" }}>
+        <div className="kids-subcats" style={{ display: "flex", gap: "1rem", justifyContent: "center", flexWrap: "wrap" }}>
           {[
             { label: "Boys", key: "boys", img: "/boyi.jpg", gradient: "145deg,#8a9e7a,#4a6040" },
             { label: "Girls", key: "girls", img: "/girly.jpg", gradient: "145deg,#c4b8a8,#8a7868" },
-
-
           ].map(cat => (
             <div key={cat.label} style={{ textAlign: "center", cursor: "pointer" }} onClick={() => { setSelCategory(selCategory === cat.key ? "all" : cat.key); setPage(1); }}>
-              <div style={{ width: 140, height: 140, borderRadius: "60%", overflow: "hidden", background: `linear-gradient(${cat.gradient})`, margin: "0 auto .6rem", border: `3px solid ${selCategory === cat.key ? "var(--dark)" : "var(--border)"}`, transition: "border-color .2s", transform: selCategory === cat.key ? "scale(1.05)" : "none" }}
+              <div className="kids-subcat-circle" style={{ width: 140, height: 140, borderRadius: "60%", overflow: "hidden", background: `linear-gradient(${cat.gradient})`, margin: "0 auto .6rem", border: `3px solid ${selCategory === cat.key ? "var(--dark)" : "var(--border)"}`, transition: "border-color .2s", transform: selCategory === cat.key ? "scale(1.05)" : "none" }}
                 onMouseEnter={e => e.currentTarget.style.borderColor = "var(--sage)"}
                 onMouseLeave={e => e.currentTarget.style.borderColor = selCategory === cat.key ? "var(--dark)" : "var(--border)"}>
                 <img src={cat.img} alt={cat.label} style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "top" }}
@@ -151,10 +155,19 @@ export default function Kids({ cart, setCart, wish, setWish }) {
       </section>
 
       {/* PRODUCTS + FILTERS */}
-      <div style={{ display: "flex", gap: "2rem", padding: "2.5rem 2rem", alignItems: "flex-start" }}>
+      <div className="kids-products-layout" style={{ display: "flex", gap: "2rem", padding: "2.5rem 2rem", alignItems: "flex-start" }}>
+
+        {/* MOBILE FILTER TOGGLE */}
+        <button
+          className="kids-filter-toggle"
+          onClick={() => setSidebarOpen(o => !o)}
+        >
+          <span>☰</span> {sidebarOpen ? "Hide Filters" : "Show Filters"}
+          {hasActiveFilters && <span className="kids-filter-badge">●</span>}
+        </button>
 
         {/* FILTERS SIDEBAR */}
-        <div style={{ width: 200, flexShrink: 0, position: "sticky", top: "70px" }}>
+        <div className={`kids-sidebar${sidebarOpen ? " sidebar-open" : ""}`} style={{ width: 200, flexShrink: 0, position: "sticky", top: "70px" }}>
 
           {/* Sort */}
           <div style={{ marginBottom: "1.8rem" }}>
@@ -166,30 +179,29 @@ export default function Kids({ cart, setCart, wish, setWish }) {
             ))}
           </div>
 
-
           {/* Brand */}
           <div style={{ borderTop: "1px solid var(--border)", paddingTop: "1.5rem", marginBottom: "1.8rem" }}>
             <div style={{ fontSize: ".65rem", letterSpacing: ".18em", textTransform: "uppercase", fontWeight: 600, marginBottom: ".8rem" }}>Brand</div>
             {[...new Set(allProducts.map(p => p.brand))].map(b => (
-              <div key={b} onClick={() => toggleBrand(b.toLowerCase())} style={{ display: "flex", alignItems: "center", gap: ".5rem", padding: ".3rem 0", cursor: "pointer" }}>
+              <div key={b} onClick={() => { toggleBrand(b.toLowerCase()); setSidebarOpen(false); }} style={{ display: "flex", alignItems: "center", gap: ".5rem", padding: ".3rem 0", cursor: "pointer" }}>
                 <div style={{ width: 14, height: 14, border: `1.5px solid ${selBrands.includes(b.toLowerCase()) ? "var(--dark)" : "var(--border)"}`, background: selBrands.includes(b.toLowerCase()) ? "var(--dark)" : "transparent", borderRadius: 2, flexShrink: 0, transition: "all .2s" }} />
                 <span style={{ fontSize: ".75rem", color: selBrands.includes(b.toLowerCase()) ? "var(--dark)" : "var(--warm)", transition: "color .2s" }}>{b}</span>
               </div>
             ))}
           </div>
 
-
           {/* Type */}
           <div style={{ borderTop: "1px solid var(--border)", paddingTop: "1.5rem", marginBottom: "1.8rem" }}>
             <div style={{ fontSize: ".65rem", letterSpacing: ".18em", textTransform: "uppercase", fontWeight: 600, marginBottom: ".8rem" }}>Type</div>
             {[...new Set(allProducts.map(p => p.type).filter(Boolean))].map(t => (
-              <div key={t} onClick={() => toggleType(t)} style={{ display: "flex", alignItems: "center", gap: ".5rem", padding: ".3rem 0", cursor: "pointer" }}>
+              <div key={t} onClick={() => { toggleType(t); setSidebarOpen(false); }} style={{ display: "flex", alignItems: "center", gap: ".5rem", padding: ".3rem 0", cursor: "pointer" }}>
                 <div style={{ width: 14, height: 14, border: `1.5px solid ${selType === t ? "var(--dark)" : "var(--border)"}`, background: selType === t ? "var(--dark)" : "transparent", borderRadius: 2, flexShrink: 0, transition: "all .2s" }} />
                 <span style={{ fontSize: ".75rem", color: selType === t ? "var(--dark)" : "var(--warm)", transition: "color .2s" }}>{t.charAt(0).toUpperCase() + t.slice(1)}</span>
               </div>
             ))}
           </div>
 
+          {/* Size */}
           <div style={{ borderTop: "1px solid var(--border)", paddingTop: "1.5rem", marginBottom: "1.8rem" }}>
             <div style={{ fontSize: ".65rem", letterSpacing: ".18em", textTransform: "uppercase", fontWeight: 600, marginBottom: ".8rem" }}>Size</div>
             <div style={{ display: "flex", flexWrap: "wrap", gap: ".4rem" }}>
@@ -201,6 +213,7 @@ export default function Kids({ cart, setCart, wish, setWish }) {
             </div>
           </div>
 
+          {/* Color */}
           <div style={{ borderTop: "1px solid var(--border)", paddingTop: "1.5rem", marginBottom: "1.5rem" }}>
             <div style={{ fontSize: ".65rem", letterSpacing: ".18em", textTransform: "uppercase", fontWeight: 600, marginBottom: ".8rem" }}>Color</div>
             <div style={{ display: "flex", flexWrap: "wrap", gap: ".5rem" }}>
@@ -211,15 +224,15 @@ export default function Kids({ cart, setCart, wish, setWish }) {
           </div>
 
           {/* Clear filters */}
-          {(selSizes.length > 0 || selColors.length > 0 || selBrands.length > 0 || selCategory !== "all" || selType !== "all") && (
-            <button onClick={() => { setSelSizes([]); setSelColors([]); setSelBrands([]); setSelCategory("all"); setSelType("all"); setPage(1); }} style={{ fontSize: ".65rem", letterSpacing: ".1em", textTransform: "uppercase", background: "none", border: "1px solid var(--border)", padding: ".4rem .8rem", cursor: "pointer", color: "var(--warm)", fontFamily: "'DM Sans',sans-serif", transition: "all .2s", width: "100%" }}>
+          {hasActiveFilters && (
+            <button onClick={() => { setSelSizes([]); setSelColors([]); setSelBrands([]); setSelCategory("all"); setSelType("all"); setPage(1); setSidebarOpen(false); }} style={{ fontSize: ".65rem", letterSpacing: ".1em", textTransform: "uppercase", background: "none", border: "1px solid var(--border)", padding: ".4rem .8rem", cursor: "pointer", color: "var(--warm)", fontFamily: "'DM Sans',sans-serif", transition: "all .2s", width: "100%" }}>
               Clear Filters
             </button>
           )}
         </div>
 
         {/* PRODUCTS GRID */}
-        <div id="products-grid" style={{ flex: 1 }}>
+        <div id="products-grid" style={{ flex: 1, minWidth: 0 }}>
           {/* count */}
           <div style={{ fontSize: ".72rem", color: "var(--warm)", marginBottom: "1.2rem", letterSpacing: ".04em" }}>
             {filtered.length} product{filtered.length !== 1 ? "s" : ""} {totalPages > 1 ? `— page ${page} of ${totalPages}` : ""}
@@ -227,7 +240,7 @@ export default function Kids({ cart, setCart, wish, setWish }) {
 
           {filtered.length === 0
             ? <div style={{ textAlign: "center", padding: "4rem 0", color: "var(--warm)", fontSize: ".85rem" }}>No products match your filters.</div>
-            : <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: "2.3rem" }}>
+            : <div className="kids-product-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: "2.3rem" }}>
               {paginated.map(p => (
                 <KidCard key={p.id} p={p} wish={wish} toggleWish={toggleWish} />
               ))}
@@ -236,21 +249,20 @@ export default function Kids({ cart, setCart, wish, setWish }) {
         </div>
       </div>
 
-
       {/* PAGINATION */}
       {totalPages > 1 && (
-        <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: ".5rem", padding: "2.5rem 0" }}>
-          <button onClick={() => { setPage(p => Math.max(1, p - 1)); document.getElementById("products-grid").scrollIntoView({ behavior: "smooth" }); }} disabled={page === 1}
+        <div className="kids-pagination" style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: ".5rem", padding: "2.5rem 0" }}>
+          <button onClick={() => { setPage(p => Math.max(1, p - 1)); scrollToGrid(); }} disabled={page === 1}
             style={{ width: 36, height: 36, borderRadius: "50%", border: "1px solid var(--border)", background: "none", cursor: page === 1 ? "not-allowed" : "pointer", opacity: page === 1 ? .4 : 1, fontSize: "1rem", display: "flex", alignItems: "center", justifyContent: "center" }}>
             ‹
           </button>
           {Array.from({ length: totalPages }, (_, i) => i + 1).map(n => (
-            <button key={n} onClick={() => { setPage(n); document.getElementById("products-grid").scrollIntoView({ behavior: "smooth" }); }}
+            <button key={n} onClick={() => { setPage(n); scrollToGrid(); }}
               style={{ width: 36, height: 36, borderRadius: "50%", border: `1px solid ${page === n ? "var(--dark)" : "var(--border)"}`, background: page === n ? "var(--dark)" : "none", color: page === n ? "#fff" : "var(--dark)", cursor: "pointer", fontSize: ".78rem", fontWeight: page === n ? 600 : 400, transition: "all .2s", display: "flex", alignItems: "center", justifyContent: "center" }}>
               {n}
             </button>
           ))}
-          <button onClick={() => { setPage(p => Math.min(totalPages, p + 1)); document.getElementById("products-grid").scrollIntoView({ behavior: "smooth" }); }} disabled={page === totalPages}
+          <button onClick={() => { setPage(p => Math.min(totalPages, p + 1)); scrollToGrid(); }} disabled={page === totalPages}
             style={{ width: 36, height: 36, borderRadius: "50%", border: "1px solid var(--border)", background: "none", cursor: page === totalPages ? "not-allowed" : "pointer", opacity: page === totalPages ? .4 : 1, fontSize: "1rem", display: "flex", alignItems: "center", justifyContent: "center" }}>
             ›
           </button>
@@ -259,7 +271,134 @@ export default function Kids({ cart, setCart, wish, setWish }) {
 
       {/* FOOTER */}
       <SHFooter addRef={addRef} />
-
     </div>
   );
 }
+
+// ─── RESPONSIVE CSS ───
+const KIDS_CSS = `
+
+/* ── Mobile filter toggle ── */
+.kids-filter-toggle {
+  display: none;
+}
+
+/* ════════════════════════════
+   TABLET  (≤1024px)
+════════════════════════════ */
+@media (max-width: 1024px) {
+  .kids-hero {
+    height: 300px !important;
+  }
+  .kids-product-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 1.4rem !important;
+  }
+}
+
+/* ════════════════════════════
+   MOBILE  (≤768px)
+════════════════════════════ */
+@media (max-width: 768px) {
+
+  /* Hero */
+  .kids-hero {
+    height: auto !important;
+    min-height: 220px !important;
+    padding: 2.5rem 0 !important;
+  }
+  .kids-hero-text {
+    padding: 0 6% !important;
+  }
+  .kids-hero-desc {
+    display: none !important;
+  }
+
+  /* Subcategory circles */
+  .kids-subcats {
+    gap: 1.5rem !important;
+  }
+  .kids-subcat-circle {
+    width: 100px !important;
+    height: 100px !important;
+  }
+
+  /* Products layout — stack sidebar above grid */
+  .kids-products-layout {
+    flex-direction: column !important;
+    padding: 1.2rem 1rem !important;
+    gap: 0 !important;
+  }
+
+  /* Mobile filter toggle button */
+  .kids-filter-toggle {
+    display: flex !important;
+    align-items: center;
+    gap: .5rem;
+    width: 100%;
+    background: #1a1a18;
+    color: #fff;
+    border: none;
+    padding: .65rem 1rem;
+    font-size: .72rem;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    border-radius: 4px;
+    margin-bottom: 1rem;
+  }
+  .kids-filter-badge {
+    color: #92A079;
+    font-size: .9rem;
+    line-height: 1;
+  }
+
+  /* Sidebar — hidden by default on mobile */
+  .kids-sidebar {
+    display: none;
+    width: 100% !important;
+    position: static !important;
+    top: unset !important;
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 1.2rem 1rem;
+    margin-bottom: 1.2rem;
+  }
+  .kids-sidebar.sidebar-open {
+    display: block !important;
+  }
+
+  /* Product grid */
+  .kids-product-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 0.8rem !important;
+  }
+
+  /* Pagination */
+  .kids-pagination {
+    flex-wrap: wrap !important;
+    gap: .3rem !important;
+    padding: 1.5rem 1rem !important;
+  }
+}
+
+/* ════════════════════════════
+   SMALL MOBILE  (≤480px)
+════════════════════════════ */
+@media (max-width: 480px) {
+  .kids-product-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 0.6rem !important;
+  }
+  .kids-subcat-circle {
+    width: 80px !important;
+    height: 80px !important;
+  }
+  .kids-products-layout {
+    padding: 1rem 0.75rem !important;
+  }
+}
+`;
