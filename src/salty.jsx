@@ -75,6 +75,7 @@ export default function SaltyBrand({ cart, wish = [], setWish }) {
   const [sortBy, setSortBy] = useState("default");
   const [selType, setSelType] = useState("all");
   const [page, setPage] = useState(1);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const PER_PAGE = 9;
 
   const navigate = useNavigate();
@@ -119,15 +120,17 @@ export default function SaltyBrand({ cart, wish = [], setWish }) {
   const totalPages = Math.ceil(filtered.length / PER_PAGE);
   const paginated = filtered.slice((page - 1) * PER_PAGE, page * PER_PAGE);
 
+  const hasActiveFilters = selSizes || selColors || selType !== "all";
+
   return (
     <div style={{ minHeight: "100vh", background: "var(--cream)" }}>
       <style>{SHARED_CSS + PAGE_CSS}</style>
       <SHNav cart={cart} wish={wish} />
 
       {/* ════════════════════════════════
-          1. HERO BANNER — white bg inside border
+          1. HERO BANNER
       ════════════════════════════════ */}
-      <section style={{
+      <section className="salty-hero" style={{
         position: "relative", height: SZ.heroBanner, overflow: "hidden",
         background: "#ffffff",
         display: "flex", alignItems: "center",
@@ -140,10 +143,10 @@ export default function SaltyBrand({ cart, wish = [], setWish }) {
           onError={e => e.target.style.display = "none"} />
         <div style={{ position: "absolute", inset: 0, background: BRAND.heroOverlay, borderRadius: 10 }} />
 
-        <div style={{ position: "relative", zIndex: 2, display: "flex", alignItems: "center", gap: "4rem", padding: "0 6%", width: "100%" }}>
+        <div className="salty-hero-inner" style={{ position: "relative", zIndex: 2, display: "flex", alignItems: "center", gap: "4rem", padding: "0 6%", width: "100%" }}>
 
           {/* LOGO */}
-          <div style={{ flexShrink: 0, width: SZ.heroLogoSize, height: SZ.heroLogoSize, borderRadius: "50%", overflow: "hidden", background: "#f8f6f2", border: "1.5px solid rgba(26,26,24,.12)", boxShadow: "0 8px 32px rgba(26,26,24,.1)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+          <div className="salty-hero-logo" style={{ flexShrink: 0, width: SZ.heroLogoSize, height: SZ.heroLogoSize, borderRadius: "50%", overflow: "hidden", background: "#f8f6f2", border: "1.5px solid rgba(26,26,24,.12)", boxShadow: "0 8px 32px rgba(26,26,24,.1)", display: "flex", alignItems: "center", justifyContent: "center" }}>
             <img src={BRAND.logo} alt={BRAND.name}
               style={{ width: "100%", height: "100%", objectFit: "contain" }}
               onError={e => { e.target.style.display = "none"; e.target.nextSibling.style.display = "flex"; }} />
@@ -153,12 +156,12 @@ export default function SaltyBrand({ cart, wish = [], setWish }) {
           </div>
 
           {/* TEXT */}
-          <div style={{ maxWidth: 500 }}>
+          <div className="salty-hero-text" style={{ maxWidth: 500 }}>
             <div style={{ fontSize: ".58rem", letterSpacing: ".3em", textTransform: "uppercase", color: "var(--warm)", marginBottom: ".6rem" }}>StyleHub · Brand</div>
             <h1 style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: "clamp(2.6rem,4vw,3.6rem)", fontWeight: 400, lineHeight: 1.1, marginBottom: "1rem", color: "var(--dark)" }}>
               {BRAND.name}
             </h1>
-            <p style={{ fontSize: ".90rem", lineHeight: 1.85, color: "#555252", marginBottom: "1.8rem", maxWidth: 440 }}>
+            <p className="salty-hero-desc" style={{ fontSize: ".90rem", lineHeight: 1.85, color: "#555252", marginBottom: "1.8rem", maxWidth: 440 }}>
               {BRAND.desc}
             </p>
             <button onClick={scrollGrid} className="salty-cta-btn">Shop Now</button>
@@ -173,7 +176,7 @@ export default function SaltyBrand({ cart, wish = [], setWish }) {
         <h2 style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: "clamp(1.6rem,2.5vw,2.2rem)", fontWeight: 400, textAlign: "center", marginBottom: "2.5rem", letterSpacing: ".04em" }}>
           Shop by {BRAND.name}
         </h2>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: "1rem" }}>
+        <div className="shop-grid" style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: "1rem" }}>
           {allProducts.slice(0, 4).map((p, i) => (
             <div key={p.id} className={`reveal d${i + 1}`} ref={addRef}
               style={{ cursor: "pointer", textAlign: "center" }}
@@ -196,7 +199,7 @@ export default function SaltyBrand({ cart, wish = [], setWish }) {
           3. SEE WHAT'S POPULAR
       ════════════════════════════════ */}
       <section style={{ background: "#ffffff", padding: "5rem 6%", borderBottom: "2px solid rgba(26,26,24,.12)" }}>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "5rem", alignItems: "center" }}>
+        <div className="popular-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "5rem", alignItems: "center" }}>
 
           {/* LEFT TEXT */}
           <div className="reveal" ref={addRef}>
@@ -207,7 +210,7 @@ export default function SaltyBrand({ cart, wish = [], setWish }) {
           </div>
 
           {/* RIGHT — decorative dark blob */}
-          <div style={{ position: "relative", minHeight: "300px" }}>
+          <div className="popular-blob" style={{ position: "relative", minHeight: "300px" }}>
             <div style={{ position: "absolute", right: "-6%", top: "-22%", width: "52%", height: "144%", background: "var(--dark)", borderRadius: "60% 0 0 60%", zIndex: 0 }} />
           </div>
 
@@ -217,10 +220,19 @@ export default function SaltyBrand({ cart, wish = [], setWish }) {
       {/* ════════════════════════════════
           4. ALL PRODUCTS — filters + grid
       ════════════════════════════════ */}
-      <div style={{ display: "flex", gap: "2.5rem", padding: "3rem 6%", alignItems: "flex-start", background: "var(--cream)" }}>
+      <div className="products-layout" style={{ display: "flex", gap: "2.5rem", padding: "3rem 6%", alignItems: "flex-start", background: "var(--cream)" }}>
+
+        {/* MOBILE FILTER TOGGLE */}
+        <button
+          className="mobile-filter-toggle"
+          onClick={() => setSidebarOpen(o => !o)}
+        >
+          <span>☰</span> {sidebarOpen ? "Hide Filters" : "Show Filters"}
+          {hasActiveFilters && <span className="filter-badge">●</span>}
+        </button>
 
         {/* SIDEBAR */}
-        <div style={{ width: 185, flexShrink: 0, position: "sticky", top: "70px" }}>
+        <div className={`products-sidebar${sidebarOpen ? " sidebar-open" : ""}`} style={{ width: 185, flexShrink: 0, position: "sticky", top: "70px" }}>
 
           {/* Sort */}
           <div style={{ marginBottom: "1.8rem" }}>
@@ -243,7 +255,7 @@ export default function SaltyBrand({ cart, wish = [], setWish }) {
               ["hoodies", "Hoodies"],
               ["dresses", "Dresses"]
             ].map(([val, label]) => (
-              <CheckRow key={val} label={label} active={selType === val} onClick={() => toggleType(val)} />
+              <CheckRow key={val} label={label} active={selType === val} onClick={() => { toggleType(val); setSidebarOpen(false); }} />
             ))}
           </FilterSection>
 
@@ -269,8 +281,8 @@ export default function SaltyBrand({ cart, wish = [], setWish }) {
             </div>
           </FilterSection>
 
-          {(selSizes || selColors || selType !== "all") && (
-            <button onClick={() => { setSelSizes(null); setSelColors(null); setSelType("all"); setPage(1); }}
+          {hasActiveFilters && (
+            <button onClick={() => { setSelSizes(null); setSelColors(null); setSelType("all"); setPage(1); setSidebarOpen(false); }}
               style={{ fontSize: ".61rem", letterSpacing: ".1em", textTransform: "uppercase", background: "none", border: "1px solid var(--border)", padding: ".36rem .8rem", cursor: "pointer", color: "var(--warm)", fontFamily: "'DM Sans',sans-serif", width: "100%", borderRadius: 3 }}>
               Clear Filters
             </button>
@@ -278,7 +290,7 @@ export default function SaltyBrand({ cart, wish = [], setWish }) {
         </div>
 
         {/* GRID */}
-        <div id="salty-grid" style={{ flex: 1 }}>
+        <div id="salty-grid" style={{ flex: 1, minWidth: 0 }}>
           <div style={{ fontSize: ".7rem", color: "var(--warm)", marginBottom: "1rem", letterSpacing: ".04em" }}>
             {filtered.length} product{filtered.length !== 1 ? "s" : ""}
             {totalPages > 1 ? ` — page ${page} of ${totalPages}` : ""}
@@ -286,14 +298,14 @@ export default function SaltyBrand({ cart, wish = [], setWish }) {
 
           {filtered.length === 0
             ? <div style={{ textAlign: "center", padding: "4rem 0", color: "var(--warm)", fontSize: ".85rem" }}>No products match your filters.</div>
-            : <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: "1.4rem" }}>
+            : <div className="product-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: "1.4rem" }}>
               {paginated.map(p => <PCard key={p.id} p={p} wish={wish} toggleWish={toggleWish} />)}
             </div>
           }
 
           {/* PAGINATION */}
           {totalPages > 1 && (
-            <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: ".45rem", padding: "2.5rem 0" }}>
+            <div className="pagination-row" style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: ".45rem", padding: "2.5rem 0" }}>
               <PagBtn onClick={() => { setPage(p => Math.max(1, p - 1)); scrollGrid(); }} disabled={page === 1}>‹</PagBtn>
               {Array.from({ length: totalPages }, (_, i) => i + 1).map(n => (
                 <PagBtn key={n} onClick={() => { setPage(n); scrollGrid(); }} active={page === n}>{n}</PagBtn>
@@ -356,4 +368,157 @@ const PAGE_CSS = `
   transition:background .2s;
 }
 .salty-cta-btn:hover { background:#92A079; }
+
+/* ── Mobile filter toggle button ── */
+.mobile-filter-toggle {
+  display: none;
+}
+
+/* ── Sidebar hidden state on mobile ── */
+.products-sidebar {
+  display: block;
+}
+
+/* ════════════════════════════
+   TABLET  (≤1024px)
+════════════════════════════ */
+@media (max-width: 1024px) {
+  .shop-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+  .product-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+  .salty-hero-inner {
+    gap: 2.5rem !important;
+  }
+}
+
+/* ════════════════════════════
+   MOBILE  (≤768px)
+════════════════════════════ */
+@media (max-width: 768px) {
+
+  /* Hero */
+  .salty-hero {
+    margin: 0.6rem !important;
+    height: auto !important;
+    min-height: unset !important;
+    border-radius: 8px !important;
+  }
+  .salty-hero-inner {
+    flex-direction: column !important;
+    gap: 1.4rem !important;
+    padding: 2rem 1.2rem 2.2rem !important;
+    text-align: center !important;
+    align-items: center !important;
+  }
+  .salty-hero-logo {
+    width: 110px !important;
+    height: 110px !important;
+  }
+  .salty-hero-text {
+    max-width: 100% !important;
+  }
+  .salty-hero-desc {
+    display: none !important;
+  }
+
+  /* Shop grid */
+  .shop-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 0.75rem !important;
+  }
+
+  /* Popular section */
+  .popular-grid {
+    grid-template-columns: 1fr !important;
+    gap: 0 !important;
+  }
+  .popular-blob {
+    display: none !important;
+  }
+
+  /* Products layout — stack sidebar above grid */
+  .products-layout {
+    flex-direction: column !important;
+    padding: 1.2rem 4% !important;
+    gap: 0 !important;
+  }
+
+  /* Mobile filter toggle */
+  .mobile-filter-toggle {
+    display: flex !important;
+    align-items: center;
+    gap: .5rem;
+    width: 100%;
+    background: var(--dark);
+    color: #fff;
+    border: none;
+    padding: .65rem 1rem;
+    font-size: .72rem;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    border-radius: 4px;
+    margin-bottom: 1rem;
+  }
+  .filter-badge {
+    color: #92A079;
+    font-size: .9rem;
+    line-height: 1;
+  }
+
+  /* Sidebar — hidden by default on mobile, shown when open */
+  .products-sidebar {
+    display: none;
+    width: 100% !important;
+    position: static !important;
+    top: unset !important;
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 1.2rem 1rem;
+    margin-bottom: 1.2rem;
+  }
+  .products-sidebar.sidebar-open {
+    display: block !important;
+  }
+
+  /* Product grid */
+  .product-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 0.8rem !important;
+  }
+
+  /* Pagination */
+  .pagination-row {
+    flex-wrap: wrap !important;
+    gap: .3rem !important;
+    padding: 1.5rem 0 !important;
+  }
+}
+
+/* ════════════════════════════
+   SMALL MOBILE  (≤480px)
+════════════════════════════ */
+@media (max-width: 480px) {
+  .shop-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 0.5rem !important;
+  }
+  .product-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 0.6rem !important;
+  }
+  .salty-hero {
+    margin: 0.4rem !important;
+  }
+  .salty-hero-logo {
+    width: 90px !important;
+    height: 90px !important;
+  }
+}
 `;
