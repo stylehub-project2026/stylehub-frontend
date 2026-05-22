@@ -92,7 +92,7 @@ const PAGE_CSS = `
 .w-sc-btn { position:absolute; top:50%; transform:translateY(-50%); z-index:4; background:#fff; border:1px solid var(--border); border-radius:50%; width:36px; height:36px; display:flex; align-items:center; justify-content:center; cursor:pointer; box-shadow:0 2px 10px rgba(0,0,0,.08); transition:all .2s; }
 .w-sc-btn:hover { box-shadow:0 4px 16px rgba(0,0,0,.13); }
 .w-sc-btn.l { left:-18px; } .w-sc-btn.r { right:-18px; }
-.w-sc-track { display:flex; gap:20px; overflow-x:auto; padding-bottom:4px; scroll-snap-type:x mandatory; }
+.w-sc-track { display:flex; gap:20px; overflow-x:auto; padding-bottom:4px; scroll-snap-type:x mandatory; -webkit-overflow-scrolling:touch; }
 .w-sc-track::-webkit-scrollbar { display:none; }
 /* ── prod card ── */
 .w-pc { position:relative; flex:0 0 220px; cursor:pointer; }
@@ -115,12 +115,8 @@ const PAGE_CSS = `
 .w-stars-row { color:var(--gold,#c8a96e); font-size:.65rem; display:flex; gap:1px; }
 /* ── trending grid ── */
 .w-trend-g { display:grid; grid-template-columns:repeat(3,1fr); gap:20px; }
-@media(max-width:768px){ .w-trend-g{ grid-template-columns:repeat(2,1fr); } }
-@media(max-width:480px){ .w-trend-g{ grid-template-columns:1fr; } }
 /* ── pick card ── */
 .w-picks-g { display:grid; grid-template-columns:repeat(4,1fr); gap:20px; }
-@media(max-width:992px){ .w-picks-g{ grid-template-columns:repeat(2,1fr); } }
-@media(max-width:480px){ .w-picks-g{ grid-template-columns:1fr; } }
 .w-pick-card { cursor:pointer; }
 .w-pick-img-wrap { position:relative; overflow:hidden; border-radius:3px; aspect-ratio:3/4; background:var(--cream); }
 .w-pick-img-wrap img { width:100%; height:100%; object-fit:cover; transition:transform .5s; }
@@ -140,15 +136,14 @@ const PAGE_CSS = `
 .w-sale-ban-text h2 { font-family:'Cormorant Garamond',serif; font-size:clamp(1.6rem,3.5vw,2.6rem); font-weight:600; margin-bottom:20px; line-height:1.15; }
 .w-sale-cta-btn { background:transparent; border:1.5px solid rgba(255,255,255,.5); color:#fff; padding:.55rem 1.4rem; font-size:.72rem; letter-spacing:.12em; text-transform:uppercase; cursor:pointer; transition:all .2s; border-radius:2px; width:fit-content; }
 .w-sale-cta-btn:hover { background:#fff; color:var(--dark); }
-@media(max-width:600px){ .w-sale-ban-inner{ flex-direction:column; } .w-sale-ban-inner img{ width:100%; height:200px; } }
 /* ── quick view modal ── */
 .w-qv-backdrop { position:fixed; inset:0; background:rgba(26,26,24,.55); z-index:1050; display:flex; align-items:center; justify-content:center; padding:16px; animation:wFadeIn .2s ease; }
 @keyframes wFadeIn { from{opacity:0} to{opacity:1} }
 .w-qv-modal { background:#fff; max-width:760px; width:100%; border-radius:4px; overflow:hidden; display:flex; max-height:90vh; animation:wSlideUp .3s ease; }
 @keyframes wSlideUp { from{opacity:0;transform:translateY(24px)} to{opacity:1;transform:none} }
-.w-qv-img { width:46%; object-fit:cover; display:block; }
-.w-qv-body { flex:1; padding:32px 28px; overflow-y:auto; }
-.w-qv-close { position:absolute; top:14px; right:16px; background:none; border:none; font-size:1.4rem; cursor:pointer; color:var(--warm); line-height:1; }
+.w-qv-img { width:46%; object-fit:cover; display:block; flex-shrink:0; }
+.w-qv-body { flex:1; padding:32px 28px; overflow-y:auto; position:relative; }
+.w-qv-close { position:absolute; top:14px; right:16px; background:none; border:none; font-size:1.4rem; cursor:pointer; color:var(--warm); line-height:1; z-index:2; }
 .w-qv-tag-badge { background:var(--sage); color:#fff; font-size:.58rem; padding:.2rem .55rem; letter-spacing:.08em; font-weight:600; text-transform:uppercase; border-radius:2px; display:inline-block; margin-bottom:12px; }
 .w-qv-brand { font-size:.68rem; letter-spacing:.15em; text-transform:uppercase; color:var(--warm); margin-bottom:4px; }
 .w-qv-name { font-family:'Cormorant Garamond',serif; font-size:1.6rem; font-weight:600; color:var(--dark); margin-bottom:10px; }
@@ -170,6 +165,92 @@ const PAGE_CSS = `
 /* ── toast ── */
 .w-toast { position:fixed; bottom:28px; left:50%; transform:translateX(-50%) translateY(20px); background:var(--dark); color:#fff; padding:.55rem 1.4rem; border-radius:30px; font-size:.78rem; letter-spacing:.06em; pointer-events:none; opacity:0; transition:all .3s; z-index:1100; white-space:nowrap; }
 .w-toast.on { opacity:1; transform:translateX(-50%) translateY(0); }
+
+/* ════════════════════════════════
+   MOBILE FILTER DRAWER
+═══════════════════════════════════ */
+.w-filter-bar { display:none; }
+.w-filter-drawer-backdrop { display:none; }
+
+/* ════════════════════════════════
+   RESPONSIVE BREAKPOINTS
+═══════════════════════════════════ */
+
+/* ── Tablet (≤992px) ── */
+@media(max-width:992px){
+  .w-picks-g { grid-template-columns:repeat(2,1fr); }
+  .w-sc-btn { display:none; }
+  .w-pc { flex:0 0 180px; }
+}
+
+/* ── Tablet small (≤768px) ── */
+@media(max-width:768px){
+  /* hero */
+  .w-hero-banner img,
+  .w-hero-overlay img { height:380px; }
+  .w-hero-sale { min-height:380px; }
+  .w-hero-sale img { height:380px; }
+  .w-hero-overlay-sub { display:none; }
+  /* sections */
+  .w-sp { padding:40px 0; }
+  /* categories: 1 row scrollable */
+  .w-cat-card { aspect-ratio:3/4; }
+  /* trending */
+  .w-trend-g { grid-template-columns:repeat(2,1fr); gap:14px; }
+  /* picks */
+  .w-picks-g { grid-template-columns:repeat(2,1fr); }
+  /* sale banner */
+  .w-sale-ban-inner { flex-direction:column; }
+  .w-sale-ban-inner img { width:100%; height:200px; }
+  .w-sale-ban-text { padding:28px 6%; }
+  /* quick view */
+  .w-qv-modal { flex-direction:column; max-width:100%; max-height:92vh; border-radius:12px 12px 0 0; align-self:flex-end; }
+  .w-qv-backdrop { align-items:flex-end; padding:0; }
+  .w-qv-img { width:100%; height:220px; object-fit:cover; flex-shrink:0; }
+  .w-qv-body { padding:20px 20px 24px; }
+  .w-qv-name { font-size:1.25rem; }
+  /* filter bar */
+  .w-filter-bar { display:flex; align-items:center; justify-content:space-between; gap:.6rem; padding:.7rem 0 1rem; flex-wrap:wrap; }
+  .w-filter-btn { display:flex; align-items:center; gap:.4rem; background:var(--dark); color:#fff; border:none; padding:.5rem 1.1rem; font-size:.7rem; letter-spacing:.1em; text-transform:uppercase; cursor:pointer; border-radius:3px; font-family:'DM Sans',sans-serif; }
+  .w-sort-select { border:1px solid var(--border); background:#fff; padding:.45rem .7rem; font-size:.7rem; letter-spacing:.05em; color:var(--dark); font-family:'DM Sans',sans-serif; border-radius:3px; cursor:pointer; flex:1; max-width:180px; }
+  /* filter drawer */
+  .w-filter-drawer-backdrop { display:block; position:fixed; inset:0; background:rgba(0,0,0,.45); z-index:900; animation:wFadeIn .2s ease; }
+  .w-filter-drawer { position:fixed; top:0; left:0; bottom:0; width:min(320px,88vw); background:#fff; z-index:901; overflow-y:auto; padding:0; transform:translateX(-100%); transition:transform .32s cubic-bezier(.4,0,.2,1); box-shadow:4px 0 24px rgba(0,0,0,.15); }
+  .w-filter-drawer.open { transform:translateX(0); }
+  .w-filter-drawer-head { display:flex; align-items:center; justify-content:space-between; padding:1.1rem 1.3rem; border-bottom:1px solid var(--border); position:sticky; top:0; background:#fff; z-index:2; }
+  .w-filter-drawer-title { font-size:.78rem; font-weight:600; letter-spacing:.12em; text-transform:uppercase; color:var(--dark); }
+  .w-filter-drawer-close { background:none; border:none; font-size:1.3rem; cursor:pointer; color:var(--warm); line-height:1; }
+  .w-filter-drawer-body { padding:1.2rem 1.3rem; }
+  /* all products layout: no sidebar, full width grid */
+  .w-ap-layout { flex-direction:column !important; }
+  .w-ap-sidebar { display:none !important; }
+  .w-ap-grid { grid-template-columns:repeat(2,1fr) !important; }
+  /* hero arrows smaller */
+  .w-hero-arrow { width:30px; height:30px; }
+  .w-hero-arrow.p { left:10px; }
+  .w-hero-arrow.n { right:10px; }
+}
+
+/* ── Mobile (≤480px) ── */
+@media(max-width:480px){
+  .w-hero-banner img,
+  .w-hero-overlay img { height:280px; }
+  .w-hero-sale { min-height:280px; }
+  .w-hero-sale img { height:280px; }
+  .w-hero-overlay-ey { display:none; }
+  .w-trend-g { grid-template-columns:repeat(2,1fr); gap:10px; }
+  .w-ap-grid { grid-template-columns:repeat(2,1fr) !important; gap:10px !important; }
+  .w-pc { flex:0 0 150px; }
+  .w-prod-info { padding:7px 0 2px; }
+  .w-prod-name { font-size:.75rem; }
+  .w-prod-price { font-size:.8rem; }
+}
+
+/* ── Very small (≤360px) ── */
+@media(max-width:360px){
+  .w-ap-grid { grid-template-columns:1fr !important; }
+  .w-trend-g { grid-template-columns:1fr; }
+}
 `;
 
 /* ══════════════════════════════════════════ HELPERS ══════════════════════════════════════════ */
@@ -207,7 +288,7 @@ function QuickViewModal({ p, onClose, onAddToCart }) {
 
   return (
     <div className="w-qv-backdrop" onClick={onClose}>
-      <div className="w-qv-modal" onClick={(e) => e.stopPropagation()} style={{ position: "relative" }}>
+      <div className="w-qv-modal" onClick={(e) => e.stopPropagation()}>
         <img className="w-qv-img" src={p.img} alt={p.name} onError={(e) => { e.target.src = "https://placehold.co/360x480?text=No+Image"; }} />
         <div className="w-qv-body">
           <button className="w-qv-close" onClick={onClose}>×</button>
@@ -367,23 +448,101 @@ function HeroCarousel() {
           </div>
         </div>
       )}
-      <button className="w-hero-arrow p" onClick={() => go(-1)} style={{ top: "50%", left: 18, position: "absolute", transform: "translateY(-50%)", background: "rgba(255,255,255,.85)", border: "1px solid var(--border)", borderRadius: "50%", width: 38, height: 38, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", zIndex: 5 }}>
+      {/* Arrows */}
+      <button className="w-hero-arrow p" onClick={() => go(-1)}>
         <i className="bi bi-chevron-left" />
       </button>
-      <button className="w-hero-arrow n" onClick={() => go(1)} style={{ top: "50%", right: 18, position: "absolute", transform: "translateY(-50%)", background: "rgba(255,255,255,.85)", border: "1px solid var(--border)", borderRadius: "50%", width: 38, height: 38, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", zIndex: 5 }}>
+      <button className="w-hero-arrow n" onClick={() => go(1)}>
         <i className="bi bi-chevron-right" />
       </button>
-      <div style={{ position: "absolute", bottom: 20, left: "50%", transform: "translateX(-50%)", display: "flex", gap: 6 }}>
+      {/* Dots */}
+      <div style={{ position: "absolute", bottom: 20, left: "50%", transform: "translateX(-50%)", display: "flex", gap: 6, zIndex: 5 }}>
         {HERO_SLIDES.map((_, i) => (
           <button key={i} className={`w-hero-dot ${i === cur ? "on" : ""}`} onClick={() => { setCur(i); setKey(k => k + 1); }} />
         ))}
       </div>
-      <div style={{ position: "absolute", bottom: 22, right: 28, fontSize: ".7rem", letterSpacing: ".1em", color: (s.fullBanner || s.fullOverlay || s.fullSale) ? "rgba(255,255,255,.7)" : "var(--warm)" }}>
+      {/* Counter */}
+      <div style={{ position: "absolute", bottom: 22, right: 28, fontSize: ".7rem", letterSpacing: ".1em", color: (s.fullBanner || s.fullOverlay || s.fullSale) ? "rgba(255,255,255,.7)" : "var(--warm)", zIndex: 5 }}>
         <span>{String(cur + 1).padStart(2, "0")}</span>
         <span style={{ opacity: 0.4 }}> / </span>
         <span style={{ opacity: 0.4 }}>{String(HERO_SLIDES.length).padStart(2, "0")}</span>
       </div>
     </div>
+  );
+}
+
+/* ══════════════════════════════════════════ FILTER SIDEBAR CONTENT ══════════════════════════════════════════ */
+function FilterContent({
+  ALL_BRANDS, ALL_TYPES, ALL_SIZES, ALL_COLORS,
+  selBrands, selType, selSizes, selColors, sortBy,
+  setSelBrands, setSelType, setSelSizes, setSelColors, setSortBy,
+  setFilterPage, hasFilters, onClear,
+}) {
+  return (
+    <>
+      {/* Sort */}
+      <div style={{ marginBottom: "1.8rem" }}>
+        <div style={{ fontSize: ".6rem", letterSpacing: ".2em", textTransform: "uppercase", fontWeight: 600, marginBottom: ".65rem", color: "var(--dark)" }}>Sort By</div>
+        {[["default", "Default"], ["low", "Price: Low → High"], ["high", "Price: High → Low"], ["sale", "On Sale"]].map(([val, label]) => (
+          <div key={val} onClick={() => setSortBy(val)} style={{ fontSize: ".75rem", padding: ".28rem 0", cursor: "pointer", color: sortBy === val ? "var(--dark)" : "var(--warm)", fontWeight: sortBy === val ? 600 : 400, transition: "color .2s" }}>{label}</div>
+        ))}
+      </div>
+
+      {/* Brand */}
+      {ALL_BRANDS.length > 0 && (
+        <div style={{ borderTop: "1px solid var(--border)", paddingTop: "1.3rem", marginBottom: "1.6rem" }}>
+          <div style={{ fontSize: ".6rem", letterSpacing: ".2em", textTransform: "uppercase", fontWeight: 600, marginBottom: ".65rem", color: "var(--dark)" }}>Brand</div>
+          {ALL_BRANDS.map(b => (
+            <div key={b} onClick={() => { setSelBrands(p => p.includes(b) ? p.filter(x => x !== b) : [...p, b]); setFilterPage(1); }} style={{ display: "flex", alignItems: "center", gap: ".5rem", padding: ".26rem 0", cursor: "pointer" }}>
+              <div style={{ width: 13, height: 13, border: `1.5px solid ${selBrands.includes(b) ? "var(--dark)" : "var(--border)"}`, background: selBrands.includes(b) ? "var(--dark)" : "transparent", borderRadius: 2, flexShrink: 0, transition: "all .2s" }} />
+              <span style={{ fontSize: ".73rem", color: selBrands.includes(b) ? "var(--dark)" : "var(--warm)", transition: "color .2s" }}>{b}</span>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Type */}
+      {ALL_TYPES.length > 0 && (
+        <div style={{ borderTop: "1px solid var(--border)", paddingTop: "1.3rem", marginBottom: "1.6rem" }}>
+          <div style={{ fontSize: ".6rem", letterSpacing: ".2em", textTransform: "uppercase", fontWeight: 600, marginBottom: ".65rem", color: "var(--dark)" }}>Type</div>
+          {ALL_TYPES.map(t => (
+            <div key={t} onClick={() => { setSelType(p => p === t ? "all" : t); setFilterPage(1); }} style={{ display: "flex", alignItems: "center", gap: ".5rem", padding: ".26rem 0", cursor: "pointer" }}>
+              <div style={{ width: 13, height: 13, border: `1.5px solid ${selType === t ? "var(--dark)" : "var(--border)"}`, background: selType === t ? "var(--dark)" : "transparent", borderRadius: 2, flexShrink: 0, transition: "all .2s" }} />
+              <span style={{ fontSize: ".73rem", color: selType === t ? "var(--dark)" : "var(--warm)", transition: "color .2s" }}>{t.charAt(0).toUpperCase() + t.slice(1)}</span>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Size */}
+      {ALL_SIZES.length > 0 && (
+        <div style={{ borderTop: "1px solid var(--border)", paddingTop: "1.3rem", marginBottom: "1.6rem" }}>
+          <div style={{ fontSize: ".6rem", letterSpacing: ".2em", textTransform: "uppercase", fontWeight: 600, marginBottom: ".65rem", color: "var(--dark)" }}>Size</div>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: ".32rem" }}>
+            {ALL_SIZES.map(s => (
+              <button key={s} onClick={() => { setSelSizes(p => p === s ? null : s); setFilterPage(1); }} style={{ padding: ".26rem .52rem", fontSize: ".63rem", border: `1.5px solid ${selSizes === s ? "var(--dark)" : "var(--border)"}`, background: selSizes === s ? "var(--dark)" : "transparent", color: selSizes === s ? "#fff" : "var(--dark)", cursor: "pointer", fontFamily: "'DM Sans',sans-serif", transition: "all .2s", minWidth: 32, borderRadius: 3 }}>{s}</button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Color */}
+      {ALL_COLORS.length > 0 && (
+        <div style={{ borderTop: "1px solid var(--border)", paddingTop: "1.3rem", marginBottom: "1.6rem" }}>
+          <div style={{ fontSize: ".6rem", letterSpacing: ".2em", textTransform: "uppercase", fontWeight: 600, marginBottom: ".65rem", color: "var(--dark)" }}>Color</div>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: ".4rem" }}>
+            {ALL_COLORS.map((c, i) => (
+              <div key={i} onClick={() => { setSelColors(p => p === c ? null : c); setFilterPage(1); }} style={{ width: 22, height: 22, borderRadius: "50%", background: c, cursor: "pointer", border: (c === "#fff" || c === "#ffffff") ? "1.5px solid var(--border)" : "2px solid transparent", boxShadow: selColors === c ? "0 0 0 2.5px var(--dark)" : "none", transform: selColors === c ? "scale(1.2)" : "none", transition: "all .2s" }} />
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Clear */}
+      {hasFilters && (
+        <button onClick={onClear} style={{ fontSize: ".61rem", letterSpacing: ".1em", textTransform: "uppercase", background: "none", border: "1px solid var(--border)", padding: ".36rem .8rem", cursor: "pointer", color: "var(--warm)", fontFamily: "'DM Sans',sans-serif", width: "100%", borderRadius: 3 }}>Clear Filters</button>
+      )}
+    </>
   );
 }
 
@@ -401,6 +560,7 @@ export default function WomenPage() {
   const [selBrands, setSelBrands] = useState([]);
   const [sortBy, setSortBy] = useState("default");
   const [filterPage, setFilterPage] = useState(1);
+  const [drawerOpen, setDrawerOpen] = useState(false);
   const FILTER_PER_PAGE = 9;
 
   useEffect(() => {
@@ -457,9 +617,22 @@ export default function WomenPage() {
     }, 50);
   };
 
+  const handleClearFilters = () => {
+    setSelSizes(null); setSelColors(null); setSelType("all"); setSelBrands([]); setFilterPage(1);
+  };
+
   useEffect(() => {
     document.title = `StyleHub — Women${cartCount > 0 ? ` (${cartCount})` : ""}`;
   }, [cartCount]);
+
+  // Close drawer on body scroll / escape
+  useEffect(() => {
+    if (!drawerOpen) return;
+    const onKey = (e) => { if (e.key === "Escape") setDrawerOpen(false); };
+    document.addEventListener("keydown", onKey);
+    document.body.style.overflow = "hidden";
+    return () => { document.removeEventListener("keydown", onKey); document.body.style.overflow = ""; };
+  }, [drawerOpen]);
 
   return (
     <div>
@@ -553,92 +726,112 @@ export default function WomenPage() {
         const totalPages = Math.ceil(filtered.length / FILTER_PER_PAGE);
         const paginated = filtered.slice((filterPage - 1) * FILTER_PER_PAGE, filterPage * FILTER_PER_PAGE);
         const hasFilters = selSizes || selColors || selType !== "all" || selBrands.length > 0;
+        const activeFilterCount = (selSizes ? 1 : 0) + (selColors ? 1 : 0) + (selType !== "all" ? 1 : 0) + selBrands.length;
+
+        const filterProps = {
+          ALL_BRANDS, ALL_TYPES, ALL_SIZES, ALL_COLORS,
+          selBrands, selType, selSizes, selColors, sortBy,
+          setSelBrands, setSelType, setSelSizes, setSelColors, setSortBy,
+          setFilterPage, hasFilters, onClear: handleClearFilters,
+        };
 
         return (
           <section id="all-products" ref={allProductsRef} style={{ background: "var(--cream)", padding: "3rem 5%" }}>
             <h2 className="w-sec-title reveal" ref={addRef}>All Products</h2>
             <div className="w-sec-line reveal" ref={addRef} />
-            <div style={{ display: "flex", gap: "2.5rem", alignItems: "flex-start" }}>
-              <div style={{ width: 185, flexShrink: 0, position: "sticky", top: 70 }}>
-                <div style={{ marginBottom: "1.8rem" }}>
-                  <div style={{ fontSize: ".6rem", letterSpacing: ".2em", textTransform: "uppercase", fontWeight: 600, marginBottom: ".65rem", color: "var(--dark)" }}>Sort By</div>
-                  {[["default", "Default"], ["low", "Price: Low → High"], ["high", "Price: High → Low"], ["sale", "On Sale"]].map(([val, label]) => (
-                    <div key={val} onClick={() => setSortBy(val)} style={{ fontSize: ".75rem", padding: ".28rem 0", cursor: "pointer", color: sortBy === val ? "var(--dark)" : "var(--warm)", fontWeight: sortBy === val ? 600 : 400, transition: "color .2s" }}>{label}</div>
-                  ))}
+
+            {/* ── Mobile filter bar (hidden on desktop via CSS) ── */}
+            <div className="w-filter-bar">
+              <button className="w-filter-btn" onClick={() => setDrawerOpen(true)}>
+                <i className="bi bi-sliders" />
+                Filters{activeFilterCount > 0 ? ` (${activeFilterCount})` : ""}
+              </button>
+              <select
+                className="w-sort-select"
+                value={sortBy}
+                onChange={e => { setSortBy(e.target.value); setFilterPage(1); }}
+              >
+                <option value="default">Default</option>
+                <option value="low">Price: Low → High</option>
+                <option value="high">Price: High → Low</option>
+                <option value="sale">On Sale</option>
+              </select>
+              {hasFilters && (
+                <button onClick={handleClearFilters} style={{ fontSize: ".65rem", letterSpacing: ".08em", background: "none", border: "1px solid var(--border)", padding: ".4rem .8rem", cursor: "pointer", color: "var(--warm)", borderRadius: 3, fontFamily: "'DM Sans',sans-serif", whiteSpace: "nowrap" }}>
+                  Clear ×
+                </button>
+              )}
+            </div>
+
+            {/* ── Mobile filter drawer ── */}
+            {drawerOpen && (
+              <div className="w-filter-drawer-backdrop" onClick={() => setDrawerOpen(false)}>
+                <div className={`w-filter-drawer ${drawerOpen ? "open" : ""}`} onClick={e => e.stopPropagation()}>
+                  <div className="w-filter-drawer-head">
+                    <span className="w-filter-drawer-title">Filters</span>
+                    <button className="w-filter-drawer-close" onClick={() => setDrawerOpen(false)}>×</button>
+                  </div>
+                  <div className="w-filter-drawer-body">
+                    <FilterContent {...filterProps} />
+                  </div>
+                  <div style={{ padding: "1rem 1.3rem", borderTop: "1px solid var(--border)", position: "sticky", bottom: 0, background: "#fff" }}>
+                    <button onClick={() => setDrawerOpen(false)} style={{ width: "100%", background: "var(--dark)", color: "#fff", border: "none", padding: ".7rem", fontSize: ".75rem", letterSpacing: ".12em", textTransform: "uppercase", cursor: "pointer", borderRadius: 3, fontFamily: "'DM Sans',sans-serif" }}>
+                      View {filtered.length} Result{filtered.length !== 1 ? "s" : ""}
+                    </button>
+                  </div>
                 </div>
-                {ALL_BRANDS.length > 0 && (
-                  <div style={{ borderTop: "1px solid var(--border)", paddingTop: "1.3rem", marginBottom: "1.6rem" }}>
-                    <div style={{ fontSize: ".6rem", letterSpacing: ".2em", textTransform: "uppercase", fontWeight: 600, marginBottom: ".65rem", color: "var(--dark)" }}>Brand</div>
-                    {ALL_BRANDS.map(b => (
-                      <div key={b} onClick={() => { setSelBrands(p => p.includes(b) ? p.filter(x => x !== b) : [...p, b]); setFilterPage(1); }} style={{ display: "flex", alignItems: "center", gap: ".5rem", padding: ".26rem 0", cursor: "pointer" }}>
-                        <div style={{ width: 13, height: 13, border: `1.5px solid ${selBrands.includes(b) ? "var(--dark)" : "var(--border)"}`, background: selBrands.includes(b) ? "var(--dark)" : "transparent", borderRadius: 2, flexShrink: 0, transition: "all .2s" }} />
-                        <span style={{ fontSize: ".73rem", color: selBrands.includes(b) ? "var(--dark)" : "var(--warm)", transition: "color .2s" }}>{b}</span>
-                      </div>
-                    ))}
-                  </div>
-                )}
-                {ALL_TYPES.length > 0 && (
-                  <div style={{ borderTop: "1px solid var(--border)", paddingTop: "1.3rem", marginBottom: "1.6rem" }}>
-                    <div style={{ fontSize: ".6rem", letterSpacing: ".2em", textTransform: "uppercase", fontWeight: 600, marginBottom: ".65rem", color: "var(--dark)" }}>Type</div>
-                    {ALL_TYPES.map(t => (
-                      <div key={t} onClick={() => { setSelType(p => p === t ? "all" : t); setFilterPage(1); }} style={{ display: "flex", alignItems: "center", gap: ".5rem", padding: ".26rem 0", cursor: "pointer" }}>
-                        <div style={{ width: 13, height: 13, border: `1.5px solid ${selType === t ? "var(--dark)" : "var(--border)"}`, background: selType === t ? "var(--dark)" : "transparent", borderRadius: 2, flexShrink: 0, transition: "all .2s" }} />
-                        <span style={{ fontSize: ".73rem", color: selType === t ? "var(--dark)" : "var(--warm)", transition: "color .2s" }}>{t.charAt(0).toUpperCase() + t.slice(1)}</span>
-                      </div>
-                    ))}
-                  </div>
-                )}
-                {ALL_SIZES.length > 0 && (
-                  <div style={{ borderTop: "1px solid var(--border)", paddingTop: "1.3rem", marginBottom: "1.6rem" }}>
-                    <div style={{ fontSize: ".6rem", letterSpacing: ".2em", textTransform: "uppercase", fontWeight: 600, marginBottom: ".65rem", color: "var(--dark)" }}>Size</div>
-                    <div style={{ display: "flex", flexWrap: "wrap", gap: ".32rem" }}>
-                      {ALL_SIZES.map(s => (
-                        <button key={s} onClick={() => { setSelSizes(p => p === s ? null : s); setFilterPage(1); }} style={{ padding: ".26rem .52rem", fontSize: ".63rem", border: `1.5px solid ${selSizes === s ? "var(--dark)" : "var(--border)"}`, background: selSizes === s ? "var(--dark)" : "transparent", color: selSizes === s ? "#fff" : "var(--dark)", cursor: "pointer", fontFamily: "'DM Sans',sans-serif", transition: "all .2s", minWidth: 32, borderRadius: 3 }}>{s}</button>
-                      ))}
-                    </div>
-                  </div>
-                )}
-                {ALL_COLORS.length > 0 && (
-                  <div style={{ borderTop: "1px solid var(--border)", paddingTop: "1.3rem", marginBottom: "1.6rem" }}>
-                    <div style={{ fontSize: ".6rem", letterSpacing: ".2em", textTransform: "uppercase", fontWeight: 600, marginBottom: ".65rem", color: "var(--dark)" }}>Color</div>
-                    <div style={{ display: "flex", flexWrap: "wrap", gap: ".4rem" }}>
-                      {ALL_COLORS.map((c, i) => (
-                        <div key={i} onClick={() => { setSelColors(p => p === c ? null : c); setFilterPage(1); }} style={{ width: 22, height: 22, borderRadius: "50%", background: c, cursor: "pointer", border: (c === "#fff" || c === "#ffffff" || c === "#ffffffff") ? "1.5px solid var(--border)" : "2px solid transparent", boxShadow: selColors === c ? "0 0 0 2.5px var(--dark)" : "none", transform: selColors === c ? "scale(1.2)" : "none", transition: "all .2s" }} />
-                      ))}
-                    </div>
-                  </div>
-                )}
-                {hasFilters && (
-                  <button onClick={() => { setSelSizes(null); setSelColors(null); setSelType("all"); setSelBrands([]); setFilterPage(1); }} style={{ fontSize: ".61rem", letterSpacing: ".1em", textTransform: "uppercase", background: "none", border: "1px solid var(--border)", padding: ".36rem .8rem", cursor: "pointer", color: "var(--warm)", fontFamily: "'DM Sans',sans-serif", width: "100%", borderRadius: 3 }}>Clear Filters</button>
-                )}
               </div>
-              <div style={{ flex: 1 }}>
+            )}
+
+            {/* ── Layout: sidebar + grid ── */}
+            <div className="w-ap-layout" style={{ display: "flex", gap: "2.5rem", alignItems: "flex-start" }}>
+
+              {/* Desktop sidebar */}
+              <div className="w-ap-sidebar" style={{ width: 185, flexShrink: 0, position: "sticky", top: 70 }}>
+                <FilterContent {...filterProps} />
+              </div>
+
+              {/* Products */}
+              <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ fontSize: ".7rem", color: "var(--warm)", marginBottom: "1rem", letterSpacing: ".04em" }}>
                   {filtered.length} product{filtered.length !== 1 ? "s" : ""}{totalPages > 1 ? ` — page ${filterPage} of ${totalPages}` : ""}
                 </div>
                 {filtered.length === 0
                   ? <div style={{ textAlign: "center", padding: "4rem 0", color: "var(--warm)", fontSize: ".85rem" }}>No products match your filters.</div>
-                  : <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: "1.4rem" }}>
-                    {paginated.map(p => (
-                      <div key={p.id} onClick={() => setQuickView(p)} style={{ background: "#fff", border: "1px solid var(--border)", cursor: "pointer", borderRadius: 5, overflow: "hidden", transition: "box-shadow .25s" }} onMouseEnter={e => e.currentTarget.style.boxShadow = "0 8px 28px rgba(26,26,24,.1)"} onMouseLeave={e => e.currentTarget.style.boxShadow = "none"}>
-                        <div style={{ position: "relative", aspectRatio: "3/4", background: "#f0ece6", overflow: "hidden" }}>
-                          {p.img ? <img src={p.img} alt={p.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} onError={e => e.target.style.display = "none"} /> : <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "2rem" }}>👗</div>}
-                          {p.old && <div style={{ position: "absolute", top: ".7rem", left: ".7rem", background: "var(--red)", color: "#fff", fontSize: ".52rem", padding: ".2rem .55rem", fontWeight: 700, borderRadius: 3 }}>SALE</div>}
-                        </div>
-                        <div style={{ padding: ".55rem .65rem" }}>
-                          <div style={{ fontSize: ".52rem", letterSpacing: ".15em", textTransform: "uppercase", color: "var(--warm)", marginBottom: ".15rem" }}>{p.brand}</div>
-                          <div style={{ fontSize: ".78rem", fontWeight: 500, marginBottom: ".25rem" }}>{p.name}</div>
-                          <div style={{ display: "flex", gap: ".5rem", alignItems: "center" }}>
-                            {p.old && <span style={{ fontSize: ".68rem", color: "var(--warm)", textDecoration: "line-through" }}>LE {p.old?.toLocaleString()}</span>}
-                            <span style={{ fontSize: ".78rem", fontWeight: 600, color: p.old ? "var(--red)" : "" }}>LE {p.price?.toLocaleString()}</span>
+                  : (
+                    <div className="w-ap-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: "1.4rem" }}>
+                      {paginated.map(p => (
+                        <div
+                          key={p.id}
+                          onClick={() => setQuickView(p)}
+                          style={{ background: "#fff", border: "1px solid var(--border)", cursor: "pointer", borderRadius: 5, overflow: "hidden", transition: "box-shadow .25s" }}
+                          onMouseEnter={e => e.currentTarget.style.boxShadow = "0 8px 28px rgba(26,26,24,.1)"}
+                          onMouseLeave={e => e.currentTarget.style.boxShadow = "none"}
+                        >
+                          <div style={{ position: "relative", aspectRatio: "3/4", background: "#f0ece6", overflow: "hidden" }}>
+                            {p.img
+                              ? <img src={p.img} alt={p.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} onError={e => e.target.style.display = "none"} />
+                              : <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "2rem" }}>👗</div>
+                            }
+                            {p.old && <div style={{ position: "absolute", top: ".7rem", left: ".7rem", background: "var(--red)", color: "#fff", fontSize: ".52rem", padding: ".2rem .55rem", fontWeight: 700, borderRadius: 3 }}>SALE</div>}
+                          </div>
+                          <div style={{ padding: ".55rem .65rem" }}>
+                            <div style={{ fontSize: ".52rem", letterSpacing: ".15em", textTransform: "uppercase", color: "var(--warm)", marginBottom: ".15rem" }}>{p.brand}</div>
+                            <div style={{ fontSize: ".78rem", fontWeight: 500, marginBottom: ".25rem" }}>{p.name}</div>
+                            <div style={{ display: "flex", gap: ".5rem", alignItems: "center" }}>
+                              {p.old && <span style={{ fontSize: ".68rem", color: "var(--warm)", textDecoration: "line-through" }}>LE {p.old?.toLocaleString()}</span>}
+                              <span style={{ fontSize: ".78rem", fontWeight: 600, color: p.old ? "var(--red)" : "" }}>LE {p.price?.toLocaleString()}</span>
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    ))}
-                  </div>
+                      ))}
+                    </div>
+                  )
                 }
+
+                {/* Pagination */}
                 {totalPages > 1 && (
-                  <div style={{ display: "flex", justifyContent: "center", gap: ".45rem", padding: "2.5rem 0" }}>
+                  <div style={{ display: "flex", justifyContent: "center", gap: ".45rem", padding: "2.5rem 0", flexWrap: "wrap" }}>
                     <button onClick={() => setFilterPage(p => Math.max(1, p - 1))} disabled={filterPage === 1} style={{ width: 34, height: 34, borderRadius: "50%", border: "1px solid var(--border)", background: "none", cursor: filterPage === 1 ? "not-allowed" : "pointer", opacity: filterPage === 1 ? .4 : 1, fontSize: "1rem" }}>‹</button>
                     {Array.from({ length: totalPages }, (_, i) => i + 1).map(n => (
                       <button key={n} onClick={() => setFilterPage(n)} style={{ width: 34, height: 34, borderRadius: "50%", border: `1px solid ${filterPage === n ? "var(--dark)" : "var(--border)"}`, background: filterPage === n ? "var(--dark)" : "none", color: filterPage === n ? "#fff" : "var(--dark)", cursor: "pointer", fontSize: ".75rem", fontWeight: filterPage === n ? 600 : 400, transition: "all .2s" }}>{n}</button>
