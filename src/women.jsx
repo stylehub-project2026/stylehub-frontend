@@ -1,7 +1,7 @@
 import React from "react";
 import { useState, useRef, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { SHNav, SHFooter, useScrollReveal, SHARED_CSS } from "./shared";
+import { SHNav, SHFooter, useScrollReveal, SHARED_CSS, PRODUCTS, shuffle } from "./shared";
 
 
 /* ══════════════════════════════════════════ DATA ══════════════════════════════════════════ */
@@ -563,34 +563,34 @@ export default function WomenPage() {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const FILTER_PER_PAGE = 9;
 
-  const [loading, setLoading] = useState(false);
-
-useEffect(() => {
-  setLoading(true);
-  fetch(`https://stylehub-backend-tau.vercel.app/api/products?category=women&limit=100&t=${Date.now()}`)
-    .then(r => r.json())
-    .then(data => {
-      const list = (data.data?.products || []).map(p => ({
-        id: p._id,
+  useEffect(() => {
+    const mapped = PRODUCTS
+      .filter(p => p.gender === "women" || p.gender === "unisex")
+      .map(p => ({
+        id: p.id,
         name: p.name,
-        price: p.price,
-        old: p.salePrice || null,
-        brand: p.seller?.brandName || "StyleHub",
-        img: p.images?.[0]
-          ? (p.images[0].startsWith('http') ? p.images[0] : `https://stylehub-backend-tau.vercel.app${p.images[0]}`)
-          : null,
+        price: parseInt(p.price.replace(/[^0-9]/g, ""), 10),
+        old: p.oldPrice ? parseInt(p.oldPrice.replace(/[^0-9]/g, ""), 10) : null,
+        brand: p.brand,
+        img: p.img || null,
         sizes: p.sizes || [],
         colors: p.colors || [],
-        rating: p.avgRating || 0,
-        reviews: p.reviewCount || 0,
-        tag: p.salePrice ? "Sale" : null,
-        type: (p.tags?.[0] || "").toLowerCase(),
-        brandLogo: p.seller?.brandLogo || null
+        rating: p.rating || 0,
+        reviews: p.reviews || 0,
+        tag: p.oldPrice ? "Sale" : null,
+        type: (p.type || "").toLowerCase(),
+        brandLogo: null,
+        category: "women",
       }));
-      setProducts(list);
-      setLoading(false);
-    });
-}, []);
+    const byBrand = {};
+    mapped.forEach(p => { if (!byBrand[p.brand]) byBrand[p.brand] = []; byBrand[p.brand].push(p); });
+    Object.values(byBrand).forEach(arr => arr.sort(() => Math.random() - 0.5));
+    const brands = Object.values(byBrand).sort(() => Math.random() - 0.5);
+    const interleaved = [];
+    const maxLen = Math.max(...brands.map(b => b.length));
+    for (let i = 0; i < maxLen; i++) { brands.forEach(arr => { if (arr[i]) interleaved.push(arr[i]); }); }
+    setProducts(interleaved);
+  }, []);
 
   const NEW_ARRIVALS = products.slice(0, 6);
   const TRENDING = products.slice(0, 6);

@@ -567,50 +567,25 @@ export default function App() {
   const [toast, setToast] = useState("");
 
   // ─── HOMEPAGE PRODUCTS ───
-  const [homeProducts, setHomeProducts] = useState({ best: [], new: [], sale: [], trend: [], picks: [] });
-
-useEffect(() => {
-  if (backendProducts.length === 0) return;
-
-  const mapped = backendProducts.map(p => ({
-    id: p._id,
-    name: p.name,
-    price: p.price,
-    old: p.salePrice || null,
-    brand: p.seller?.brandName || "StyleHub",
-    img: p.images?.[0]
-      ? (p.images[0].startsWith('http') ? p.images[0] : `https://stylehub-backend-tau.vercel.app${p.images[0]}`)
-      : null,
-    sizes: p.sizes || [],
-    colors: p.colors || [],
-    rating: p.avgRating || 0,
-    reviews: p.reviewCount || 0,
-    tag: p.salePrice ? "Sale" : null,
-    gradient: "145deg,#8a9a7a,#4a5c40",
-  }));
-
-  const interleaveByBrand = (arr) => {
-    const byBrand = {};
-    arr.forEach(p => { if (!byBrand[p.brand]) byBrand[p.brand] = []; byBrand[p.brand].push(p); });
-    Object.values(byBrand).forEach(a => a.sort(() => Math.random() - 0.5));
-    const brands = Object.values(byBrand).sort(() => Math.random() - 0.5);
-    const result = [];
-    const maxLen = Math.max(0, ...brands.map(b => b.length));
-    for (let i = 0; i < maxLen; i++) { brands.forEach(a => { if (a[i]) result.push(a[i]); }); }
-    return result;
-  };
-
-  const shuffled = [...mapped].sort(() => Math.random() - 0.5);
-  const saleItems = mapped.filter(p => p.old);
-
-  setHomeProducts({
-    best: interleaveByBrand(shuffled),
-    new: interleaveByBrand([...mapped].sort(() => Math.random() - 0.5)),
-    sale: saleItems.length > 0 ? interleaveByBrand(saleItems) : interleaveByBrand(shuffled),
-    trend: interleaveByBrand([...mapped].sort(() => Math.random() - 0.5)),
-    picks: interleaveByBrand(shuffled),
+  const [homeProducts] = useState(() => {
+    const interleaveByBrand = (arr) => {
+      const byBrand = {};
+      arr.forEach(p => { if (!byBrand[p.brand]) byBrand[p.brand] = []; byBrand[p.brand].push(p); });
+      Object.values(byBrand).forEach(a => a.sort(() => Math.random() - 0.5));
+      const brands = Object.values(byBrand).sort(() => Math.random() - 0.5);
+      const result = [];
+      const maxLen = Math.max(...brands.map(b => b.length));
+      for (let i = 0; i < maxLen; i++) { brands.forEach(a => { if (a[i]) result.push(a[i]); }); }
+      return result;
+    };
+    return {
+      best: interleaveByBrand(PRODUCTS.filter(p => p.tab === "best")),
+      new: interleaveByBrand(PRODUCTS.filter(p => p.tab === "new")),
+      sale: interleaveByBrand(PRODUCTS.filter(p => p.tab === "sale")),
+      trend: interleaveByBrand(PRODUCTS.filter(p => p.tab === "trend")),
+      picks: interleaveByBrand(PRODUCTS.filter(p => p.tab === "picks")),
+    };
   });
-}, [backendProducts]);
   const addRef = useScrollReveal();
   const location = useLocation();
 
