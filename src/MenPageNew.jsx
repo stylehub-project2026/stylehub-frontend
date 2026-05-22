@@ -3,7 +3,7 @@ import { useState, useRef, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { SHNav, SHFooter, SHARED_CSS } from "./shared";
 
-/* ══════════════════════════════════════════ DATA ══════════════════════════════════════════ */
+/*  DATA  */
 const HERO_SLIDES = [
     {
         ey: "New Collection 2026",
@@ -35,9 +35,9 @@ const HERO_SLIDES = [
 ];
 
 const CATEGORIES = [
-    { name: "Pants", img: "https://twentysevenegy.myshopify.com/cdn/shop/files/022A2473.jpg?v=1768003189&width=980", count: "24 styles" },
-    { name: "Hoodies", img: "https://m.media-amazon.com/images/I/61pyF5Fn+qL._AC_SY445_SX342_QL70_ML2_.jpg", count: "18 styles" },
-    { name: "Jackets", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTtGWEsZvzeQ6zJL-0wsuiw6mKMZryONXoHyw&s", count: "12 styles" },
+    { name: "Pants", path: "/men/pants", img: "https://twentysevenegy.myshopify.com/cdn/shop/files/022A2473.jpg?v=1768003189&width=980", count: "24 styles" },
+    { name: "Hoodies", path: "/men/hoodies", img: "https://m.media-amazon.com/images/I/61pyF5Fn+qL._AC_SY445_SX342_QL70_ML2_.jpg", count: "18 styles" },
+    { name: "Jackets", path: "/men/jackets", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTtGWEsZvzeQ6zJL-0wsuiw6mKMZryONXoHyw&s", count: "12 styles" },
 ];
 
 /* ══════════════════════════════════════════ HELPERS ══════════════════════════════════════════ */
@@ -307,7 +307,7 @@ function PickCard({ p, onQuickView, onWish, wishlisted, addRef, d = 1 }) {
     );
 }
 
-/* ══════════════════════════════════════════ HERO CAROUSEL ══════════════════════════════════════════ */
+/*  HERO CAROUSEL  */
 function HeroCarousel() {
     const [cur, setCur] = useState(0);
     const [key, setKey] = useState(0);
@@ -388,6 +388,7 @@ function HeroCarousel() {
 
 /* ══════════════════════════════════════════ MAIN ══════════════════════════════════════════ */
 export default function MenPage({ cart = [], setCart, wish = [], setWish }) {
+    const navigate = useNavigate();
     const wishlist = wish;
     const cartCount = cart.reduce((s, x) => s + (x.qty || 1), 0);
 
@@ -682,16 +683,22 @@ export default function MenPage({ cart = [], setCart, wish = [], setWish }) {
                     <div className="row g-3">
                         {CATEGORIES.map((c, i) => (
                             <div className="col-12 col-md-4" key={i}>
-                                <div className={`cat-card reveal d${i + 1}`} ref={addRef}>
-                                    <img
-                                        src={c.img}
-                                        alt={c.name}
-                                        style={{ objectPosition: "top" }}
-                                    />
+                                <div
+                                    className={`cat-card reveal d${i + 1}`}
+                                    ref={addRef}
+                                    onClick={() => navigate(c.path)}   // ← add this
+                                    style={{ cursor: "pointer" }}
+                                >
+                                    <img src={c.img} alt={c.name} style={{ objectPosition: "top" }} />
                                     <div className="cat-ov">
                                         <div className="cat-name">{c.name}</div>
                                         <div className="cat-count">{c.count}</div>
-                                        <button className="cat-btn">Shop Now →</button>
+                                        <button
+                                            className="cat-btn"
+                                            onClick={(e) => { e.stopPropagation(); navigate(c.path); }}
+                                        >
+                                            Shop Now →
+                                        </button>
                                     </div>
                                 </div>
                             </div>
