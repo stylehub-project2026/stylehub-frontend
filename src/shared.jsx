@@ -61,7 +61,7 @@ export function shuffle(arr) {
 }
 
 export const FOOTER_COLS = [
-  { title: "Shop", links: [["Women", "/women"], ["Men", "#"], ["Kids", "/kids"]] },
+  { title: "Shop", links: [["Women", "/women"], ["Men", "/men"], ["Kids", "/kids"]] },
   { title: "Sell With Us", links: [["Sign Up", "/seller"], ["How It Works", "/seller"], ["Seller Support", "#"]] },
   { title: "Discover", links: [["New Arrivals", "/women/new-arrivals"], ["Build Outfit", "/buildoutfit"], ["Trending", "/trending"]] },
   { title: "Contact Us", links: [["Contact Us", "/contactus"], ["About Us", "/aboutus"], ["Instagram", "#"], ["Facebook", "./https://www.facebook.com/profile.php?id=61584765721087"]] },
