@@ -21,7 +21,7 @@ const HERO_SLIDES = [
   },
   {
     fullSale: true,
-    img: "/finalcover2.jpg",
+    img: "/women.jpg",
     btn: "Shop the Sale",
   },
 ];
