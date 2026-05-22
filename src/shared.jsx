@@ -138,7 +138,7 @@ export const PRODUCTS = [
   { id:113,    gender:"unisex", name:" Ripped blue jeans ",          brand:"27",  img3d:"ripped1.jpg"  ,      price:"LE 750",   oldPrice:"LE 850",   img:"/ripped.jpg",        colors:["#357a97ff"],              sizes:["XS","S","M","L","XL"],  rating:4.6, reviews:203 },
   { id:114,    gender:"unisex", name:" PIVOT SWEATPANTS",          brand:"27",  img3d:"oh.jpg"  ,      price:"LE 550",   oldPrice:"LE 650",   img:"/oh2.jpg",        colors:["#95999aff"],              sizes:["XS","S","M","L","XL"],  rating:4.6, reviews:203 },
   { id:115,    gender:"men", name:" STWD graphic T-shirt",          brand:"marble",  img3d:"st1.jpg"  ,      price:"LE 850",   oldPrice:"LE 950",   img:"/st.jpg",        colors:["#1d5562ff"],              sizes:["XS","S","M","L","XL"],  rating:4.6, reviews:203 },
-  { id:116,    gender:"women", name:" Sheer blouse with ruffle",          brand:"anitka",  img3d:"sheer.jpg"  ,      price:"LE 850",   oldPrice:"LE 950",   img:"/sheer2.jpg",        colors:["#1d5562ff"],              sizes:["XS","S","M","L","XL"],  rating:4.6, reviews:203 },
+  { id:116,    name:" Sheer blouse with ruffle",          brand:"antika",  img3d:"sheer.jpg"  ,      price:"LE 850",   oldPrice:"LE 950",   img:"/sheer2.jpg",        colors:["#1d5562ff"],              sizes:["XS","S","M","L","XL"],  rating:4.6, reviews:203 },
 
 
 
