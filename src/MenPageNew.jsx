@@ -19,7 +19,7 @@ const HERO_SLIDES = [
         h1: "Men",
         sub: "Up to 50% off selected items from local designers.",
         btn: "Explore Sale",
-        img: "https://img.freepik.com/free-photo/surprised-redhead-man-stretch-out-hands-with-shopping-bags-give-you-gifts-standing-pink-backgro_1258-161714.jpg?semt=ais_hybrid&w=740&q=80",
+        img: "/men-slider_photo.jpg",
         bg: "#ede9e0",
         fullBg: true,
     },
@@ -207,7 +207,7 @@ function QuickViewModal({ p, onClose, onAddToCart }) {
     );
 }
 
-/* ══════════════════════════════════════════ PRODUCT CARD ══════════════════════════════════════════ */
+/*  PRODUCT CARD  */
 function ProdCard({ p, onQuickView, onWish, wishlisted, addRef, d = 1 }) {
     const navigate = useNavigate();
     return (
@@ -738,7 +738,7 @@ export default function MenPage({ cart = [], setCart, wish = [], setWish }) {
             {/* SALE BANNER */}
             <section className="sale-ban reveal" ref={addRef}>
                 <div className="sale-ban-inner">
-                    <img src="/images/men-section-page.png" alt="End of Season Sale" />
+                    <img src="/men-section-page.png" alt="End of Season Sale" />
                     <div className="sale-ban-text">
                         <p className="sale-sub">Limited Time Only</p>
                         <h2>END OF SEASON SALE</h2>
