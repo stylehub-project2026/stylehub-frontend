@@ -28,7 +28,7 @@ const HERO_SLIDES = [
         h1: "Wear What\nMakes You Bold",
         sub: "Support Egyptian creators — every purchase matters.",
         btn: "Meet the Brands",
-        img: "/images/men-slider3.webp",
+        img: "/men-slider3.webp",
         bg: "#f0ece8",
         fullBg: true,
     },
