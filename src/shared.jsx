@@ -407,47 +407,876 @@ export function SHFooter() {
   );
 }
 
-
 export const SHARED_CSS = `
 @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap');
-:root { --cream:#F8F6F2; --dark:#1a1a18; --sage:#92A079; --deep:#728060; --warm:#8c8880; --border:#e4e0da; --gold:#c8a96e; --red:#e63946; }
-body { font-family:'DM Sans',sans-serif; background:var(--cream); color:var(--dark); }
-.sh-nav { background:#fff; border-bottom:1px solid var(--border); height:56px; }
-.sh-nav a { color:var(--dark); text-decoration:none; font-size:1rem; letter-spacing:.04em; transition:color .2s; position:relative; padding-bottom:3px; }
-.sh-nav a::after { content:''; position:absolute; bottom:0; left:0; width:0; height:1.6px; background:var(--sage); transition:width .25s; }
-.sh-nav a:hover { color:var(--sage); } .sh-nav a:hover::after { width:100%; }
-.sh-badge { background:var(--sage); color:#fff; font-size:.5rem; width:14px; height:14px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:700; position:absolute; top:-6px; right:-8px; }
-.nav-icon { color:var(--dark); display:flex; align-items:center; position:relative; transition:color .2s; cursor:pointer; text-decoration:none; }
-.nav-icon:hover { color:var(--sage); }
-.nav-item { position:relative; }
-.nav-item:hover .dropdown { opacity:1; pointer-events:auto; transform:translateY(0); }
-.dropdown { position:absolute; top:100%; left:0; background:#fff; border:1px solid var(--border); min-width:160px; opacity:0; pointer-events:none; transform:translateY(8px); transition:all .25s; z-index:100; box-shadow:0 8px 24px rgba(0,0,0,.08); }
-.dropdown a { display:block; padding:.6rem 1.2rem; font-size:.72rem; color:var(--dark); text-decoration:none; letter-spacing:.04em; transition:background .2s; }
-.dropdown a:hover { background:var(--cream); color:var(--sage); }
-.sh-foot { background:var(--deep); color:rgba(255,255,255,.8); }
-.f-logo-txt { font-family:'Cormorant Garamond',serif; font-size:1.5rem; font-weight:500; color:#fff; text-decoration:none; }
-.f-about { font-size:.78rem; line-height:1.7; color:rgba(255,255,255,.55); }
-.f-soc { width:30px; height:30px; border:1px solid rgba(255,255,255,.3); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:.65rem; color:rgba(255,255,255,.6); text-decoration:none; transition:all .2s; }
-.f-soc:hover { background:rgba(255,255,255,.15); color:#fff; }
-.f-col-title { font-size:.64rem; letter-spacing:.2em; text-transform:uppercase; color:rgba(255,255,255,.45); font-weight:500; }
-.f-col a { display:block; font-size:.78rem; color:rgba(255,255,255,.7); text-decoration:none; transition:all .2s; }
-.f-col a:hover { color:#fff; }
-.sh-foot a { color:rgba(255,255,255,.7); text-decoration:none; } .sh-foot a:hover { color:#fff; }
-.f-copy { font-size:.7rem; color:rgba(255,255,255,.35); }
-.fpb { background:rgba(255,255,255,.12); border-radius:3px; padding:.2rem .5rem; font-size:.58rem; color:rgba(255,255,255,.6); font-weight:600; }
-.reveal { opacity:0; transform:translateY(24px); transition:opacity .7s,transform .7s; }
-.revealed { opacity:1; transform:none; }
-.d1{transition-delay:.1s} .d2{transition-delay:.2s} .d3{transition-delay:.3s} .d4{transition-delay:.4s}
-/* FOOTER */
-.sh-foot { background:var(--deep); color:rgba(255,255,255,.8); }
-.f-logo-txt { font-family:'Cormorant Garamond',serif; font-size:1.5rem; font-weight:500; color:#fff; text-decoration:none; }
-.f-about { font-size:.78rem; line-height:1.7; color:rgba(255,255,255,.55); }
-.f-soc { width:30px; height:30px; border:1px solid rgba(255,255,255,.3); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:.65rem; color:rgba(255,255,255,.6); text-decoration:none; transition:all .2s; }
-.f-soc:hover { background:rgba(255,255,255,.15); color:#fff; }
-.f-col-title { font-size:.64rem; letter-spacing:.2em; text-transform:uppercase; color:rgba(255,255,255,.45); font-weight:500; }
-.f-col a { display:block; font-size:.78rem; color:rgba(255,255,255,.7); text-decoration:none; transition:all .2s; }
-.f-col a:hover { color:#fff; }
-.sh-foot a { color:rgba(255,255,255,.7); text-decoration:none; } .sh-foot a:hover { color:#fff; }
-.f-copy { font-size:.7rem; color:rgba(255,255,255,.35); }
-.fpb { background:rgba(255,255,255,.12); border-radius:3px; padding:.2rem .5rem; font-size:.58rem; color:rgba(255,255,255,.6); font-weight:600; }
+
+/* ══════════════════════════════════════════
+   CSS VARIABLES (Design Tokens)
+   Used everywhere via var(--name)
+══════════════════════════════════════════ */
+:root {
+  --cream: #F8F6F2;
+  --dark:  #1a1a18;
+  --sage:  #92A079;
+  --deep:  #728060;
+  --warm:  #8c8880;
+  --border:#e4e0da;
+  --gold:  #c8a96e;
+  --red:   #e63946;
+}
+
+/* ══════════════════════════════════════════
+   BASE / RESET
+   Sets font and background for the whole app
+══════════════════════════════════════════ */
+*, *::before, *::after {
+  box-sizing: border-box; /* prevents elements from overflowing their containers */
+}
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--cream);
+  color: var(--dark);
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden; /* prevents horizontal scroll on mobile */
+}
+
+img {
+  max-width: 100%; /* all images shrink to fit their container on small screens */
+  height: auto;
+  display: block;
+}
+
+/* ══════════════════════════════════════════
+   NAVIGATION BAR
+   Bootstrap 3 breakpoint: collapses below 768px (xs/sm)
+══════════════════════════════════════════ */
+.sh-nav {
+  background: #fff;
+  border-bottom: 1px solid var(--border);
+  height: 56px;
+  padding: 0 1.5rem; /* default padding for medium+ screens */
+  z-index: 1000;
+}
+
+/* Tighter nav padding on phones (Bootstrap xs: <768px) */
+@media (max-width: 767px) {
+  .sh-nav {
+    padding: 0 .75rem; /* less side padding so logo and icons don't crowd */
+    height: 50px;
+  }
+}
+
+/* Nav links — hidden on xs/sm, shown on lg via Bootstrap d-none d-lg-flex */
+.sh-nav a {
+  color: var(--dark);
+  text-decoration: none;
+  font-size: .73rem;
+  letter-spacing: .04em;
+  transition: color .2s;
+  position: relative;
+  padding-bottom: 3px;
+}
+
+/* Animated underline on nav links */
+.sh-nav a::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0;
+  width: 0; height: 1.6px;
+  background: var(--sage);
+  transition: width .25s;
+}
+.sh-nav a:hover { color: var(--sage); }
+.sh-nav a:hover::after { width: 100%; }
+
+/* Cart / wish badge */
+.sh-badge {
+  background: var(--sage);
+  color: #fff;
+  font-size: .5rem;
+  width: 14px; height: 14px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700;
+  position: absolute;
+  top: -6px; right: -8px;
+}
+
+/* Icon buttons in nav */
+.nav-icon {
+  color: var(--dark);
+  display: flex; align-items: center;
+  position: relative;
+  transition: color .2s;
+  cursor: pointer;
+  text-decoration: none;
+  background: none;
+  border: none;
+  padding: 0;
+}
+.nav-icon:hover { color: var(--sage); }
+
+/* Brands dropdown — appears on hover */
+.nav-item { position: relative; }
+.nav-item:hover .dropdown {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+.dropdown {
+  position: absolute;
+  top: 100%; left: 0;
+  background: #fff;
+  border: 1px solid var(--border);
+  min-width: 160px;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(8px);
+  transition: all .25s;
+  z-index: 100;
+  box-shadow: 0 8px 24px rgba(0,0,0,.08);
+}
+.dropdown a {
+  display: block;
+  padding: .6rem 1.2rem;
+  font-size: .72rem;
+  color: var(--dark);
+  text-decoration: none;
+  letter-spacing: .04em;
+  transition: background .2s;
+}
+.dropdown a:hover {
+  background: var(--cream);
+  color: var(--sage);
+}
+
+/* ══════════════════════════════════════════
+   SCROLL REVEAL ANIMATION
+   Bootstrap 3 grid columns use these classes
+   .reveal = hidden, .revealed = visible
+   .d1–d4 = staggered delays for grid items
+══════════════════════════════════════════ */
+.reveal {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity .7s, transform .7s;
+}
+.revealed {
+  opacity: 1;
+  transform: none;
+}
+
+/* Stagger delays — used on grid cols like col-md-4 d1, d2, d3 */
+.d1 { transition-delay: .1s; }
+.d2 { transition-delay: .2s; }
+.d3 { transition-delay: .3s; }
+.d4 { transition-delay: .4s; }
+
+/* Reduce motion for accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .reveal, .revealed {
+    transition: none;
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* ══════════════════════════════════════════
+   FOOTER
+   Bootstrap 3 grid: row + col-md-* + col-xs-6
+   Stacks to single column on phones
+══════════════════════════════════════════ */
+.sh-foot {
+  background: var(--deep);
+  color: rgba(255,255,255,.8);
+  padding: 3rem 1.5rem 1.5rem; /* default padding */
+}
+
+/* Less padding on phones */
+@media (max-width: 767px) {
+  .sh-foot {
+    padding: 2rem 1rem 1rem;
+  }
+}
+
+.f-logo-txt {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.5rem;
+  font-weight: 500;
+  color: #fff;
+  text-decoration: none;
+}
+
+/* Footer tagline */
+.f-about {
+  font-size: .78rem;
+  line-height: 1.7;
+  color: rgba(255,255,255,.55);
+  max-width: 280px; /* keeps line length readable on wide screens */
+}
+
+/* Social icon circles */
+.f-soc {
+  width: 30px; height: 30px;
+  border: 1px solid rgba(255,255,255,.3);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: .65rem;
+  color: rgba(255,255,255,.6);
+  text-decoration: none;
+  transition: all .2s;
+}
+.f-soc:hover {
+  background: rgba(255,255,255,.15);
+  color: #fff;
+}
+
+/* Footer column titles */
+.f-col-title {
+  font-size: .64rem;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,.45);
+  font-weight: 500;
+  margin-bottom: .75rem;
+}
+
+/* Footer column links */
+.f-col a {
+  display: block;
+  font-size: .78rem;
+  color: rgba(255,255,255,.7);
+  text-decoration: none;
+  transition: all .2s;
+  margin-bottom: .4rem;
+}
+.f-col a:hover { color: #fff; }
+.sh-foot a {
+  color: rgba(255,255,255,.7);
+  text-decoration: none;
+}
+.sh-foot a:hover { color: #fff; }
+
+/* Copyright row */
+.f-copy {
+  font-size: .7rem;
+  color: rgba(255,255,255,.35);
+}
+
+/* Payment badges — VISA / FAWRY / CASH */
+.fpb {
+  background: rgba(255,255,255,.12);
+  border-radius: 3px;
+  padding: .2rem .5rem;
+  font-size: .58rem;
+  color: rgba(255,255,255,.6);
+  font-weight: 600;
+}
+
+/* ══════════════════════════════════════════
+   SEARCH DRAWER
+   Slides in from right, full height
+   On phones: takes 90vw width
+══════════════════════════════════════════ */
+.sr-input::placeholder { color: #b0a89a; }
+.sr-input { outline: none; }
+
+/* ══════════════════════════════════════════
+   TYPOGRAPHY — RESPONSIVE FONT SIZES
+   clamp(min, preferred, max) scales smoothly
+   Works across Bootstrap 3 breakpoints
+══════════════════════════════════════════ */
+
+/* Page-level headings — serif, scales from mobile to desktop */
+h1, .h1-display {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(1.8rem, 5vw, 3.6rem); /* 1.8rem on phones, up to 3.6rem on desktops */
+  font-weight: 600;
+  line-height: 1.1;
+}
+
+h2, .h2-display {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(1.4rem, 3vw, 2.2rem);
+  font-weight: 600;
+}
+
+/* Section subtitles */
+.section-sub {
+  font-size: clamp(.8rem, 1.5vw, .95rem);
+  color: var(--warm);
+  line-height: 1.7;
+}
+
+/* ══════════════════════════════════════════
+   PRODUCT CARDS — SHARED RESPONSIVE RULES
+   Used in Women, Men, Kids pages
+   Bootstrap 3: col-xs-6 col-sm-4 col-md-3
+══════════════════════════════════════════ */
+
+/* Card image wrapper keeps aspect ratio on all screen sizes */
+.sh-card-img {
+  position: relative;
+  overflow: hidden;
+  border-radius: 3px;
+  aspect-ratio: 3/4;
+  background: var(--cream);
+}
+.sh-card-img img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  transition: transform .5s;
+}
+
+/* Hover zoom — disabled on touch devices to avoid sticky hover */
+@media (hover: hover) {
+  .sh-card:hover .sh-card-img img {
+    transform: scale(1.06);
+  }
+}
+
+/* Card info below image */
+.sh-card-info {
+  padding: 8px 0 4px;
+}
+.sh-card-brand {
+  font-size: .68rem;
+  color: var(--warm);
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  margin-bottom: 2px;
+}
+.sh-card-name {
+  font-size: .82rem;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis; /* truncates long names with ... */
+}
+.sh-card-price {
+  font-size: .88rem;
+  font-weight: 600;
+}
+.sh-card-old {
+  font-size: .72rem;
+  color: var(--warm);
+  text-decoration: line-through;
+  margin-left: 6px;
+}
+
+/* ══════════════════════════════════════════
+   HERO SECTION — RESPONSIVE
+   Bootstrap 3 xs (<768px): stacks vertically
+   Bootstrap 3 md (≥992px): side by side
+══════════════════════════════════════════ */
+.sh-hero {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 60px 7%;
+  gap: 32px;
+  min-height: 520px;
+}
+
+/* Tablet (Bootstrap sm: 768px–991px) */
+@media (max-width: 991px) {
+  .sh-hero {
+    padding: 40px 5%;
+    min-height: 420px;
+    gap: 24px;
+  }
+}
+
+/* Phone (Bootstrap xs: <768px) — stack text above image */
+@media (max-width: 767px) {
+  .sh-hero {
+    flex-direction: column;      /* stacks text then image */
+    padding: 32px 1rem 24px;
+    min-height: unset;
+    text-align: center;
+    gap: 20px;
+  }
+  .sh-hero-img {
+    width: 100%;
+    max-width: 320px;
+    margin: 0 auto;
+  }
+  .sh-hero-txt {
+    max-width: 100%; /* full width on phones */
+  }
+  /* Center the CTA buttons on mobile */
+  .sh-hero-btns {
+    justify-content: center !important;
+  }
+}
+
+/* ══════════════════════════════════════════
+   HORIZONTAL SCROLL TRACK (New Arrivals)
+   On phones: cards shrink to 160px wide
+   On tablets: 190px
+   On desktops: 220px
+══════════════════════════════════════════ */
+.sh-scroll-track {
+  display: flex;
+  gap: 16px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  padding-bottom: 4px;
+  -webkit-overflow-scrolling: touch; /* smooth momentum scrolling on iOS */
+}
+.sh-scroll-track::-webkit-scrollbar { display: none; } /* hide scrollbar */
+
+/* Default card width for desktop */
+.sh-scroll-card {
+  flex: 0 0 220px;
+  scroll-snap-align: start;
+}
+
+/* Tablet */
+@media (max-width: 991px) {
+  .sh-scroll-card { flex: 0 0 190px; }
+}
+
+/* Phone */
+@media (max-width: 767px) {
+  .sh-scroll-card { flex: 0 0 160px; }
+  .sh-scroll-track { gap: 12px; }
+}
+
+/* ══════════════════════════════════════════
+   SECTION LAYOUT — SHARED
+   .sh-section used on every page section
+══════════════════════════════════════════ */
+.sh-section {
+  padding: 60px 0;
+}
+
+/* Less vertical spacing on phones */
+@media (max-width: 767px) {
+  .sh-section { padding: 36px 0; }
+}
+
+/* Section title + decorative line */
+.sh-sec-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(1.5rem, 3vw, 2.2rem);
+  font-weight: 600;
+  text-align: center;
+  color: var(--dark);
+  margin-bottom: 6px;
+}
+.sh-sec-line {
+  width: 44px; height: 2px;
+  background: var(--sage);
+  margin: 0 auto 32px;
+}
+
+/* ══════════════════════════════════════════
+   PRODUCT GRID — RESPONSIVE
+   Bootstrap 3 approach: uses CSS grid with
+   responsive column counts matching Bootstrap
+   breakpoints exactly
+══════════════════════════════════════════ */
+
+/* 4 columns on large desktops (Bootstrap lg: ≥1200px) */
+.sh-grid-4 {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+}
+
+/* 3 columns → 2 columns → 1 column */
+.sh-grid-3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+/* Medium devices (Bootstrap md: 992px–1199px) */
+@media (max-width: 1199px) {
+  .sh-grid-4 { grid-template-columns: repeat(3, 1fr); }
+}
+
+/* Small devices / tablets (Bootstrap sm: 768px–991px) */
+@media (max-width: 991px) {
+  .sh-grid-4 { grid-template-columns: repeat(2, 1fr); }
+  .sh-grid-3 { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* Extra small / phones (Bootstrap xs: <768px) */
+@media (max-width: 767px) {
+  .sh-grid-4 { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+  .sh-grid-3 { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+}
+
+/* Very small phones (<480px) — single column */
+@media (max-width: 479px) {
+  .sh-grid-4 { grid-template-columns: 1fr; }
+  .sh-grid-3 { grid-template-columns: 1fr; }
+}
+
+/* ══════════════════════════════════════════
+   ALL PRODUCTS SIDEBAR + GRID LAYOUT
+   Bootstrap 3 approach:
+   - Desktop: sidebar left (185px) + grid right (flex:1)
+   - Tablet: sidebar collapses to horizontal filter bar
+   - Phone: sidebar hidden behind a toggle button
+══════════════════════════════════════════ */
+.sh-filter-layout {
+  display: flex;
+  gap: 2.5rem;
+  align-items: flex-start;
+}
+
+/* Sidebar sticky on desktop */
+.sh-sidebar {
+  width: 185px;
+  flex-shrink: 0;
+  position: sticky;
+  top: 70px; /* below nav height */
+}
+
+/* Tablet (Bootstrap sm: 768px–991px) — sidebar goes on top as a row */
+@media (max-width: 991px) {
+  .sh-filter-layout {
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+  .sh-sidebar {
+    width: 100%; /* full width on tablet */
+    position: static; /* no longer sticky */
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border);
+  }
+}
+
+/* Phone (Bootstrap xs: <768px) */
+@media (max-width: 767px) {
+  .sh-sidebar {
+    gap: .75rem;
+  }
+  /* Each filter group takes half width on phones */
+  .sh-filter-group {
+    flex: 0 0 calc(50% - .5rem);
+  }
+}
+
+/* ══════════════════════════════════════════
+   SALE BANNER
+   Bootstrap 3 xs: stacks image above text
+   Bootstrap 3 sm+: side by side
+══════════════════════════════════════════ */
+.sh-sale-banner {
+  display: flex;
+  min-height: 260px;
+}
+.sh-sale-banner-img {
+  width: 55%;
+  object-fit: cover;
+}
+.sh-sale-banner-text {
+  flex: 1;
+  background: var(--dark);
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 40px 5%;
+}
+.sh-sale-banner-text h2 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(1.6rem, 3.5vw, 2.6rem);
+  font-weight: 600;
+  margin-bottom: 20px;
+  line-height: 1.15;
+}
+
+/* Phone — stack image above text */
+@media (max-width: 767px) {
+  .sh-sale-banner { flex-direction: column; }
+  .sh-sale-banner-img {
+    width: 100%;
+    height: 200px;
+  }
+  .sh-sale-banner-text {
+    padding: 24px 1.2rem;
+  }
+}
+
+/* ══════════════════════════════════════════
+   QUICK VIEW MODAL — RESPONSIVE
+   Bootstrap 3 xs: stacks image above details
+   Bootstrap 3 sm+: side by side layout
+══════════════════════════════════════════ */
+.sh-modal-backdrop {
+  position: fixed; inset: 0;
+  background: rgba(26,26,24,.55);
+  z-index: 1050;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px; /* padding so modal never touches screen edges on phones */
+  animation: shFadeIn .2s ease;
+}
+@keyframes shFadeIn { from{opacity:0} to{opacity:1} }
+
+.sh-modal {
+  background: #fff;
+  max-width: 760px;
+  width: 100%;
+  border-radius: 4px;
+  overflow: hidden;
+  display: flex;
+  max-height: 90vh;
+  animation: shSlideUp .3s ease;
+}
+@keyframes shSlideUp {
+  from{opacity:0; transform:translateY(24px)}
+  to{opacity:1; transform:none}
+}
+
+/* Tablet (Bootstrap sm: <768px) — modal goes full width, stacks */
+@media (max-width: 767px) {
+  .sh-modal {
+    flex-direction: column; /* image on top, details below */
+    max-height: 95vh;
+    overflow-y: auto;
+  }
+  .sh-modal-img {
+    width: 100% !important; /* overrides inline width: 46% */
+    height: 260px;
+    object-fit: cover;
+  }
+  .sh-modal-body {
+    padding: 20px 16px !important; /* tighter padding on phone */
+  }
+}
+
+/* ══════════════════════════════════════════
+   CATEGORY CARDS
+   Bootstrap 3: col-xs-12 col-sm-4
+   On phone: full width stacked
+══════════════════════════════════════════ */
+.sh-cat-card {
+  position: relative;
+  overflow: hidden;
+  border-radius: 4px;
+  cursor: pointer;
+  aspect-ratio: 4/4;
+}
+.sh-cat-card img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  transition: transform .5s;
+}
+@media (hover: hover) {
+  .sh-cat-card:hover img { transform: scale(1.07); }
+}
+.sh-cat-overlay {
+  position: absolute; inset: 0;
+  background: linear-gradient(to top, rgba(26,26,24,.75) 0%, transparent 50%);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 20px;
+}
+
+/* On phones, category cards are shorter */
+@media (max-width: 767px) {
+  .sh-cat-card { aspect-ratio: 4/3; }
+}
+
+/* ══════════════════════════════════════════
+   TOAST NOTIFICATION
+   Fixed at bottom, always centered
+   Works on all screen sizes
+══════════════════════════════════════════ */
+.sh-toast {
+  position: fixed;
+  bottom: 28px;
+  left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  background: var(--dark);
+  color: #fff;
+  padding: .55rem 1.4rem;
+  border-radius: 30px;
+  font-size: .78rem;
+  letter-spacing: .06em;
+  pointer-events: none;
+  opacity: 0;
+  transition: all .3s;
+  z-index: 1100;
+  white-space: nowrap;
+
+  /* On phones toast shouldn't be too wide */
+  max-width: calc(100vw - 2rem);
+  white-space: normal;
+  text-align: center;
+}
+.sh-toast.on {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* ══════════════════════════════════════════
+   PAGINATION
+   Bootstrap 3 xs: smaller buttons on phones
+══════════════════════════════════════════ */
+.sh-pagination {
+  display: flex;
+  justify-content: center;
+  gap: .45rem;
+  padding: 2.5rem 0;
+  flex-wrap: wrap; /* wraps to next line on very small screens */
+}
+.sh-page-btn {
+  width: 34px; height: 34px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: none;
+  cursor: pointer;
+  font-size: .75rem;
+  font-weight: 400;
+  transition: all .2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.sh-page-btn.active {
+  background: var(--dark);
+  color: #fff;
+  border-color: var(--dark);
+  font-weight: 600;
+}
+.sh-page-btn:disabled {
+  opacity: .4;
+  cursor: not-allowed;
+}
+
+/* Smaller pagination on phones */
+@media (max-width: 767px) {
+  .sh-page-btn { width: 30px; height: 30px; font-size: .68rem; }
+}
+
+/* ══════════════════════════════════════════
+   UTILITY HELPERS
+   Mirrors Bootstrap 3 spacing/display helpers
+   with our own naming
+══════════════════════════════════════════ */
+
+/* Text utilities */
+.text-sage   { color: var(--sage); }
+.text-warm   { color: var(--warm); }
+.text-dark   { color: var(--dark); }
+.text-serif  { font-family: 'Cormorant Garamond', serif; }
+.uppercase   { text-transform: uppercase; letter-spacing: .12em; }
+
+/* Spacing */
+.sh-px       { padding-left: 7%; padding-right: 7%; }
+
+/* Shrink side padding on tablet */
+@media (max-width: 991px) {
+  .sh-px { padding-left: 4%; padding-right: 4%; }
+}
+
+/* Full width on phone */
+@media (max-width: 767px) {
+  .sh-px { padding-left: 1rem; padding-right: 1rem; }
+}
+
+/* ══════════════════════════════════════════
+   BUTTONS — SHARED
+   Used across all pages
+══════════════════════════════════════════ */
+.btn-sh-dark {
+  background: var(--dark);
+  color: #fff;
+  border: none;
+  padding: .65rem 1.6rem;
+  font-size: .78rem;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background .2s;
+  border-radius: 2px;
+  font-family: 'DM Sans', sans-serif;
+}
+.btn-sh-dark:hover { background: #333; }
+
+.btn-sh-outline {
+  background: transparent;
+  color: var(--dark);
+  border: 1.5px solid var(--dark);
+  padding: .65rem 1.6rem;
+  font-size: .78rem;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all .2s;
+  border-radius: 2px;
+  font-family: 'DM Sans', sans-serif;
+}
+.btn-sh-outline:hover { background: var(--dark); color: #fff; }
+
+/* Full width button on phones */
+@media (max-width: 767px) {
+  .btn-sh-dark, .btn-sh-outline {
+    width: 100%;
+    text-align: center;
+    padding: .75rem 1rem;
+  }
+}
+
+/* ══════════════════════════════════════════
+   STARS ROW
+   Same on all pages
+══════════════════════════════════════════ */
+.sh-stars {
+  color: var(--gold);
+  font-size: .65rem;
+  display: flex;
+  gap: 1px;
+}
+
+/* ══════════════════════════════════════════
+   WISHLIST HEART BUTTON ON CARDS
+══════════════════════════════════════════ */
+.sh-wish-btn {
+  position: absolute;
+  top: 10px; right: 10px;
+  background: #fff;
+  border: none;
+  border-radius: 50%;
+  width: 30px; height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0,0,0,.1);
+  transition: all .2s;
+  color: var(--warm);
+}
+.sh-wish-btn.liked { color: #e63946; }
+.sh-wish-btn:hover { transform: scale(1.1); }
+
+/* ══════════════════════════════════════════
+   SALE BADGE ON CARD IMAGES
+══════════════════════════════════════════ */
+.sh-tag-badge {
+  position: absolute;
+  top: 10px; left: 10px;
+  background: var(--sage);
+  color: #fff;
+  font-size: .58rem;
+  padding: .2rem .5rem;
+  letter-spacing: .08em;
+  font-weight: 600;
+  text-transform: uppercase;
+  border-radius: 2px;
+}
 `;
