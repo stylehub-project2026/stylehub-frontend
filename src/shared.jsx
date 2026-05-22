@@ -307,7 +307,7 @@ export function SHNav({ cart = [], wish = [] }) {
   return (
     <nav className="sh-nav sticky-top d-flex align-items-center justify-content-between px-4" style={{ position: "relative" }}>
       <a href="/" style={{ textDecoration: "none" }}>
-        <img src="/logo.jpg" alt="StyleHub" style={{ height: "50px", objectFit: "contain" }}
+        <img src="/logo.jpg" alt="StyleHub" style={{ height: "55px", objectFit: "contain" }}
           onError={e => { e.target.style.display = "none"; e.target.nextSibling.style.display = "inline"; }} />
         <span style={{ display: "none", fontFamily: "'Cormorant Garamond',serif", fontSize: "1.5rem", fontWeight: 600, color: "var(--dark)" }}>SH</span>
       </a>
