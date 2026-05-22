@@ -27,9 +27,9 @@ const HERO_SLIDES = [
 ];
 
 const CATEGORIES = [
-  { name: "Abayas", img: "/abayas2.jpg", count: "32 styles" },
+  { name: "Tops", img: "/tops.jpg", count: "28 styles" },
   { name: "Dresses", img: "/dress2.jpg", count: "21 styles" },
-  { name: "Sets", img: "/set1.jpg", count: "15 styles" },
+  { name: "Pants", img: "/pants.jpg", count: "18 styles" },
 ];
 
 
@@ -446,7 +446,16 @@ export default function WomenPage() {
   };
 
   const newArrRef = useRef(null);
+  const allProductsRef = useRef(null);
   const scroll = (ref, dir) => ref.current?.scrollBy({ left: dir * 250, behavior: "smooth" });
+
+  const handleCategoryClick = (categoryName) => {
+    setSelType(categoryName.toLowerCase());
+    setFilterPage(1);
+    setTimeout(() => {
+      allProductsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 50);
+  };
 
   useEffect(() => {
     document.title = `StyleHub — Women${cartCount > 0 ? ` (${cartCount})` : ""}`;
@@ -467,12 +476,12 @@ export default function WomenPage() {
           <div className="row g-3">
             {CATEGORIES.map((c, i) => (
               <div className="col-12 col-md-4" key={i}>
-                <div className={`w-cat-card reveal d${i + 1}`} ref={addRef}>
+                <div className={`w-cat-card reveal d${i + 1}`} ref={addRef} onClick={() => handleCategoryClick(c.name)}>
                   <img src={c.img} alt={c.name} onError={(e) => { e.target.src = "https://placehold.co/400x533?text=" + c.name; }} style={{ objectPosition: "top" }} />
                   <div className="w-cat-ov">
                     <div className="w-cat-name">{c.name}</div>
                     <div className="w-cat-count">{c.count}</div>
-                    <button className="w-cat-btn">Shop Now →</button>
+                    <button className="w-cat-btn" onClick={(e) => { e.stopPropagation(); handleCategoryClick(c.name); }}>Shop Now →</button>
                   </div>
                 </div>
               </div>
@@ -546,7 +555,7 @@ export default function WomenPage() {
         const hasFilters = selSizes || selColors || selType !== "all" || selBrands.length > 0;
 
         return (
-          <section id="all-products" style={{ background: "var(--cream)", padding: "3rem 5%" }}>
+          <section id="all-products" ref={allProductsRef} style={{ background: "var(--cream)", padding: "3rem 5%" }}>
             <h2 className="w-sec-title reveal" ref={addRef}>All Products</h2>
             <div className="w-sec-line reveal" ref={addRef} />
             <div style={{ display: "flex", gap: "2.5rem", alignItems: "flex-start" }}>
