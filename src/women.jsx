@@ -27,16 +27,11 @@ const HERO_SLIDES = [
 ];
 
 const CATEGORIES = [
-  { name: "Tops", img: "/44.jpg" },
-  { name: "Dresses", img: "/dress.jpg" },
-  { name: "Pants", img: "/pants.jpg" },
+  { name: "Tops", img: "/tops.jpg", count: "28 styles" },
+  { name: "Dresses", img: "/dress2.jpg", count: "21 styles" },
+  { name: "Pants", img: "/pants.jpg", count: "18 styles" },
 ];
 
-const getCategoryCount = (categoryName) =>
-  PRODUCTS.filter(p =>
-    (p.gender === "women" || p.gender === "unisex") &&
-    (p.type || "").toLowerCase() === categoryName.toLowerCase()
-  ).length;
 
 /* ══════════════════════════════════════════ PAGE CSS ══════════════════════════════════════════ */
 const PAGE_CSS = `
@@ -277,7 +272,7 @@ function ProdCard({ p, d, addRef, onQuickView, onWish, wishlisted }) {
         <div className="w-prod-brand" style={{ cursor: "pointer" }} onClick={() => navigate(`/brand/${encodeURIComponent(p.brand)}`)}>{p.brand}</div>
         <div className="w-prod-name">{p.name}</div>
         <div className="d-flex align-items-center mb-1">
-          <span className="w-prod-price"> {p.price.toLocaleString()}</span>
+          <span className="w-prod-price">LE {p.price.toLocaleString()}</span>
           {p.old && <span className="w-prod-old">LE {p.old.toLocaleString()}</span>}
         </div>
         {p.rating > 0 && <Stars n={p.rating} />}
@@ -302,7 +297,7 @@ function PickCard({ p, d, addRef, onQuickView, onWish, wishlisted }) {
       <div className="w-pick-info">
         <div className="w-pick-text">
           <div className="w-prod-name">{p.name}</div>
-          <div className="w-prod-price"> {p.price.toLocaleString()}</div>
+          <div className="w-prod-price">LE {p.price.toLocaleString()}</div>
         </div>
         {p.brandLogo && <img src={p.brandLogo} alt={p.brand} className="w-pick-brand-logo" onError={(e) => { e.target.style.display = "none"; }} />}
       </div>
@@ -485,7 +480,7 @@ export default function WomenPage() {
                   <img src={c.img} alt={c.name} onError={(e) => { e.target.src = "https://placehold.co/400x533?text=" + c.name; }} style={{ objectPosition: "top" }} />
                   <div className="w-cat-ov">
                     <div className="w-cat-name">{c.name}</div>
-                    <div className="w-cat-count">{getCategoryCount(c.name)} styles</div>
+                    <div className="w-cat-count">{c.count}</div>
                     <button className="w-cat-btn" onClick={(e) => { e.stopPropagation(); handleCategoryClick(c.name); }}>Shop Now →</button>
                   </div>
                 </div>
