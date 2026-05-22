@@ -25,8 +25,6 @@ const HERO_SLIDES = [
     },
     {
         ey: "Local Brands Spotlight",
-        h1: "Wear What\nMakes You Bold",
-        sub: "Support Egyptian creators — every purchase matters.",
         btn: "Meet the Brands",
         img: "/men-banner-3.jpg",
         bg: "#f0ece8",
