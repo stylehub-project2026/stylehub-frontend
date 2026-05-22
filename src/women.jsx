@@ -27,11 +27,16 @@ const HERO_SLIDES = [
 ];
 
 const CATEGORIES = [
-  { name: "Tops", img: "/tops.jpg", count: "28 styles" },
-  { name: "Dresses", img: "/dress2.jpg", count: "21 styles" },
-  { name: "Pants", img: "/pants.jpg", count: "18 styles" },
+  { name: "Tops", img: "/44.jpg" },
+  { name: "Dresses", img: "/dress2.jpg" },
+  { name: "Pants", img: "/pants.jpg" },
 ];
 
+const getCategoryCount = (categoryName) =>
+  PRODUCTS.filter(p =>
+    (p.gender === "women" || p.gender === "unisex") &&
+    (p.type || "").toLowerCase() === categoryName.toLowerCase()
+  ).length;
 
 /* ══════════════════════════════════════════ PAGE CSS ══════════════════════════════════════════ */
 const PAGE_CSS = `
@@ -480,7 +485,7 @@ export default function WomenPage() {
                   <img src={c.img} alt={c.name} onError={(e) => { e.target.src = "https://placehold.co/400x533?text=" + c.name; }} style={{ objectPosition: "top" }} />
                   <div className="w-cat-ov">
                     <div className="w-cat-name">{c.name}</div>
-                    <div className="w-cat-count">{c.count}</div>
+                    <div className="w-cat-count">{getCategoryCount(c.name)} styles</div>
                     <button className="w-cat-btn" onClick={(e) => { e.stopPropagation(); handleCategoryClick(c.name); }}>Shop Now →</button>
                   </div>
                 </div>
