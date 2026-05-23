@@ -154,16 +154,16 @@ body { font-family:'DM Sans',sans-serif; background:var(--cream); color:var(--da
 .p-old { font-size:.85rem; color:var(--warm); text-decoration:line-through; }
 .p-new { font-size:.84rem; font-weight:600; color:var(--red); } .p-reg { font-size:.78rem; font-weight:500; }
 
-/* TRENDING CARD — FIX: flex column so all cards in a row match height */
-.tc { background:#fff; border:1px solid var(--border); transition:box-shadow .25s; display:flex; flex-direction:column; height:100%; }
+/* TRENDING CARD */
+.tc { background:#fff; border:1px solid var(--border); transition:box-shadow .25s; }
 .tc:hover { box-shadow:0 6px 24px rgba(26,26,24,.1); }
-.tc-img { aspect-ratio:1/1; overflow:hidden; background:#f0ece6; position:relative; cursor:pointer; flex-shrink:0; }
+.tc-img { aspect-ratio:1/1; overflow:hidden; background:#f0ece6; position:relative; cursor:pointer; }
 .tc-img img,.tc-ph { width:100%; height:100%; transition:transform .5s cubic-bezier(.22,1,.36,1); }
 .tc-img img { object-fit:cover; } .tc-ph { display:flex; align-items:center; justify-content:center; }
 .tc:hover .tc-img img,.tc:hover .tc-ph { transform:scale(1.06); }
 .tc-w { position:absolute; top:.6rem; left:.6rem; background:#fff; border:none; border-radius:50%; width:28px; height:28px; display:flex; align-items:center; justify-content:center; cursor:pointer; box-shadow:0 2px 8px rgba(0,0,0,.1); transition:transform .2s; }
 .tc-w:hover { transform:scale(1.15); } .tc-w.on { color:var(--red); }
-.tc-brand { font-size:.70rem; letter-spacing:.15em; text-transform:uppercase; color:var(--warm); }
+.tc-brand { font-size:.78rem; letter-spacing:.15em; text-transform:uppercase; color:var(--warm); }
 .tc-name { font-size:.88rem; font-weight:500; }
 .tc-price { font-size:.79rem; font-weight:600; } .tc-price.sale { color:var(--red); }
 .tc-old { font-size:.7rem; color:var(--warm); text-decoration:line-through; }
@@ -639,28 +639,28 @@ export default function App() {
           {/* BRANDS */}
           <BrandsCarousel />
 
-          {/* PRODUCTS
-              FIX: removed "py-3 my-5" Bootstrap classes — they added ~48px
-              extra margin that fought the responsive CSS overrides.
-              The .products-section class now fully controls all spacing. */}
-          <section
-            className="products-section"
-            style={{ paddingTop: "7rem", paddingBottom: "7rem", paddingLeft: "7rem", paddingRight: "7rem" }}
-          >
-            <div className="sh-tabs reveal" ref={addRef}>
-              {[["best", "Best Sellers"], ["new", "New Arrivals"], ["sale", "Sale"]].map(([key, label]) => (
-                <div key={key} className={`sh-tab${tab === key ? " on" : ""}`} onClick={() => setTab(key)}>{label}</div>
-              ))}
+          {/* PRODUCTS */}
+      <section className="products-section py-3 my-3">
+        <div className="sh-tabs reveal" ref={addRef}>
+          {[["best","Best Sellers"],["new","New Arrivals"],["sale","Sale"]].map(([key,label])=>(
+            <div key={key} className={`sh-tab${tab===key?" on":""}`} onClick={()=>setTab(key)}>{label}</div>
+          ))}
+        </div>
+        <div className="row row-cols-2 row-cols-md-3 g-3">
+          {homeProducts.filter(p=>p.tab===tab).slice(0,6).map((p,i)=>(
+            <div className="col" key={p.id}>
+              <PCard p={p} onOpen={setModal} addRef={addRef} d={(i%3)+1} wish={wish} toggleWish={toggleWish}/>
             </div>
-            <div className="row row-cols-2 row-cols-md-3 g-3">
-              {homeProducts[tab].slice(0, 6).map((p, i) => (
-                <div className="col" key={p.id}>
-                  <PCard p={p} onOpen={setModal} addRef={addRef} d={(i % 3) + 1} wish={wish} toggleWish={toggleWish} />
-                </div>
-              ))}
-            </div>
-          </section>
+          ))}
+        </div>
+      </section>
 
+
+          
+          
+          
+          
+          
           {/* JOIN */}
           <div
             className="sh-join join-section text-center reveal py-5"
@@ -707,13 +707,10 @@ export default function App() {
           </section>
 
           {/* TRENDING */}
-          <section
-            className="trending-section py-4"
-            style={{ marginTop: "6rem", paddingLeft: "1.5rem", paddingRight: "1.5rem" }}
-          >
-            <div className="sec-title reveal" ref={addRef}>Trending Now</div>
-            <TrendingCarousel products={homeProducts.trend} onOpen={setModal} wish={wish} toggleWish={toggleWish} onAdd={addToCart} />
-          </section>
+      <section className="px-4 py-4 mobile-mt-sm" style={{marginTop:"6rem"}}>
+        <div className="sec-title reveal" ref={addRef}>Trending Now</div>
+        <TrendingCarousel products={homeProducts.filter(p=>p.tab==="trend")} onOpen={setModal} wish={wish} toggleWish={toggleWish} onAdd={addToCart}/>
+      </section>
 
           {/* EDITORIAL */}
           <div
