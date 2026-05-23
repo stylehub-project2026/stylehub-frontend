@@ -4,6 +4,49 @@ import { SHNav, SHFooter, SHARED_CSS, PRODUCTS } from "./shared";
 
 const API = "https://stylehub-backend-tau.vercel.app/api";
 
+// ─── RESPONSIVE CSS ───
+const PRODUCT_CSS = `
+/* Main two-column grid */
+.pd-grid { display:grid; grid-template-columns:52% 48%; gap:0; }
+.pd-left { display:flex; gap:.75rem; padding:1rem 2rem 4rem 4%; }
+.pd-right { padding:2rem 6% 4rem 3rem; }
+.pd-breadcrumb {
+  padding:1rem 5%; font-size:.7rem; color:var(--warm);
+  font-family:'DM Sans',sans-serif; display:flex; gap:.5rem; align-items:center;
+}
+.pd-also-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:1.5rem; }
+.pd-reviews-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:1.2rem; }
+.pd-section { padding:3rem 5%; }
+
+/* ── Tablet / iPad (≤1024px) ── */
+@media(max-width:1024px){
+  .pd-grid { grid-template-columns:1fr; }
+  .pd-left { padding:1rem 1.5rem 2rem; aspect-ratio:unset !important; min-height:420px; }
+  .pd-right { padding:1.5rem 1.5rem 3rem; }
+  .pd-also-grid { grid-template-columns:repeat(2,1fr); gap:1.2rem; }
+  .pd-reviews-grid { grid-template-columns:repeat(2,1fr); }
+  .pd-section { padding:2.5rem 1.5rem; }
+}
+
+/* ── Mobile (≤768px) ── */
+@media(max-width:768px){
+  .pd-left { padding:1rem 1rem 1.5rem; gap:.5rem; min-height:360px; }
+  .pd-right { padding:1rem 1rem 2.5rem; }
+  .pd-breadcrumb { padding:.75rem 1rem; }
+  .pd-reviews-grid { grid-template-columns:1fr; }
+  .pd-section { padding:2rem 1rem; }
+}
+
+/* ── Small mobile (≤480px) ── */
+@media(max-width:480px){
+  .pd-left { padding:.75rem .75rem 1rem; min-height:300px; }
+  .pd-right { padding:.75rem .75rem 2rem; }
+  .pd-also-grid { grid-template-columns:repeat(2,1fr); gap:.8rem; }
+  .pd-breadcrumb { padding:.75rem; font-size:.62rem; }
+  .pd-section { padding:1.5rem .75rem; }
+}
+`;
+
 const Heart = ({ on }) => (
   <svg width="18" height="18" viewBox="0 0 24 24" fill={on ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
@@ -250,10 +293,11 @@ export default function ProductDetail({ cart, setCart, wish, setWish }) {
   return (
     <div style={{ minHeight: "100vh", background: "var(--cream)" }}>
       <style>{SHARED_CSS}</style>
+      <style>{PRODUCT_CSS}</style>
       <SHNav cart={cart} wish={wish} />
 
       {/* Breadcrumb */}
-      <div style={{ padding: "1rem 5%", fontSize: ".7rem", color: "var(--warm)", fontFamily: "'DM Sans',sans-serif", display: "flex", gap: ".5rem", alignItems: "center" }}>
+      <div className="pd-breadcrumb">
         <span onClick={() => navigate("/")} style={{ cursor: "pointer" }}>Home</span>
         <span>›</span>
         <span onClick={() => navigate(-1)} style={{ cursor: "pointer" }}>{product.brand}</span>
@@ -262,10 +306,10 @@ export default function ProductDetail({ cart, setCart, wish, setWish }) {
       </div>
 
       {/* Main Content */}
-      <div style={{ display: "grid", gridTemplateColumns: "52% 48%", gap: "0" }}>
+      <div className="pd-grid">
 
         {/* LEFT — Images */}
-        <div style={{ display: "flex", gap: ".75rem", aspectRatio: "3/4", padding: "1rem 2rem 4rem 4%" }}>
+        <div className="pd-left" style={{ aspectRatio: "3/4" }}>
 
           {/* Thumbnail strip — vertical column on the left */}
           {allImages.length > 1 && (
@@ -301,7 +345,7 @@ export default function ProductDetail({ cart, setCart, wish, setWish }) {
             </div>
           )}
 
-          {/* Main Image — fills remaining width, full height of container */}
+          {/* Main Image */}
           <div style={{ flex: 1, overflow: "hidden", background: "#f0ece6", position: "relative" }}>
             {allImages[selectedImg] ? (
               <img src={getImageUrl(allImages[selectedImg])} alt={product.name}
@@ -320,7 +364,7 @@ export default function ProductDetail({ cart, setCart, wish, setWish }) {
         </div>
 
         {/* RIGHT — Info */}
-        <div style={{ padding: "2rem 6% 4rem 3rem" }}>
+        <div className="pd-right">
           <div style={{ fontSize: ".65rem", letterSpacing: ".2em", textTransform: "uppercase", color: "var(--warm)", marginBottom: ".5rem", fontFamily: "'DM Sans',sans-serif" }}>
             {product.brand}
           </div>
@@ -335,7 +379,7 @@ export default function ProductDetail({ cart, setCart, wish, setWish }) {
               {product.rating.toFixed(1)} · {product.reviewCount} review{product.reviewCount !== 1 ? "s" : ""}
             </span>
           </div>
-          <div style={{ display: "flex", alignItems: "center", gap: "1rem", marginBottom: "1.5rem" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "1rem", marginBottom: "1.5rem", flexWrap: "wrap" }}>
             <span style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: "1.8rem", fontWeight: 600, color: product.salePrice ? "var(--red)" : "var(--dark)" }}>
               LE {(product.salePrice || product.price)?.toLocaleString()}
             </span>
@@ -372,7 +416,7 @@ export default function ProductDetail({ cart, setCart, wish, setWish }) {
           {product.colors.length > 0 && (
             <div style={{ marginBottom: "1.5rem" }}>
               <div style={{ fontSize: ".65rem", letterSpacing: ".15em", textTransform: "uppercase", color: "var(--dark)", fontWeight: 600, marginBottom: ".7rem", fontFamily: "'DM Sans',sans-serif" }}>COLOR</div>
-              <div style={{ display: "flex", gap: ".5rem" }}>
+              <div style={{ display: "flex", gap: ".5rem", flexWrap: "wrap" }}>
                 {product.colors.map((c, i) => (
                   <div key={i} onClick={() => { setSelectedColor(c); setSelectedImg(i); }}
                     style={{ width: 28, height: 28, borderRadius: "50%", background: c, border: selectedColor === c ? "2px solid var(--dark)" : "2px solid var(--border)", cursor: "pointer", boxShadow: selectedColor === c ? "0 0 0 2px var(--dark)" : "none", transform: selectedColor === c ? "scale(1.15)" : "none", transition: "all .2s" }} />
@@ -412,21 +456,18 @@ export default function ProductDetail({ cart, setCart, wish, setWish }) {
       </div>
 
       {/* ════════════════════════════════════════════
-          YOU MAY ALSO LIKE  (same brand, before reviews)
+          YOU MAY ALSO LIKE
       ════════════════════════════════════════════ */}
       {sameBrandProducts.length > 0 && (
-        <div style={{ padding: "3rem 5%", borderTop: "1px solid var(--border)", background: "var(--cream)" }}>
+        <div className="pd-section" style={{ borderTop: "1px solid var(--border)", background: "var(--cream)" }}>
           <div style={{ maxWidth: 1200, margin: "0 auto" }}>
-            {/* Heading */}
             <div style={{ marginBottom: "2rem" }}>
               <h2 style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: "2rem", fontWeight: 400, color: "var(--dark)", marginBottom: ".4rem" }}>
                 You May Also Like
               </h2>
               <div style={{ width: 40, height: 2, background: "var(--warm)" }} />
             </div>
-
-            {/* Grid */}
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "1.5rem" }}>
+            <div className="pd-also-grid">
               {sameBrandProducts.map(p => (
                 <ProductCard
                   key={p.id}
@@ -434,7 +475,7 @@ export default function ProductDetail({ cart, setCart, wish, setWish }) {
                   getImageUrl={(img) => {
                     if (!img) return null;
                     if (img.startsWith("http")) return img;
-                    return img; // local hardcoded products use /public images
+                    return img;
                   }}
                   onClick={() => navigate(`/product/${p.id}`)}
                 />
@@ -447,7 +488,7 @@ export default function ProductDetail({ cart, setCart, wish, setWish }) {
       {/* ════════════════════════════════════════════
           REVIEWS SECTION
       ════════════════════════════════════════════ */}
-      <div style={{ padding: "3rem 5%", borderTop: "1px solid var(--border)", background: "#fff" }}>
+      <div className="pd-section" style={{ borderTop: "1px solid var(--border)", background: "#fff" }}>
         <div style={{ maxWidth: 1200, margin: "0 auto" }}>
 
           {/* Review Form */}
@@ -510,7 +551,7 @@ export default function ProductDetail({ cart, setCart, wish, setWish }) {
           {reviews.length > 0 && (
             <>
               <h2 style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: "1.6rem", fontWeight: 400, marginBottom: "1.5rem" }}>Customer Reviews</h2>
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: "1.2rem" }}>
+              <div className="pd-reviews-grid">
                 {reviews.map(r => (
                   <div key={r._id} style={{ padding: "1.2rem", border: "1px solid var(--border)", background: "var(--cream)", borderRadius: 4 }}>
                     <div style={{ display: "flex", gap: ".1rem", marginBottom: ".5rem" }}>
