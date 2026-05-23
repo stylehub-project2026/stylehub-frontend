@@ -102,7 +102,7 @@ body { font-family:'DM Sans',sans-serif; background:var(--cream); color:var(--da
 .hero-ov { position:absolute; inset:0; background:linear-gradient(to right,rgba(248,246,242,.5) 20%,transparent 100%); }
 .hero-ct { position:relative; z-index:2; max-width:460px; padding:0 5%; }
 .hero-title { font-family:'Cormorant Garamond',serif; font-size:clamp(2.2rem,4vw,3.4rem); font-weight:400; line-height:1.12; margin-bottom:1rem; }
-.hero-sub { font-size:.85rem; line-height:1.8; color:var(--warm); margin-bottom:1.8rem; }
+.hero-sub { font-size:.95rem; line-height:1.8; color:var(--warm); margin-bottom:1.8rem; }
 .h-arr { position:absolute; top:50%; transform:translateY(-50%); z-index:5; background:rgba(255,255,255,.8); border:none; width:36px; height:36px; border-radius:50%; cursor:pointer; font-size:1rem; display:flex; align-items:center; justify-content:center; transition:all .2s; }
 .h-arr:hover { background:#fff; box-shadow:0 4px 16px rgba(0,0,0,.15); }
 .h-arr.l { left:1rem; } .h-arr.r { right:1rem; }
