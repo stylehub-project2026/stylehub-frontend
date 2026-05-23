@@ -142,10 +142,34 @@ const CSS = `
 .ck-order-num { font-size:1.1rem; font-family:'Cormorant Garamond',serif; }
 .ck-order-total { font-size:.78rem; color:var(--warm); margin-top:.3rem; }
 
+/* ─── RESPONSIVE ─── */
 @media(max-width:768px){
-  .ck-layout { grid-template-columns:1fr; }
+  .ck-shell { padding:2rem 1rem 4rem; }
+  .ck-layout { grid-template-columns:1fr; gap:1.5rem; }
   .ck-aside { position:static; }
   .ck-row { grid-template-columns:1fr; }
+  .ck-card { padding:1.2rem; }
+  .ck-steps { margin-bottom:2rem; }
+  .ck-step-label { font-size:.55rem; letter-spacing:.06em; }
+  .ck-step-circle { width:26px; height:26px; font-size:.6rem; }
+  .ck-radio-row { padding:.75rem .8rem; gap:.6rem; }
+  .ck-radio-sub { font-size:.6rem; }
+  .ck-success { padding:3rem 1rem; }
+  .ck-success-title { font-size:1.8rem; }
+  .ck-bill-header { flex-direction:column; align-items:flex-start; gap:.3rem; }
+  .ck-bill-item { gap:.7rem; }
+}
+
+@media(max-width:480px){
+  .ck-shell { padding:1.5rem .75rem 4rem; }
+  .ck-card { padding:1rem; }
+  .ck-step-label { display:none; }
+  .ck-step-line { margin:0 .3rem; }
+  .ck-card-title { font-size:1.15rem; }
+  .ck-sumbox { padding:1rem; }
+  .ck-success-title { font-size:1.5rem; }
+  .ck-success-sub { font-size:.78rem; }
+  .ck-order-cards { grid-template-columns:1fr; }
 }
 `;
 
@@ -377,7 +401,6 @@ function StepPayment({ form, setForm, errors, brandGroups, onNext, onBack }) {
               { key: "cod", label: "Cash on Delivery", sub: "Pay when your order arrives" },
               { key: "fawry", label: "Fawry", sub: "Pay at any Fawry outlet" },
               { key: "card", label: "Credit / Debit Card", sub: "VISA · Mastercard · Meeza" },
-
             ].map(opt => (
               <div key={opt.key} className={`ck-radio-row${current === opt.key ? " on" : ""}`}
                 onClick={() => setForm(f => ({ ...f, [pKey]: opt.key }))}>
@@ -579,7 +602,6 @@ export default function Checkout({ cart = [], setCart, wish = [], setWish }) {
       .then(r => r.json())
       .then(data => {
         if (data.success) {
-          // Transform backend items to checkout format
           const transformed = (data.data.items || []).map(i => ({
             id: i.product._id,
             qty: i.quantity,
