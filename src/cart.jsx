@@ -37,10 +37,14 @@ const CART_CSS = `
 .cart-wrap { max-width: 1000px; margin: 0 auto; padding: 3rem 2rem; }
 .cart-page { min-height: 100vh; background: var(--cream); }
 
-@media (max-width: 768px) {
+/* tablet + iPad (up to 1024px) → single column */
+@media (max-width: 1024px) {
   .cart-grid { grid-template-columns: 1fr; gap: 2rem; }
   .cart-aside { position: static; }
-  .cart-wrap { padding: 2rem 1rem; }
+}
+
+@media (max-width: 768px) {
+  .cart-wrap { padding: 2rem 1.2rem; }
 }
 
 @media (max-width: 480px) {
