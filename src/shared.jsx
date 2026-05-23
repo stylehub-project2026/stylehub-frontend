@@ -412,7 +412,7 @@ export const SHARED_CSS = `
 @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap');
 :root { --cream:#F8F6F2; --dark:#1a1a18; --sage:#92A079; --deep:#728060; --warm:#8c8880; --border:#e4e0da; --gold:#c8a96e; --red:#e63946; }
 body { font-family:'DM Sans',sans-serif; background:var(--cream); color:var(--dark); }
-.sh-nav { background:#fff; border-bottom:1px solid var(--border); height:56px; }
+.sh-nav { background:#fff; border-bottom:1px solid var(--border); height:59px; }
 .sh-nav a { color:var(--dark); text-decoration:none; font-size:1rem; letter-spacing:.04em; transition:color .2s; position:relative; padding-bottom:3px; }
 .sh-nav a::after { content:''; position:absolute; bottom:0; left:0; width:0; height:1.6px; background:var(--sage); transition:width .25s; }
 .sh-nav a:hover { color:var(--sage); } .sh-nav a:hover::after { width:100%; }
