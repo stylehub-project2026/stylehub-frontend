@@ -9,7 +9,7 @@ const BACKEND_BASE = "https://stylehub-backend-tau.vercel.app/api";
 
 async function sellerRequest(method, path, body = null) {
   const headers = { "Content-Type": "application/json" };
-  const token = localStorage.getItem("token");
+  const token = localStorage.getItem("sellerToken");
   if (token) headers["Authorization"] = `Bearer ${token}`;
   const res = await fetch(`${BACKEND_BASE}${path}`, {
     method,
@@ -815,7 +815,7 @@ function ProductsView() {
     setSaving(true);
     setMsg(null);
     try {
-      const token = localStorage.getItem("token");
+      const token = localStorage.getItem("sellerToken");
       const formData = new FormData();
       formData.append("name", form.name);
       formData.append("price", form.price);
@@ -857,7 +857,7 @@ function ProductsView() {
   const handleDelete = async (productId) => {
 
     try {
-      const token = localStorage.getItem("token") || localStorage.getItem("token");
+      const token = localStorage.getItem("sellerToken") || localStorage.getItem("sellerToken");
       const res = await fetch(`https://stylehub-backend-tau.vercel.app/api/products/${productId}`, {
         method: "DELETE",
         headers: { "Authorization": `Bearer ${token}`, "Content-Type": "application/json" },
@@ -1388,7 +1388,7 @@ function SettingsView() {
       formData.append("description", description);
       if (logoFile) formData.append("logo", logoFile);
 
-      const token = localStorage.getItem("token");
+      const token = localStorage.getItem("sellerToken");
       const res = await fetch(`https://stylehub-backend-tau.vercel.app/api/sellers/profile`, {
         method: "PUT",
         headers: { Authorization: `Bearer ${token}` },

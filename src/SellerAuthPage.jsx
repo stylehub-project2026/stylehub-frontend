@@ -456,7 +456,7 @@ function SellerSignInForm({ onForgot, onSwitchSignUp, onDone }) {
     try {
       const idToken = await signInWithGoogle();
       const { data } = await authAPI.googleAuth(idToken);
-      localStorage.setItem("token", data.data.token);
+      localStorage.setItem("sellerToken", data.data.token);
       localStorage.setItem("seller", JSON.stringify(data.data.user));
       setOk(true);
       setTimeout(onDone, 900);
@@ -481,7 +481,7 @@ function SellerSignInForm({ onForgot, onSwitchSignUp, onDone }) {
     try {
       const res = await sellerAuthAPI.signin(email, pw);
       const { token, user } = res.data.data;
-      localStorage.setItem("token", token);
+      localStorage.setItem("sellerToken", token);
       localStorage.setItem("seller", JSON.stringify(user));
       setOk(true);
       setTimeout(onDone, 900);
@@ -659,7 +659,7 @@ function SellerSignUpForm({ onSwitchSignIn, onDone }) {
           form.clothingCategories.join(",")
         );
         const { token, user } = res.data.data;
-        localStorage.setItem("token", token);
+        localStorage.setItem("sellerToken", token);
         localStorage.setItem("seller", JSON.stringify(user));
         setOk(true);
         setTimeout(onDone, 1100);

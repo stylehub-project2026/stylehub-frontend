@@ -28,7 +28,7 @@ import ContactPage from "./ContactPage";
 import { saveCart, saveWishlist, sellerSignOut } from "./api";
 
 function isSellerLoggedIn() {
-  return !!localStorage.getItem("token") && !!localStorage.getItem("seller");
+  return !!localStorage.getItem("sellerToken") && !!localStorage.getItem("seller");
 }
 
 // ─── SCROLL REVEAL ───
@@ -365,10 +365,10 @@ function TrendingCarousel({ products, onOpen, wish, toggleWish, onAdd }) {
 
   useEffect(() => {
     const update = () => {
-      if (window.innerWidth < 480)       setVisibleCount(2);
-      else if (window.innerWidth < 768)  setVisibleCount(2);
+      if (window.innerWidth < 480) setVisibleCount(2);
+      else if (window.innerWidth < 768) setVisibleCount(2);
       else if (window.innerWidth < 1024) setVisibleCount(3);
-      else                               setVisibleCount(4);
+      else setVisibleCount(4);
     };
     update();
     window.addEventListener("resize", update);
@@ -408,12 +408,12 @@ function TrendingCarousel({ products, onOpen, wish, toggleWish, onAdd }) {
                 flexDirection: "column",
               }}
             >
-              <TCard p={p} onOpen={onOpen} addRef={() => {}} d={(i % 4) + 1} wish={wish} toggleWish={toggleWish} onAdd={onAdd} />
+              <TCard p={p} onOpen={onOpen} addRef={() => { }} d={(i % 4) + 1} wish={wish} toggleWish={toggleWish} onAdd={onAdd} />
             </div>
           ))}
         </div>
       </div>
-      {cur > 0   && <button className="h-arr l" onClick={() => setCur(c => c - 1)}>‹</button>}
+      {cur > 0 && <button className="h-arr l" onClick={() => setCur(c => c - 1)}>‹</button>}
       {cur < max && <button className="h-arr r" onClick={() => setCur(c => c + 1)}>›</button>}
     </div>
   );
@@ -572,9 +572,9 @@ export default function App() {
       return result;
     };
     return {
-      best:  interleaveByBrand(PRODUCTS.filter(p => p.tab === "best")),
-      new:   interleaveByBrand(PRODUCTS.filter(p => p.tab === "new")),
-      sale:  interleaveByBrand(PRODUCTS.filter(p => p.tab === "sale")),
+      best: interleaveByBrand(PRODUCTS.filter(p => p.tab === "best")),
+      new: interleaveByBrand(PRODUCTS.filter(p => p.tab === "new")),
+      sale: interleaveByBrand(PRODUCTS.filter(p => p.tab === "sale")),
       trend: interleaveByBrand(PRODUCTS.filter(p => p.tab === "trend")),
       picks: interleaveByBrand(PRODUCTS.filter(p => p.tab === "picks")),
     };
@@ -639,7 +639,7 @@ export default function App() {
           {/* PRODUCTS — fixed: homeProducts is an object, use homeProducts[tab] */}
           <section className="products-section py-3 my-1">
             <div className="sh-tabs reveal" ref={addRef}>
-              {[["best","Best Sellers"],["new","New Arrivals"],["sale","Sale"]].map(([key,label]) => (
+              {[["best", "Best Sellers"], ["new", "New Arrivals"], ["sale", "Sale"]].map(([key, label]) => (
                 <div key={key} className={`sh-tab${tab === key ? " on" : ""}`} onClick={() => setTab(key)}>{label}</div>
               ))}
             </div>
@@ -717,7 +717,7 @@ export default function App() {
           >
             {[
               { tag: "Editorial", title: "Discover Latest in Fashion", gradient: "145deg,#8a9a7a,#4a5c40", img: "/beni.png", href: "/women" },
-              { tag: "Explore",   title: "Explore Fashion New Era",    gradient: "145deg,#c4a882,#8a7060", img: "/bano.png",  href: "/brand/27" },
+              { tag: "Explore", title: "Explore Fashion New Era", gradient: "145deg,#c4a882,#8a7060", img: "/bano.png", href: "/brand/27" },
             ].map((e, i) => (
               <div className="col-md-6" key={i}>
                 <a href={e.href} className="sh-ed">
@@ -733,7 +733,7 @@ export default function App() {
           <div className="trust-bar d-flex justify-content-center gap-5 py-4 border-top reveal flex-wrap" ref={addRef}>
             {[
               { icon: "🚚", label: "100% Free Shipping", sub: "Free shipping on all orders" },
-              { icon: "↩",  label: "Easy Returns",       sub: "30-day hassle-free returns" },
+              { icon: "↩", label: "Easy Returns", sub: "30-day hassle-free returns" },
               { icon: "🎧", label: "24/7 Online Support", sub: "We're here whenever you need us" },
             ].map((t, i) => (
               <div key={i} className="text-center" style={{ maxWidth: 180 }}>

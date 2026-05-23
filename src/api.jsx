@@ -54,10 +54,11 @@ export async function sellerSignIn({ email, password }) {
 }
 
 export function sellerSignOut() {
+    localStorage.removeItem("sellerToken");
+    localStorage.removeItem("seller");
     localStorage.removeItem("stylehub-seller-token");
     localStorage.removeItem("stylehub-seller-logged-in");
     localStorage.removeItem("stylehub-seller-user");
-    localStorage.removeItem("token");
 }
 
 export function isSellerLoggedIn() {
