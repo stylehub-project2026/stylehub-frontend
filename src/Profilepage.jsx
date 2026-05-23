@@ -55,6 +55,7 @@ const CSS = `
 
 .pf-form-row { display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:1rem; }
 .pf-form-row.full { grid-template-columns:1fr; }
+.pf-form-row.three { grid-template-columns:1fr 1fr 1fr; }
 .pf-field { display:flex; flex-direction:column; gap:.3rem; }
 .pf-label { font-size:.56rem; letter-spacing:.15em; text-transform:uppercase; color:var(--warm); }
 .pf-input { padding:.62rem .85rem; border:1.5px solid var(--border); font-family:'DM Sans',sans-serif; font-size:.82rem; color:var(--dark); background:#fff; outline:none; transition:border-color .2s; border-radius:6px; }
@@ -64,6 +65,7 @@ const CSS = `
 .pf-save-btn:hover { background:var(--deep); }
 .pf-save-btn:disabled { opacity:.5; cursor:not-allowed; }
 .pf-success-msg { background:#edf7ee; border:1px solid #b8e6bc; color:#2d7a35; padding:.55rem 1rem; border-radius:6px; font-size:.72rem; margin-bottom:1rem; }
+.pf-error-msg { background:#fdf0f0; border:1px solid #f5c6cb; color:#842029; padding:.55rem 1rem; border-radius:6px; font-size:.72rem; margin-bottom:1rem; }
 
 .how-steps { display:grid; grid-template-columns:repeat(3,1fr); gap:1.2rem; margin-top:.8rem; }
 .how-step { text-align:center; padding:.8rem; }
@@ -89,7 +91,7 @@ const CSS = `
 @media(max-width:640px){
   .pf-points-banner { flex-direction:column; align-items:flex-start; }
   .pf-pts-right { text-align:left; }
-  .pf-form-row { grid-template-columns:1fr; }
+  .pf-form-row, .pf-form-row.three { grid-template-columns:1fr; }
   .wish-grid { grid-template-columns:repeat(2,1fr); }
   .how-steps { grid-template-columns:1fr; }
 }
@@ -101,22 +103,34 @@ export default function ProfilePage({ cart, wish = [], setWish }) {
     const [user, setUser] = useState(null);
     const [points, setPoints] = useState(0);
     const [orders, setOrders] = useState([]);
-    const [wishProducts, setWishProducts] = useState([]); // ✅ كانت ناقصة
+    const [wishProducts, setWishProducts] = useState([]);
     const [loading, setLoading] = useState(true);
+
+    // Edit profile
     const [editForm, setEditForm] = useState({ firstName: "", lastName: "", phone: "" });
     const [saving, setSaving] = useState(false);
     const [saveMsg, setSaveMsg] = useState("");
+
+    // Change password
+    const [pwForm, setPwForm] = useState({ currentPassword: "", newPassword: "", confirmPassword: "" });
+    const [pwSaving, setPwSaving] = useState(false);
+    const [pwMsg, setPwMsg] = useState({ text: "", ok: true });
+
+    // Address
+    const [address, setAddress] = useState({ street: "", city: "", governorate: "", postalCode: "" });
+    const [addrSaving, setAddrSaving] = useState(false);
+    const [addrMsg, setAddrMsg] = useState({ text: "", ok: true });
 
     useEffect(() => {
         const token = localStorage.getItem("token");
         if (!token) { navigate("/signin"); return; }
 
-        // تحميل بيانات المستخدم من localStorage فوراً
         const stored = localStorage.getItem("user");
         if (stored) {
             const u = JSON.parse(stored);
             setUser(u);
             setEditForm({ firstName: u.firstName || "", lastName: u.lastName || "", phone: u.phone || "" });
+            if (u.address) setAddress(u.address);
         }
 
         fetch(`${API}/orders/my-orders`, { headers: { Authorization: `Bearer ${token}` } })
@@ -131,7 +145,6 @@ export default function ProfilePage({ cart, wish = [], setWish }) {
             .catch(() => { });
     }, []);
 
-    // جلب منتجات الـ wishlist
     useEffect(() => {
         if (!wish.length) { setWishProducts([]); return; }
         Promise.all(
@@ -158,7 +171,7 @@ export default function ProfilePage({ cart, wish = [], setWish }) {
         const token = localStorage.getItem("token");
         setSaving(true); setSaveMsg("");
         try {
-            const res = await fetch(`${API}/users/me`, {
+            const res = await fetch(`${API}/customer/auth/me`, {
                 method: "PUT",
                 headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
                 body: JSON.stringify(editForm),
@@ -172,6 +185,70 @@ export default function ProfilePage({ cart, wish = [], setWish }) {
             }
         } catch (err) { console.error(err); }
         finally { setSaving(false); }
+    };
+
+    const handleChangePassword = async () => {
+        setPwMsg({ text: "", ok: true });
+        const { currentPassword, newPassword, confirmPassword } = pwForm;
+
+        if (!currentPassword || !newPassword || !confirmPassword) {
+            return setPwMsg({ text: "Please fill in all password fields.", ok: false });
+        }
+        if (newPassword !== confirmPassword) {
+            return setPwMsg({ text: "New passwords do not match.", ok: false });
+        }
+        if (newPassword.length < 6) {
+            return setPwMsg({ text: "New password must be at least 6 characters.", ok: false });
+        }
+
+        const token = localStorage.getItem("token");
+        setPwSaving(true);
+        try {
+            const res = await fetch(`${API}/customer/auth/change-password`, {
+                method: "PUT",
+                headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+                body: JSON.stringify({ currentPassword, newPassword }),
+            });
+            const data = await res.json();
+            if (data.success) {
+                setPwMsg({ text: "Password updated successfully!", ok: true });
+                setPwForm({ currentPassword: "", newPassword: "", confirmPassword: "" });
+                setTimeout(() => setPwMsg({ text: "", ok: true }), 3000);
+            } else {
+                setPwMsg({ text: data.message || "Something went wrong.", ok: false });
+            }
+        } catch (err) {
+            setPwMsg({ text: "Network error. Please try again.", ok: false });
+        } finally {
+            setPwSaving(false);
+        }
+    };
+
+    const handleSaveAddress = async () => {
+        setAddrMsg({ text: "", ok: true });
+        const token = localStorage.getItem("token");
+        setAddrSaving(true);
+        try {
+            const res = await fetch(`${API}/customer/auth/update-address`, {
+                method: "PUT",
+                headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+                body: JSON.stringify(address),
+            });
+            const data = await res.json();
+            if (data.success) {
+                const updated = { ...user, address: data.data.user.address };
+                setUser(updated);
+                localStorage.setItem("user", JSON.stringify({ ...updated, role: "customer" }));
+                setAddrMsg({ text: "Address saved successfully!", ok: true });
+                setTimeout(() => setAddrMsg({ text: "", ok: true }), 3000);
+            } else {
+                setAddrMsg({ text: data.message || "Something went wrong.", ok: false });
+            }
+        } catch (err) {
+            setAddrMsg({ text: "Network error. Please try again.", ok: false });
+        } finally {
+            setAddrSaving(false);
+        }
     };
 
     const handleLogout = () => {
@@ -220,7 +297,7 @@ export default function ProfilePage({ cart, wish = [], setWish }) {
                     ))}
                 </div>
 
-                {/* ORDERS */}
+                {/* ── ORDERS ── */}
                 {tab === "orders" && (
                     loading ? <div style={{ color: "var(--warm)", fontSize: ".85rem" }}>Loading orders...</div> :
                         orders.length === 0 ? (
@@ -254,7 +331,7 @@ export default function ProfilePage({ cart, wish = [], setWish }) {
                         ))
                 )}
 
-                {/* WISHLIST */}
+                {/* ── WISHLIST ── */}
                 {tab === "wishlist" && (
                     wishProducts.length === 0 ? (
                         <div className="pf-empty"><div className="pf-empty-icon">♡</div><div className="pf-empty-text">Your wishlist is empty.</div></div>
@@ -276,38 +353,143 @@ export default function ProfilePage({ cart, wish = [], setWish }) {
                     )
                 )}
 
-                {/* EDIT PROFILE */}
+                {/* ── EDIT PROFILE ── */}
                 {tab === "edit" && (
-                    <div className="pf-card">
-                        <div className="pf-card-title">Edit Profile</div>
-                        {saveMsg && <div className="pf-success-msg">✓ {saveMsg}</div>}
-                        <div className="pf-form-row">
-                            <div className="pf-field">
-                                <label className="pf-label">First Name</label>
-                                <input className="pf-input" value={editForm.firstName} onChange={e => setEditForm(f => ({ ...f, firstName: e.target.value }))} />
+                    <>
+                        {/* Personal Info */}
+                        <div className="pf-card">
+                            <div className="pf-card-title">Edit Profile</div>
+                            {saveMsg && <div className="pf-success-msg">✓ {saveMsg}</div>}
+                            <div className="pf-form-row">
+                                <div className="pf-field">
+                                    <label className="pf-label">First Name</label>
+                                    <input className="pf-input" value={editForm.firstName} onChange={e => setEditForm(f => ({ ...f, firstName: e.target.value }))} />
+                                </div>
+                                <div className="pf-field">
+                                    <label className="pf-label">Last Name</label>
+                                    <input className="pf-input" value={editForm.lastName} onChange={e => setEditForm(f => ({ ...f, lastName: e.target.value }))} />
+                                </div>
                             </div>
-                            <div className="pf-field">
-                                <label className="pf-label">Last Name</label>
-                                <input className="pf-input" value={editForm.lastName} onChange={e => setEditForm(f => ({ ...f, lastName: e.target.value }))} />
+                            <div className="pf-form-row full">
+                                <div className="pf-field">
+                                    <label className="pf-label">Email (cannot be changed)</label>
+                                    <input className="pf-input" value={user?.email || ""} disabled />
+                                </div>
                             </div>
+                            <div className="pf-form-row full">
+                                <div className="pf-field">
+                                    <label className="pf-label">Phone</label>
+                                    <input className="pf-input" value={editForm.phone} onChange={e => setEditForm(f => ({ ...f, phone: e.target.value }))} placeholder="+20 1xx xxx xxxx" />
+                                </div>
+                            </div>
+                            <button className="pf-save-btn" onClick={handleSaveProfile} disabled={saving}>
+                                {saving ? "Saving..." : "Save Changes"}
+                            </button>
                         </div>
-                        <div className="pf-form-row full">
-                            <div className="pf-field">
-                                <label className="pf-label">Email (cannot be changed)</label>
-                                <input className="pf-input" value={user?.email || ""} disabled />
+
+                        {/* Change Password */}
+                        <div className="pf-card">
+                            <div className="pf-card-title">Change Password</div>
+                            {pwMsg.text && (
+                                <div className={pwMsg.ok ? "pf-success-msg" : "pf-error-msg"}>
+                                    {pwMsg.ok ? "✓ " : "✕ "}{pwMsg.text}
+                                </div>
+                            )}
+                            <div className="pf-form-row full">
+                                <div className="pf-field">
+                                    <label className="pf-label">Current Password</label>
+                                    <input
+                                        className="pf-input"
+                                        type="password"
+                                        value={pwForm.currentPassword}
+                                        onChange={e => setPwForm(f => ({ ...f, currentPassword: e.target.value }))}
+                                        placeholder="Enter current password"
+                                    />
+                                </div>
                             </div>
-                        </div>
-                        <div className="pf-form-row full">
-                            <div className="pf-field">
-                                <label className="pf-label">Phone</label>
-                                <input className="pf-input" value={editForm.phone} onChange={e => setEditForm(f => ({ ...f, phone: e.target.value }))} placeholder="+20 1xx xxx xxxx" />
+                            <div className="pf-form-row">
+                                <div className="pf-field">
+                                    <label className="pf-label">New Password</label>
+                                    <input
+                                        className="pf-input"
+                                        type="password"
+                                        value={pwForm.newPassword}
+                                        onChange={e => setPwForm(f => ({ ...f, newPassword: e.target.value }))}
+                                        placeholder="Min 6 characters"
+                                    />
+                                </div>
+                                <div className="pf-field">
+                                    <label className="pf-label">Confirm New Password</label>
+                                    <input
+                                        className="pf-input"
+                                        type="password"
+                                        value={pwForm.confirmPassword}
+                                        onChange={e => setPwForm(f => ({ ...f, confirmPassword: e.target.value }))}
+                                        placeholder="Repeat new password"
+                                    />
+                                </div>
                             </div>
+                            <button className="pf-save-btn" onClick={handleChangePassword} disabled={pwSaving}>
+                                {pwSaving ? "Updating..." : "Update Password"}
+                            </button>
                         </div>
-                        <button className="pf-save-btn" onClick={handleSaveProfile} disabled={saving}>{saving ? "Saving..." : "Save Changes"}</button>
-                    </div>
+
+                        {/* Delivery Address */}
+                        <div className="pf-card">
+                            <div className="pf-card-title">Delivery Address</div>
+                            {addrMsg.text && (
+                                <div className={addrMsg.ok ? "pf-success-msg" : "pf-error-msg"}>
+                                    {addrMsg.ok ? "✓ " : "✕ "}{addrMsg.text}
+                                </div>
+                            )}
+                            <div className="pf-form-row full">
+                                <div className="pf-field">
+                                    <label className="pf-label">Street Address</label>
+                                    <input
+                                        className="pf-input"
+                                        value={address.street}
+                                        onChange={e => setAddress(a => ({ ...a, street: e.target.value }))}
+                                        placeholder="e.g. 12 El Nasr St, Apt 4"
+                                    />
+                                </div>
+                            </div>
+                            <div className="pf-form-row three">
+                                <div className="pf-field">
+                                    <label className="pf-label">City</label>
+                                    <input
+                                        className="pf-input"
+                                        value={address.city}
+                                        onChange={e => setAddress(a => ({ ...a, city: e.target.value }))}
+                                        placeholder="e.g. Alexandria"
+                                    />
+                                </div>
+                                <div className="pf-field">
+                                    <label className="pf-label">Governorate</label>
+                                    <input
+                                        className="pf-input"
+                                        value={address.governorate}
+                                        onChange={e => setAddress(a => ({ ...a, governorate: e.target.value }))}
+                                        placeholder="e.g. Alexandria"
+                                    />
+                                </div>
+                                <div className="pf-field">
+                                    <label className="pf-label">Postal Code</label>
+                                    <input
+                                        className="pf-input"
+                                        value={address.postalCode}
+                                        onChange={e => setAddress(a => ({ ...a, postalCode: e.target.value }))}
+                                        placeholder="e.g. 21500"
+                                    />
+                                </div>
+                            </div>
+                            <button className="pf-save-btn" onClick={handleSaveAddress} disabled={addrSaving}>
+                                {addrSaving ? "Saving..." : "Save Address"}
+                            </button>
+                        </div>
+                    </>
                 )}
 
-                {/* HOW POINTS WORK */}
+                {/* ── POINTS ── */}
                 {tab === "points" && (
                     <div className="pf-card">
                         <div className="pf-card-title">How Points Work</div>
