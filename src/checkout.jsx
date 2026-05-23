@@ -143,11 +143,15 @@ const CSS = `
 .ck-order-total { font-size:.78rem; color:var(--warm); margin-top:.3rem; }
 
 /* ─── RESPONSIVE ─── */
-@media(max-width:768px){
-  .ck-shell { padding:2rem 1rem 4rem; }
+@media(max-width:1024px){
+  .ck-shell { padding:2rem 1.5rem 4rem; }
   .ck-layout { grid-template-columns:1fr; gap:1.5rem; }
   .ck-aside { position:static; }
   .ck-row { grid-template-columns:1fr; }
+}
+
+@media(max-width:768px){
+  .ck-shell { padding:2rem 1rem 4rem; }
   .ck-card { padding:1.2rem; }
   .ck-steps { margin-bottom:2rem; }
   .ck-step-label { font-size:.55rem; letter-spacing:.06em; }
