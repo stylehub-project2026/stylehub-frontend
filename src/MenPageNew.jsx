@@ -28,7 +28,7 @@ const HERO_SLIDES = [
         h1: "Men",
         sub: "Up to 50% off selected items from local designers.",
         btn: "Explore Sale",
-        img: "/men-banner-3.jpg",
+        img: "/ChatGPT Image May 23, 2026, 07_22_56 PM.png",
         bg: "#f0ece8",
         fullBg: true,
     },
