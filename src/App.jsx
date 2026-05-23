@@ -640,7 +640,7 @@ export default function App() {
           <BrandsCarousel />
 
           {/* PRODUCTS */}
-      <section className="products-section py-3 my-3">
+      <section className="products-section py-3 my-1">
         <div className="sh-tabs reveal" ref={addRef}>
           {[["best","Best Sellers"],["new","New Arrivals"],["sale","Sale"]].map(([key,label])=>(
             <div key={key} className={`sh-tab${tab===key?" on":""}`} onClick={()=>setTab(key)}>{label}</div>
