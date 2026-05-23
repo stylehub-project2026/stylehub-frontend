@@ -89,7 +89,7 @@ export default function BlackClosetBrand({ cart, wish = [], setWish }) {
   const [sortBy, setSortBy] = useState("default");
   const [selType, setSelType] = useState("all");
   const [page, setPage] = useState(1);
-  const [filterOpen, setFilterOpen] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const PER_PAGE = 9;
 
   const navigate = useNavigate();
@@ -134,6 +134,8 @@ export default function BlackClosetBrand({ cart, wish = [], setWish }) {
   const totalPages = Math.ceil(filtered.length / PER_PAGE);
   const paginated = filtered.slice((page - 1) * PER_PAGE, page * PER_PAGE);
 
+  const hasActiveFilters = selSizes || selColors || selType !== "all";
+
   return (
     <div style={{ minHeight: "100vh", background: "var(--cream)" }}>
       <style>{SHARED_CSS + PAGE_CSS}</style>
@@ -151,11 +153,15 @@ export default function BlackClosetBrand({ cart, wish = [], setWish }) {
               style={{ width: "85%", height: "85%", objectFit: "contain" }}
               onError={e => e.target.style.display = "none"} />
           </div>
-          <div>
-            <div style={{ fontSize: ".6rem", letterSpacing: ".35em", textTransform: "uppercase", color: "var(--warm)", marginBottom: ".6rem" }}>StyleHub · Brand</div>
-            <h1 style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: "clamp(2.5rem,5vw,4rem)", fontWeight: 400, lineHeight: 1, marginBottom: ".8rem", color: "var(--dark)" }}>{BRAND.name}</h1>
-            <p style={{ fontSize: ".8rem", lineHeight: 1.7, color: "#555", maxWidth: 480 }}>{BRAND.desc}</p>
-            <button onClick={scrollGrid} className="bc-cta-btn" style={{ marginTop: "1.5rem" }}>Shop Now</button>
+          <div className="bc-hero-text">
+            <div style={{ fontSize: ".58rem", letterSpacing: ".3em", textTransform: "uppercase", color: "var(--warm)", marginBottom: ".6rem" }}>StyleHub · Brand</div>
+            <h1 style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: "clamp(2.6rem,4vw,3.6rem)", fontWeight: 400, lineHeight: 1.1, marginBottom: "1rem", color: "var(--dark)" }}>
+              {BRAND.name}
+            </h1>
+            <p className="bc-hero-desc" style={{ fontSize: ".90rem", lineHeight: 1.85, color: "#555252", marginBottom: "1.8rem", maxWidth: 440 }}>
+              {BRAND.desc}
+            </p>
+            <button onClick={scrollGrid} className="bc-cta-btn">Shop Now</button>
           </div>
         </div>
       </section>
@@ -169,7 +175,9 @@ export default function BlackClosetBrand({ cart, wish = [], setWish }) {
             <p style={{ fontSize: ".86rem", lineHeight: 1.85, color: "#555252", marginBottom: "2rem", maxWidth: 400 }}>{BRAND.desc}</p>
             <button onClick={scrollGrid} className="bc-cta-btn">Browse All</button>
           </div>
-          <div style={{ position: "relative", minHeight: "300px" }}>
+
+          {/* decorative dark blob */}
+          <div className="bc-popular-blob" style={{ position: "relative", minHeight: "300px" }}>
             <div style={{ position: "absolute", right: "-6%", top: "-22%", width: "52%", height: "144%", background: "var(--dark)", borderRadius: "60% 0 0 60%", zIndex: 0 }} />
           </div>
         </div>
@@ -177,12 +185,18 @@ export default function BlackClosetBrand({ cart, wish = [], setWish }) {
 
       {/* ── PRODUCTS ── */}
       <div className="bc-brand-layout">
-        <button className="bc-filter-toggle-btn" onClick={() => setFilterOpen(o => !o)}>
-          {filterOpen ? "✕ Close Filters" : "⚙ Filters & Sort"}
+
+        {/* MOBILE FILTER TOGGLE */}
+        <button
+          className="bc-filter-toggle-btn"
+          onClick={() => setSidebarOpen(o => !o)}
+        >
+          <span>☰</span> {sidebarOpen ? "Hide Filters" : "Show Filters"}
+          {hasActiveFilters && <span className="bc-filter-badge">●</span>}
         </button>
 
         {/* SIDEBAR */}
-        <div className={`bc-brand-sidebar${filterOpen ? " sidebar-open" : ""}`}>
+        <div className={`bc-brand-sidebar${sidebarOpen ? " sidebar-open" : ""}`}>
           <div style={{ marginBottom: "1.8rem" }}>
             <div className="filter-label">Sort By</div>
             {[["default", "Default"], ["low", "Price: Low → High"], ["high", "Price: High → Low"], ["sale", "On Sale"]].map(([val, label]) => (
@@ -195,7 +209,7 @@ export default function BlackClosetBrand({ cart, wish = [], setWish }) {
 
           <FilterSection title="Type">
             {[["tops", "Tops"], ["bottoms", "Bottoms"], ["jackets", "Jackets"], ["t-shirt", "T-Shirt"], ["hoodies", "Hoodies"], ["dresses", "Dresses"]].map(([val, label]) => (
-              <CheckRow key={val} label={label} active={selType === val} onClick={() => toggleType(val)} />
+              <CheckRow key={val} label={label} active={selType === val} onClick={() => { toggleType(val); setSidebarOpen(false); }} />
             ))}
           </FilterSection>
 
@@ -219,8 +233,8 @@ export default function BlackClosetBrand({ cart, wish = [], setWish }) {
             </div>
           </FilterSection>
 
-          {(selSizes || selColors || selType !== "all") && (
-            <button onClick={() => { setSelSizes(null); setSelColors(null); setSelType("all"); setPage(1); }}
+          {hasActiveFilters && (
+            <button onClick={() => { setSelSizes(null); setSelColors(null); setSelType("all"); setPage(1); setSidebarOpen(false); }}
               style={{ fontSize: ".61rem", letterSpacing: ".1em", textTransform: "uppercase", background: "none", border: "1px solid var(--border)", padding: ".36rem .8rem", cursor: "pointer", color: "var(--warm)", fontFamily: "'DM Sans',sans-serif", width: "100%", borderRadius: 3 }}>
               Clear Filters
             </button>
@@ -242,7 +256,7 @@ export default function BlackClosetBrand({ cart, wish = [], setWish }) {
           }
 
           {totalPages > 1 && (
-            <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: ".45rem", padding: "2.5rem 0", flexWrap: "wrap" }}>
+            <div className="bc-pagination-row" style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: ".45rem", padding: "2.5rem 0" }}>
               <PagBtn onClick={() => { setPage(p => Math.max(1, p - 1)); scrollGrid(); }} disabled={page === 1}>‹</PagBtn>
               {Array.from({ length: totalPages }, (_, i) => i + 1).map(n => (
                 <PagBtn key={n} onClick={() => { setPage(n); scrollGrid(); }} active={page === n}>{n}</PagBtn>
@@ -271,12 +285,14 @@ const PAGE_CSS = `
   font-family:'DM Sans',sans-serif; border-radius:3px; transition:background .2s;
 }
 .bc-cta-btn:hover { background:#92A079; }
+
+/* ── Hero ── */
 .bc-hero-section {
-  position:relative; min-height:420px; overflow:hidden;
+  position:relative; height:420px; overflow:hidden;
   background:#ffffff; display:flex; align-items:center;
   margin:1.5rem; border-radius:10px;
   border:2px solid rgba(26,26,24,.2);
-  box-shadow:0 4px 24px rgba(26,26,24,.07); padding:2rem 0;
+  box-shadow:0 4px 24px rgba(26,26,24,.07);
 }
 .bc-hero-inner {
   position:relative; z-index:2; display:flex; align-items:center;
@@ -284,35 +300,140 @@ const PAGE_CSS = `
 }
 .bc-hero-logo {
   width:200px; height:200px; border-radius:50%; overflow:hidden;
-  flex-shrink:0; border:3px solid rgba(26,26,24,.15);
-  box-shadow:0 8px 32px rgba(26,26,24,.12);
-  background:#fff; display:flex; align-items:center; justify-content:center;
+  flex-shrink:0; border:1.5px solid rgba(26,26,24,.12);
+  box-shadow:0 8px 32px rgba(26,26,24,.1);
+  background:#f8f6f2; display:flex; align-items:center; justify-content:center;
 }
+.bc-hero-text { max-width:500px; }
+
+/* ── Popular section ── */
 .bc-popular-grid { display:grid; grid-template-columns:1fr 1fr; gap:5rem; align-items:center; }
+
+/* ── Products layout ── */
 .bc-brand-layout { display:flex; gap:2.5rem; padding:3rem 6%; align-items:flex-start; background:var(--cream); }
 .bc-brand-sidebar { width:185px; flex-shrink:0; position:sticky; top:70px; }
 .bc-product-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:1.4rem; }
+
+/* ── Mobile filter toggle — hidden on desktop ── */
 .bc-filter-toggle-btn { display:none; }
 
+/* ════════════════════════════
+   TABLET  (≤1024px)
+════════════════════════════ */
 @media(max-width:1024px) {
-  .bc-product-grid { grid-template-columns:repeat(2,1fr); }
-  .bc-hero-logo { width:150px; height:150px; }
-  .bc-hero-inner { gap:2.5rem; }
+  .bc-product-grid { grid-template-columns:repeat(2,1fr) !important; }
+  .bc-hero-logo { width:150px !important; height:150px !important; }
+  .bc-hero-inner { gap:2.5rem !important; }
 }
+
+/* ════════════════════════════
+   MOBILE  (≤768px)
+════════════════════════════ */
 @media(max-width:768px) {
-  .bc-hero-section { min-height:unset; margin:1rem; padding:2rem 1.5rem; }
-  .bc-hero-inner { flex-direction:column; align-items:center; text-align:center; gap:1.5rem; padding:0; }
-  .bc-hero-logo { width:120px; height:120px; }
-  .bc-popular-grid { grid-template-columns:1fr; gap:2rem; }
-  .bc-brand-layout { flex-direction:column; padding:1.5rem 4%; gap:0; }
-  .bc-brand-sidebar { width:100%; position:static; display:none; padding-bottom:1rem; border-bottom:1px solid var(--border); margin-bottom:1.5rem; }
-  .bc-brand-sidebar.sidebar-open { display:block; }
-  .bc-filter-toggle-btn { display:block; width:100%; padding:.65rem 1rem; margin-bottom:1rem; background:var(--dark); color:#fff; border:none; border-radius:4px; font-size:.75rem; font-family:'DM Sans',sans-serif; letter-spacing:.1em; text-transform:uppercase; cursor:pointer; font-weight:600; }
-  .bc-product-grid { grid-template-columns:repeat(2,1fr); gap:.8rem; }
+
+  /* Hero */
+  .bc-hero-section {
+    margin:0.6rem !important;
+    height:auto !important;
+    min-height:unset !important;
+    border-radius:8px !important;
+  }
+  .bc-hero-inner {
+    flex-direction:column !important;
+    gap:1.4rem !important;
+    padding:2rem 1.2rem 2.2rem !important;
+    text-align:center !important;
+    align-items:center !important;
+  }
+  .bc-hero-logo {
+    width:110px !important;
+    height:110px !important;
+  }
+  .bc-hero-text { max-width:100% !important; }
+
+  /* Hide description on mobile (matches Salty) */
+  .bc-hero-desc { display:none !important; }
+
+  /* Popular section */
+  .bc-popular-grid {
+    grid-template-columns:1fr !important;
+    gap:0 !important;
+  }
+  .bc-popular-blob { display:none !important; }
+
+  /* Products layout — stack sidebar above grid */
+  .bc-brand-layout {
+    flex-direction:column !important;
+    padding:1.2rem 4% !important;
+    gap:0 !important;
+  }
+
+  /* Mobile filter toggle */
+  .bc-filter-toggle-btn {
+    display:flex !important;
+    align-items:center;
+    gap:.5rem;
+    width:100%;
+    background:var(--dark);
+    color:#fff;
+    border:none;
+    padding:.65rem 1rem;
+    font-size:.72rem;
+    letter-spacing:.12em;
+    text-transform:uppercase;
+    font-weight:600;
+    cursor:pointer;
+    font-family:'DM Sans',sans-serif;
+    border-radius:4px;
+    margin-bottom:1rem;
+  }
+  .bc-filter-badge {
+    color:#92A079;
+    font-size:.9rem;
+    line-height:1;
+  }
+
+  /* Sidebar — hidden by default, shown when open */
+  .bc-brand-sidebar {
+    display:none;
+    width:100% !important;
+    position:static !important;
+    top:unset !important;
+    background:#fff;
+    border:1px solid var(--border);
+    border-radius:6px;
+    padding:1.2rem 1rem;
+    margin-bottom:1.2rem;
+  }
+  .bc-brand-sidebar.sidebar-open { display:block !important; }
+
+  /* Product grid */
+  .bc-product-grid {
+    grid-template-columns:repeat(2,1fr) !important;
+    gap:0.8rem !important;
+  }
+
+  /* Pagination */
+  .bc-pagination-row {
+    flex-wrap:wrap !important;
+    gap:.3rem !important;
+    padding:1.5rem 0 !important;
+  }
 }
+
+/* ════════════════════════════
+   SMALL MOBILE  (≤480px)
+════════════════════════════ */
 @media(max-width:480px) {
-  .bc-product-grid { grid-template-columns:repeat(2,1fr); gap:.6rem; }
-  .bc-hero-logo { width:90px; height:90px; }
-  .bc-brand-layout { padding:1rem 3%; }
+  .bc-product-grid {
+    grid-template-columns:repeat(2,1fr) !important;
+    gap:0.6rem !important;
+  }
+  .bc-hero-section { margin:0.4rem !important; }
+  .bc-hero-logo {
+    width:90px !important;
+    height:90px !important;
+  }
+  .bc-brand-layout { padding:1rem 3% !important; }
 }
 `;
