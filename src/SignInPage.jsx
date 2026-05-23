@@ -5,8 +5,6 @@ import { authAPI } from "./api.jsx";
 import { signInWithGoogle } from "./firebase";
 import logoImg from "./assets/logo.png";
 
-
-
 const CSS = `
 @import url('https://fonts.googleapis.com/css2?family=Jost:wght@400;500;600;700;800&display=swap');
 @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css');
@@ -295,15 +293,56 @@ input[type="password"]::-webkit-credentials-auto-fill-button { visibility:hidden
 .fade-up { animation: fadeUp .32s ease; }
 @keyframes fadeUp { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
 
+/* ════════════════════════════
+   TABLET  (≤1024px)
+════════════════════════════ */
 @media(max-width:1024px) {
   .auth-section { gap:40px; padding:2.5rem 2rem; }
   .auth-image { display:none; }
   .sh-nav-links { display:none; }
-  .sh-f-grid { grid-template-columns:1fr 1fr; }
+  .sh-f-grid { grid-template-columns:1fr 1fr; gap:2rem; }
 }
+
+/* ════════════════════════════
+   MOBILE  (≤768px)
+════════════════════════════ */
+@media(max-width:768px) {
+  .auth-section {
+    padding: 2rem 1.2rem !important;
+    align-items: flex-start !important;
+  }
+  .auth-card {
+    width: 100% !important;
+    max-width: 480px;
+    margin: 0 auto;
+    border-radius: 16px !important;
+    padding: 2rem 1.4rem !important;
+  }
+  .card-title { font-size:1.45rem !important; }
+  .sh-name-row { grid-template-columns:1fr !important; gap:0 !important; }
+  .sh-f-grid { grid-template-columns:1fr 1fr !important; gap:1.5rem !important; }
+  .otp-cell { width:44px !important; height:50px !important; font-size:1.2rem !important; }
+}
+
+/* ════════════════════════════
+   SMALL MOBILE  (≤600px)
+════════════════════════════ */
 @media(max-width:600px) {
-  .auth-card { padding:2rem 1.5rem; }
+  .auth-card { padding:1.8rem 1.2rem !important; }
   .sh-nav-search { display:none; }
+}
+
+/* ════════════════════════════
+   SMALL MOBILE  (≤480px)
+════════════════════════════ */
+@media(max-width:480px) {
+  .auth-section { padding:1.5rem 0.8rem !important; }
+  .auth-card { border-radius:12px !important; padding:1.6rem 1rem !important; }
+  .card-title { font-size:1.3rem !important; }
+  .sh-f-grid { grid-template-columns:1fr !important; }
+  .sh-f-inner { padding:0 1.2rem !important; }
+  .otp-row { gap:6px !important; }
+  .otp-cell { width:38px !important; height:44px !important; font-size:1.1rem !important; }
 }
 `;
 
@@ -323,20 +362,11 @@ function Illustration({ mode }) {
       <img
         src={logoImg}
         alt="StyleHub Logo"
-        style={{
-          width: 220,
-          height: "auto",
-          opacity: 0.85,
-        }}
+        style={{ width: 220, height: "auto", opacity: 0.85 }}
       />
       <p style={{
-        fontSize: ".82rem",
-        color: "#92a079",
-        textAlign: "center",
-        maxWidth: 220,
-        lineHeight: 1.6,
-        fontFamily: "Jost, sans-serif",
-        letterSpacing: "1px",
+        fontSize: ".82rem", color: "#92a079", textAlign: "center",
+        maxWidth: 220, lineHeight: 1.6, fontFamily: "Jost, sans-serif", letterSpacing: "1px",
       }}>
         {mode === "signup"
           ? "Join Egypt's finest fashion marketplace."
@@ -395,7 +425,6 @@ function SignInForm({ onForgot, onSwitchSignUp, onDone }) {
     } finally { setGBusy(false); }
   };
 
-
   const submit = async (e) => {
     e.preventDefault();
     setErr("");
@@ -412,81 +441,36 @@ function SignInForm({ onForgot, onSwitchSignUp, onDone }) {
     } catch (error) {
       console.error("🔴 Signin error:", error);
       setErr(error.response?.data?.message || "Server error. Please try again.");
-    } finally {
-      setBusy(false);
-    }
+    } finally { setBusy(false); }
   };
 
   return (
     <form onSubmit={submit} className="fade-up">
-      {ok && (
-        <div className="sh-alert sh-alert-success">
-          <i className="fas fa-check-circle me-2" />
-          Signed in successfully!
-        </div>
-      )}
-      {err && (
-        <div className="sh-alert sh-alert-error">
-          <i className="fas fa-exclamation-circle me-2" />
-          {err}
-        </div>
-      )}
+      {ok && <div className="sh-alert sh-alert-success"><i className="fas fa-check-circle me-2" />Signed in successfully!</div>}
+      {err && <div className="sh-alert sh-alert-error"><i className="fas fa-exclamation-circle me-2" />{err}</div>}
 
       <label className="sh-label">Email address</label>
-      <input
-        className={`sh-input${err && !email ? " error" : ""}`}
-        type="email"
-        placeholder="Enter your email"
-        value={email}
-        onChange={(e) => {
-          setEmail(e.target.value);
-          setErr("");
-        }}
-      />
+      <input className={`sh-input${err && !email ? " error" : ""}`} type="email" placeholder="Enter your email"
+        value={email} onChange={(e) => { setEmail(e.target.value); setErr(""); }} />
 
       <label className="sh-label">Password</label>
       <div className="sh-input-wrap sh-mb">
-        <input
-          className="sh-input"
-          type={show ? "text" : "password"}
-          style={{ paddingRight: 46 }}
-          placeholder="••••••••"
-          value={pw}
-          onChange={(e) => {
-            setPw(e.target.value);
-            setErr("");
-          }}
-        />
+        <input className="sh-input" type={show ? "text" : "password"} style={{ paddingRight: 46 }}
+          placeholder="••••••••" value={pw} onChange={(e) => { setPw(e.target.value); setErr(""); }} />
         <button type="button" className="sh-eye" onClick={() => setShow(!show)}>
           <i className={`far ${show ? "fa-eye-slash" : "fa-eye"}`} />
         </button>
       </div>
 
-      <button
-        type="button"
-        className="forgot-link"
-        onClick={onForgot}
-        style={{ textAlign: "right" }}
-      >
+      <button type="button" className="forgot-link" onClick={onForgot} style={{ textAlign: "right" }}>
         Forgot password?
       </button>
 
       <button className="sh-btn" type="submit" disabled={busy}>
-        {busy ? (
-          <>
-            <i className="fas fa-circle-notch fa-spin" />
-            Signing in…
-          </>
-        ) : (
-          "SIGN IN"
-        )}
+        {busy ? <><i className="fas fa-circle-notch fa-spin" />Signing in…</> : "SIGN IN"}
       </button>
 
-      <div className="sh-divider">
-        <hr />
-        <span>or continue with</span>
-        <hr />
-      </div>
+      <div className="sh-divider"><hr /><span>or continue with</span><hr /></div>
 
       <div className="sh-social">
         <button type="button" className="sh-social-btn" onClick={handleGoogle} disabled={gBusy || busy}>
@@ -500,13 +484,8 @@ function SignInForm({ onForgot, onSwitchSignUp, onDone }) {
         </button>
       </div>
 
-      <p className="sh-switch">
-        I don't have an account?
-        <button type="button" onClick={onSwitchSignUp}>
-          Sign up
-        </button>
-      </p>
-    </form >
+      <p className="sh-switch">I don't have an account?<button type="button" onClick={onSwitchSignUp}>Sign up</button></p>
+    </form>
   );
 }
 
@@ -542,7 +521,6 @@ function SignUpForm({ onSwitchSignIn }) {
     } finally { setGBusy(false); }
   };
 
-
   const submit = async (e) => {
     e.preventDefault();
     setErr("");
@@ -551,7 +529,6 @@ function SignUpForm({ onSwitchSignIn }) {
     if (!isEmail(email)) { setErr("Please enter a valid email."); return; }
     if (pw.length < 8) { setErr("Password must be at least 8 characters."); return; }
     if (pw !== cpw) { setErr("Passwords don't match."); return; }
-
     setBusy(true);
     try {
       const { data } = await authAPI.signup(first, last, email, pw);
@@ -562,123 +539,58 @@ function SignUpForm({ onSwitchSignIn }) {
     } catch (error) {
       console.error("🔴 Signup error:", error);
       setErr(error.response?.data?.message || "Server error. Please try again.");
-    } finally {
-      setBusy(false);
-    }
+    } finally { setBusy(false); }
   };
 
   return (
     <form onSubmit={submit} className="fade-up">
-      {ok && (
-        <div className="sh-alert sh-alert-success">
-          <i className="fas fa-check-circle me-2" />
-          Account created! Welcome to StyleHub 🎉
-        </div>
-      )}
-      {err && (
-        <div className="sh-alert sh-alert-error">
-          <i className="fas fa-exclamation-circle me-2" />
-          {err}
-        </div>
-      )}
+      {ok && <div className="sh-alert sh-alert-success"><i className="fas fa-check-circle me-2" />Account created! Welcome to StyleHub 🎉</div>}
+      {err && <div className="sh-alert sh-alert-error"><i className="fas fa-exclamation-circle me-2" />{err}</div>}
 
       <div className="sh-name-row">
         <div>
           <label className="sh-label">First name</label>
-          <input
-            className="sh-input"
-            type="text"
-            placeholder="Jane"
-            value={first}
-            onChange={(e) => setFirst(e.target.value)}
-          />
+          <input className="sh-input" type="text" placeholder="Jane" value={first} onChange={(e) => setFirst(e.target.value)} />
         </div>
         <div>
           <label className="sh-label">Last name</label>
-          <input
-            className="sh-input"
-            type="text"
-            placeholder="Doe"
-            value={last}
-            onChange={(e) => setLast(e.target.value)}
-          />
+          <input className="sh-input" type="text" placeholder="Doe" value={last} onChange={(e) => setLast(e.target.value)} />
         </div>
       </div>
 
       <label className="sh-label">Email address</label>
-      <input
-        className="sh-input"
-        type="email"
-        placeholder="you@example.com"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-      />
+      <input className="sh-input" type="email" placeholder="you@example.com" value={email} onChange={(e) => setEmail(e.target.value)} />
 
       <label className="sh-label">Password</label>
       <div className="sh-input-wrap sh-mb">
-        <input
-          className="sh-input"
-          type={show ? "text" : "password"}
-          style={{ paddingRight: 46 }}
-          placeholder="Min 8 characters"
-          value={pw}
-          onChange={(e) => {
-            setPw(e.target.value);
-            setErr("");
-          }}
-        />
+        <input className="sh-input" type={show ? "text" : "password"} style={{ paddingRight: 46 }}
+          placeholder="Min 8 characters" value={pw} onChange={(e) => { setPw(e.target.value); setErr(""); }} />
         <button type="button" className="sh-eye" onClick={() => setShow(!show)}>
           <i className={`far ${show ? "fa-eye-slash" : "fa-eye"}`} />
         </button>
       </div>
       {pw && (
         <div style={{ marginTop: "-.6rem", marginBottom: "1rem" }}>
-          <div className="str-bar">
-            <div
-              className="str-fill"
-              style={{ width: meta.pct + "%", background: meta.clr }}
-            />
-          </div>
-          <p className="str-lbl" style={{ color: meta.clr }}>
-            {meta.lbl}
-          </p>
+          <div className="str-bar"><div className="str-fill" style={{ width: meta.pct + "%", background: meta.clr }} /></div>
+          <p className="str-lbl" style={{ color: meta.clr }}>{meta.lbl}</p>
         </div>
       )}
 
       <label className="sh-label">Confirm password</label>
       <div className="sh-input-wrap sh-mb">
-        <input
-          className={`sh-input${cpw && cpw !== pw ? " error" : ""}`}
-          type={showCpw ? "text" : "password"}
-          style={{ paddingRight: 46 }}
-          placeholder="Re-enter password"
-          value={cpw}
-          onChange={(e) => {
-            setCpw(e.target.value);
-            setErr("");
-          }}
-        />
+        <input className={`sh-input${cpw && cpw !== pw ? " error" : ""}`} type={showCpw ? "text" : "password"}
+          style={{ paddingRight: 46 }} placeholder="Re-enter password"
+          value={cpw} onChange={(e) => { setCpw(e.target.value); setErr(""); }} />
         <button type="button" className="sh-eye" onClick={() => setShowCpw(!showCpw)}>
           <i className={`far ${showCpw ? "fa-eye-slash" : "fa-eye"}`} />
         </button>
       </div>
 
       <button className="sh-btn" type="submit" disabled={busy}>
-        {busy ? (
-          <>
-            <i className="fas fa-circle-notch fa-spin" />
-            Creating account…
-          </>
-        ) : (
-          "CREATE ACCOUNT"
-        )}
+        {busy ? <><i className="fas fa-circle-notch fa-spin" />Creating account…</> : "CREATE ACCOUNT"}
       </button>
 
-      <div className="sh-divider">
-        <hr />
-        <span>or continue with</span>
-        <hr />
-      </div>
+      <div className="sh-divider"><hr /><span>or continue with</span><hr /></div>
 
       <div className="sh-social">
         <button type="button" className="sh-social-btn" onClick={handleGoogle} disabled={gBusy || busy}>
@@ -692,27 +604,9 @@ function SignUpForm({ onSwitchSignIn }) {
         </button>
       </div>
 
-      <p className="sh-switch">
-        Already have an account?
-        <button type="button" onClick={onSwitchSignIn}>
-          Sign in
-        </button>
-      </p>
-      <p
-        style={{
-          textAlign: "center",
-          fontSize: ".72rem",
-          color: "#aaa",
-          marginTop: ".8rem",
-        }}
-      >
-        By signing up you agree to our{" "}
-        <span style={{ color: "var(--green)", cursor: "pointer" }}>Terms</span>{" "}
-        &amp;{" "}
-        <span style={{ color: "var(--green)", cursor: "pointer" }}>
-          Privacy Policy
-        </span>
-        .
+      <p className="sh-switch">Already have an account?<button type="button" onClick={onSwitchSignIn}>Sign in</button></p>
+      <p style={{ textAlign: "center", fontSize: ".72rem", color: "#aaa", marginTop: ".8rem" }}>
+        By signing up you agree to our <span style={{ color: "var(--green)", cursor: "pointer" }}>Terms</span> &amp; <span style={{ color: "var(--green)", cursor: "pointer" }}>Privacy Policy</span>.
       </p>
     </form>
   );
@@ -730,80 +624,45 @@ function ForgotEmail({ onNext }) {
     e?.preventDefault();
     setErr("");
     if (!isEmail(email)) { setErr("Please enter a valid email."); return; }
-
     setBusy(true);
     try {
       const { data } = await authAPI.forgotPassword(email);
-      if (data.success) {
-        onNext(email);
-      } else {
-        setErr(data.message || "Something went wrong.");
-      }
+      if (data.success) { onNext(email); }
+      else { setErr(data.message || "Something went wrong."); }
     } catch (error) {
       console.error("🔴 Forgot password error:", error);
       setErr(error.response?.data?.message || "Server error. Please try again.");
-    } finally {
-      setBusy(false);
-    }
+    } finally { setBusy(false); }
   };
 
   return (
     <div className="fade-up">
       <label className="sh-label">Your email address</label>
-      <input
-        className={`sh-input${err ? " error" : ""}`}
-        type="email"
-        value={email}
+      <input className={`sh-input${err ? " error" : ""}`} type="email" value={email}
         placeholder="you@example.com"
-        onChange={(e) => {
-          setEmail(e.target.value);
-          setErr("");
-        }}
-        onKeyDown={(e) => e.key === "Enter" && submit()}
-      />
+        onChange={(e) => { setEmail(e.target.value); setErr(""); }}
+        onKeyDown={(e) => e.key === "Enter" && submit()} />
       {err && <p className="sh-err">{err}</p>}
-      <p
-        style={{
-          fontSize: ".77rem",
-          color: "var(--gray-text)",
-          marginBottom: "1.2rem",
-          lineHeight: 1.55,
-        }}
-      >
-        We'll send a{" "}
-        <strong style={{ color: "var(--green)" }}>reset link</strong> to this
-        address. It expires in 1 hour.
+      <p style={{ fontSize: ".77rem", color: "var(--gray-text)", marginBottom: "1.2rem", lineHeight: 1.55 }}>
+        We'll send a <strong style={{ color: "var(--green)" }}>reset link</strong> to this address. It expires in 1 hour.
       </p>
       <button className="sh-btn" onClick={submit} disabled={busy} type="button">
-        {busy ? (
-          <>
-            <i className="fas fa-circle-notch fa-spin" />
-            Sending link…
-          </>
-        ) : (
-          "SEND RESET LINK"
-        )}
+        {busy ? <><i className="fas fa-circle-notch fa-spin" />Sending link…</> : "SEND RESET LINK"}
       </button>
     </div>
   );
 }
 
 /* ═══════════════════════════════
-   FORGOT — STEP 2: Email Sent Confirmation
-   (Backend uses email link, not OTP)
+   FORGOT — STEP 2: Email Sent
 ═══════════════════════════════ */
 function ForgotEmailSent({ email }) {
   return (
     <div className="fade-up">
       <div className="notice-card">
-        <div className="notice-icon">
-          <i className="fas fa-envelope" />
-        </div>
+        <div className="notice-icon"><i className="fas fa-envelope" /></div>
         <h3>Check your inbox</h3>
-        <p>
-          We sent a password reset link to <strong>{email}</strong>.
-          Click the link in the email to set a new password.
-        </p>
+        <p>We sent a password reset link to <strong>{email}</strong>. Click the link in the email to set a new password.</p>
       </div>
       <p style={{ fontSize: ".77rem", color: "var(--gray-text)", lineHeight: 1.6, textAlign: "center" }}>
         Didn't receive it? Check your spam folder or go back and try again.
@@ -830,89 +689,48 @@ function ForgotNewPw({ onDone }) {
     setErr("");
     if (pw.length < 8) { setErr("Password must be at least 8 characters."); return; }
     if (pw !== cpw) { setErr("Passwords don't match."); return; }
-
     setBusy(true);
     try {
-      // الـ token بييجي من الـ URL لما اليوزر يضغط على اللينك في الإيميل
       const urlParams = new URLSearchParams(window.location.search);
       const resetToken = urlParams.get("token");
-
       await authAPI.resetPassword(resetToken, pw);
       onDone();
     } catch (error) {
       console.error("🔴 Reset password error:", error);
       setErr(error.response?.data?.message || "Reset failed.");
-    } finally {
-      setBusy(false);
-    }
+    } finally { setBusy(false); }
   };
 
   return (
     <div className="fade-up">
       <label className="sh-label">New password</label>
       <div className="sh-input-wrap sh-mb">
-        <input
-          className="sh-input"
-          type={show ? "text" : "password"}
-          style={{ paddingRight: 46 }}
-          placeholder="Min 8 characters"
-          value={pw}
-          onChange={(e) => {
-            setPw(e.target.value);
-            setErr("");
-          }}
-        />
+        <input className="sh-input" type={show ? "text" : "password"} style={{ paddingRight: 46 }}
+          placeholder="Min 8 characters" value={pw} onChange={(e) => { setPw(e.target.value); setErr(""); }} />
         <button type="button" className="sh-eye" onClick={() => setShow(!show)}>
           <i className={`far ${show ? "fa-eye-slash" : "fa-eye"}`} />
         </button>
       </div>
       {pw && (
         <div style={{ marginTop: "-.6rem", marginBottom: "1rem" }}>
-          <div className="str-bar">
-            <div
-              className="str-fill"
-              style={{ width: meta.pct + "%", background: meta.clr }}
-            />
-          </div>
-          <p className="str-lbl" style={{ color: meta.clr }}>
-            {meta.lbl}
-          </p>
+          <div className="str-bar"><div className="str-fill" style={{ width: meta.pct + "%", background: meta.clr }} /></div>
+          <p className="str-lbl" style={{ color: meta.clr }}>{meta.lbl}</p>
         </div>
       )}
 
       <label className="sh-label">Confirm new password</label>
       <div className="sh-input-wrap sh-mb">
-        <input
-          className={`sh-input${cpw && cpw !== pw ? " error" : ""}`}
-          type={showCpw ? "text" : "password"}
-          style={{ paddingRight: 46 }}
-          placeholder="Re-enter password"
-          value={cpw}
-          onChange={(e) => {
-            setCpw(e.target.value);
-            setErr("");
-          }}
-        />
+        <input className={`sh-input${cpw && cpw !== pw ? " error" : ""}`} type={showCpw ? "text" : "password"}
+          style={{ paddingRight: 46 }} placeholder="Re-enter password"
+          value={cpw} onChange={(e) => { setCpw(e.target.value); setErr(""); }} />
         <button type="button" className="sh-eye" onClick={() => setShowCpw(!showCpw)}>
           <i className={`far ${showCpw ? "fa-eye-slash" : "fa-eye"}`} />
         </button>
       </div>
       {err && <p className="sh-err">{err}</p>}
 
-      <button
-        className="sh-btn"
-        type="button"
-        onClick={submit}
-        disabled={busy || !pw || !cpw}
-      >
-        {busy ? (
-          <>
-            <i className="fas fa-circle-notch fa-spin" />
-            Updating…
-          </>
-        ) : (
-          "SET NEW PASSWORD"
-        )}
+      <button className="sh-btn" type="button" onClick={submit} disabled={busy || !pw || !cpw}>
+        {busy ? <><i className="fas fa-circle-notch fa-spin" />Updating…</> : "SET NEW PASSWORD"}
       </button>
     </div>
   );
@@ -925,18 +743,11 @@ function ForgotDone({ onLogin }) {
   return (
     <div className="fade-up" style={{ textAlign: "center" }}>
       <div className="done-card">
-        <div className="done-icon">
-          <i className="fas fa-check" />
-        </div>
+        <div className="done-icon"><i className="fas fa-check" /></div>
         <h3>Password updated!</h3>
-        <p>
-          Your password has been reset successfully. You can now sign in with
-          your new credentials.
-        </p>
+        <p>Your password has been reset successfully. You can now sign in with your new credentials.</p>
       </div>
-      <button className="sh-btn" type="button" onClick={onLogin}>
-        BACK TO SIGN IN
-      </button>
+      <button className="sh-btn" type="button" onClick={onLogin}>BACK TO SIGN IN</button>
     </div>
   );
 }
@@ -945,16 +756,8 @@ function ForgotDone({ onLogin }) {
    FORGOT WIZARD SHELL
 ═══════════════════════════════ */
 const WIZARD_HEADERS = [
-  {
-    eyebrow: "Step 1 of 2",
-    title: "Forgot Password",
-    sub: "Enter your registered email address.",
-  },
-  {
-    eyebrow: "Step 2 of 2",
-    title: "Email Sent",
-    sub: null,
-  },
+  { eyebrow: "Step 1 of 2", title: "Forgot Password", sub: "Enter your registered email address." },
+  { eyebrow: "Step 2 of 2", title: "Email Sent", sub: null },
 ];
 
 function ForgotWizard({ onBack }) {
@@ -964,84 +767,37 @@ function ForgotWizard({ onBack }) {
 
   return (
     <div className="fade-up">
-      {/* back */}
-      <button
-        type="button"
-        className="back-btn"
-        onClick={step === 1 ? onBack : () => setStep(1)}
-      >
+      <button type="button" className="back-btn" onClick={step === 1 ? onBack : () => setStep(1)}>
         <i className="fas fa-arrow-left" />
         {step === 1 ? "Back to Sign In" : "Go Back"}
       </button>
 
-      {/* header */}
-      <p
-        style={{
-          fontSize: ".72rem",
-          fontWeight: 700,
-          color: "var(--green)",
-          letterSpacing: ".8px",
-          textTransform: "uppercase",
-          marginBottom: ".4rem",
-        }}
-      >
+      <p style={{ fontSize: ".72rem", fontWeight: 700, color: "var(--green)", letterSpacing: ".8px", textTransform: "uppercase", marginBottom: ".4rem" }}>
         {h.eyebrow}
       </p>
-      <h2
-        className="card-title"
-        key={step}
-        style={{ marginBottom: h.sub ? ".4rem" : "1.4rem" }}
-      >
+      <h2 className="card-title" key={step} style={{ marginBottom: h.sub ? ".4rem" : "1.4rem" }}>
         {h.title.split(" ").map((w, i) =>
-          i === h.title.split(" ").length - 1 ? (
-            <span key={i} style={{ color: "var(--green)" }}>{w}</span>
-          ) : (
-            <span key={i}>{w} </span>
-          )
+          i === h.title.split(" ").length - 1
+            ? <span key={i} style={{ color: "var(--green)" }}>{w}</span>
+            : <span key={i}>{w} </span>
         )}
       </h2>
-      {h.sub && (
-        <p
-          style={{
-            fontSize: ".83rem",
-            color: "var(--gray-text)",
-            marginBottom: "1.4rem",
-            lineHeight: 1.55,
-          }}
-        >
-          {h.sub}
-        </p>
-      )}
+      {h.sub && <p style={{ fontSize: ".83rem", color: "var(--gray-text)", marginBottom: "1.4rem", lineHeight: 1.55 }}>{h.sub}</p>}
 
-      {/* progress bar */}
       <div className="wizard-steps">
         {[1, 2].map((s) => (
-          <div
-            key={s}
-            className="wizard-step"
-            style={{
-              flex: s <= step ? 2 : 1,
-              background:
-                s < step ? "#2d7a35" : s === step ? "var(--green)" : "var(--green-light)",
-            }}
-          />
+          <div key={s} className="wizard-step" style={{
+            flex: s <= step ? 2 : 1,
+            background: s < step ? "#2d7a35" : s === step ? "var(--green)" : "var(--green-light)",
+          }} />
         ))}
       </div>
 
-      {step === 1 && (
-        <ForgotEmail
-          onNext={(e) => {
-            setEmail(e);
-            setStep(2);
-          }}
-        />
-      )}
+      {step === 1 && <ForgotEmail onNext={(e) => { setEmail(e); setStep(2); }} />}
       {step === 2 && <ForgotEmailSent email={email} />}
     </div>
   );
 }
-
-
 
 /* ═══════════════════════════════
    ROOT
@@ -1052,24 +808,11 @@ export default function SignIn({ cart = 0, wish = [] }) {
   const from = location.state?.from || "/";
   const handleDone = () => navigate(from, { replace: true });
 
-  // لو فيه ?token= في الـ URL معناه اليوزر جاي من لينك الإيميل
   const urlToken = new URLSearchParams(window.location.search).get("token");
-
-  const [mode, setMode] = useState(urlToken ? "resetpw" : "signin"); // "signin"|"signup"|"forgot"|"resetpw"
+  const [mode, setMode] = useState(urlToken ? "resetpw" : "signin");
   const [key, setKey] = useState(0);
   const addRef = useScrollReveal();
-  const go = (m) => {
-    setMode(m);
-    setKey((k) => k + 1);
-  };
-
-  const cardTitle = {
-    signin: "Sign In",
-    signup: "Create Account",
-    forgot: "",       // handled inside wizard
-    resetpw: "",      // handled inline
-    resetdone: "",    // handled inline
-  }[mode];
+  const go = (m) => { setMode(m); setKey((k) => k + 1); };
 
   return (
     <>
@@ -1083,60 +826,27 @@ export default function SignIn({ cart = 0, wish = [] }) {
           <div className="auth-card">
             {mode !== "forgot" && mode !== "resetpw" && mode !== "resetdone" && (
               <>
-                {/* tab toggle */}
                 <div className="card-tabs">
-                  <button
-                    className={`card-tab${mode === "signin" ? " active" : ""}`}
-                    onClick={() => go("signin")}
-                  >
-                    Sign In
-                  </button>
-                  <button
-                    className={`card-tab${mode === "signup" ? " active" : ""}`}
-                    onClick={() => go("signup")}
-                  >
-                    Sign Up
-                  </button>
+                  <button className={`card-tab${mode === "signin" ? " active" : ""}`} onClick={() => go("signin")}>Sign In</button>
+                  <button className={`card-tab${mode === "signup" ? " active" : ""}`} onClick={() => go("signup")}>Sign Up</button>
                 </div>
                 <h1 className="card-title" key={mode}>
-                  {mode === "signin" ? (
-                    <>
-                      Sign <span>In</span>
-                    </>
-                  ) : (
-                    <>
-                      Create <span>Account</span>
-                    </>
-                  )}
+                  {mode === "signin" ? <>Sign <span>In</span></> : <>Create <span>Account</span></>}
                 </h1>
               </>
             )}
 
             <div key={key}>
-              {mode === "signin" && (
-                <SignInForm
-                  onForgot={() => go("forgot")}
-                  onSwitchSignUp={() => go("signup")}
-                  onDone={handleDone}
-                />
-              )}
-              {mode === "signup" && (
-                <SignUpForm onSwitchSignIn={() => go("signin")} />
-              )}
-              {mode === "forgot" && (
-                <ForgotWizard onBack={() => go("signin")} />
-              )}
+              {mode === "signin" && <SignInForm onForgot={() => go("forgot")} onSwitchSignUp={() => go("signup")} onDone={handleDone} />}
+              {mode === "signup" && <SignUpForm onSwitchSignIn={() => go("signin")} />}
+              {mode === "forgot" && <ForgotWizard onBack={() => go("signin")} />}
               {mode === "resetpw" && (
                 <div className="fade-up">
-                  <h1 className="card-title">
-                    New <span>Password</span>
-                  </h1>
+                  <h1 className="card-title">New <span>Password</span></h1>
                   <ForgotNewPw onDone={() => go("resetdone")} />
                 </div>
               )}
-              {mode === "resetdone" && (
-                <ForgotDone onLogin={() => go("signin")} />
-              )}
+              {mode === "resetdone" && <ForgotDone onLogin={() => go("signin")} />}
             </div>
           </div>
 
