@@ -5,6 +5,52 @@ import { PRODUCTS, SHNav, SHFooter, SHARED_CSS } from "./shared";
 const SHIPPING = 80;
 const API = "https://stylehub-backend-tau.vercel.app/api";
 
+// ─── RESPONSIVE CSS ───
+const CART_CSS = `
+.cart-grid {
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: 3rem;
+  align-items: flex-start;
+}
+.cart-aside {
+  background: #fff;
+  padding: 2rem;
+  border: 1px solid var(--border);
+  position: sticky;
+  top: 80px;
+}
+.cart-item {
+  display: flex;
+  gap: 1.2rem;
+  padding: 1.5rem 0;
+  border-bottom: 1px solid var(--border);
+}
+.cart-item-img {
+  width: 110px;
+  height: 140px;
+  flex-shrink: 0;
+  background: #f0ece6;
+  cursor: pointer;
+  overflow: hidden;
+}
+.cart-wrap { max-width: 1000px; margin: 0 auto; padding: 3rem 2rem; }
+.cart-page { min-height: 100vh; background: var(--cream); }
+
+@media (max-width: 768px) {
+  .cart-grid { grid-template-columns: 1fr; gap: 2rem; }
+  .cart-aside { position: static; }
+  .cart-wrap { padding: 2rem 1rem; }
+}
+
+@media (max-width: 480px) {
+  .cart-wrap { padding: 1.5rem .75rem; }
+  .cart-item { gap: .8rem; }
+  .cart-item-img { width: 85px; height: 108px; }
+  .cart-aside { padding: 1.2rem; }
+}
+`;
+
 // ─── BACKEND CART (logged-in users) ───
 function BackendCart({ cart, setCart, wish }) {
   const navigate = useNavigate();
@@ -96,8 +142,9 @@ function BackendCart({ cart, setCart, wish }) {
   const total = subtotal + SHIPPING;
 
   if (loading) return (
-    <div style={{ minHeight: "100vh", background: "var(--cream)" }}>
+    <div className="cart-page">
       <style>{SHARED_CSS}</style>
+      <style>{CART_CSS}</style>
       <SHNav cart={cart} wish={wish} />
       <div style={{ display: "flex", alignItems: "center", justifyContent: "center", minHeight: "60vh" }}>
         <span style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: "1.5rem", color: "var(--warm)" }}>Loading cart...</span>
@@ -106,8 +153,9 @@ function BackendCart({ cart, setCart, wish }) {
   );
 
   if (error) return (
-    <div style={{ minHeight: "100vh", background: "var(--cream)" }}>
+    <div className="cart-page">
       <style>{SHARED_CSS}</style>
+      <style>{CART_CSS}</style>
       <SHNav cart={cart} wish={wish} />
       <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: "60vh", padding: "2rem" }}>
         <div style={{ fontSize: "2.5rem", marginBottom: "1rem" }}>⚠️</div>
@@ -117,7 +165,7 @@ function BackendCart({ cart, setCart, wish }) {
         <p style={{ color: "var(--warm)", fontSize: ".85rem", marginBottom: "2rem", textAlign: "center", maxWidth: 420 }}>
           {error}
         </p>
-        <div style={{ display: "flex", gap: "1rem" }}>
+        <div style={{ display: "flex", gap: "1rem", flexWrap: "wrap", justifyContent: "center" }}>
           <button onClick={fetchCart} style={{ background: "var(--dark)", color: "#fff", border: "none", padding: ".8rem 2rem", fontSize: ".72rem", letterSpacing: ".12em", textTransform: "uppercase", cursor: "pointer", fontFamily: "'DM Sans',sans-serif" }}>
             Retry
           </button>
@@ -130,10 +178,11 @@ function BackendCart({ cart, setCart, wish }) {
   );
 
   return (
-    <div style={{ minHeight: "100vh", background: "var(--cream)" }}>
+    <div className="cart-page">
       <style>{SHARED_CSS}</style>
+      <style>{CART_CSS}</style>
       <SHNav cart={cart} wish={wish} />
-      <div style={{ maxWidth: 1000, margin: "0 auto", padding: "3rem 2rem" }}>
+      <div className="cart-wrap">
         <h1 style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: "2.2rem", fontWeight: 400, marginBottom: ".3rem" }}>Your Cart</h1>
         <div style={{ width: 36, height: 2, background: "var(--sage)", marginBottom: "2.5rem" }} />
 
@@ -147,7 +196,7 @@ function BackendCart({ cart, setCart, wish }) {
             </button>
           </div>
         ) : (
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 340px", gap: "3rem", alignItems: "flex-start" }}>
+          <div className="cart-grid">
             {/* ITEMS */}
             <div>
               {items.map(item => {
@@ -157,9 +206,9 @@ function BackendCart({ cart, setCart, wish }) {
                 const price = p.salePrice || p.price;
 
                 return (
-                  <div key={item._id} style={{ display: "flex", gap: "1.2rem", padding: "1.5rem 0", borderBottom: "1px solid var(--border)" }}>
+                  <div key={item._id} className="cart-item">
                     {/* Image */}
-                    <div onClick={() => navigate(`/product/${p._id}`)} style={{ width: 110, height: 140, flexShrink: 0, background: "#f0ece6", cursor: "pointer", overflow: "hidden" }}>
+                    <div className="cart-item-img" onClick={() => navigate(`/product/${p._id}`)}>
                       {img
                         ? <img src={img} alt={p.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
                         : <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center" }}>
@@ -169,10 +218,10 @@ function BackendCart({ cart, setCart, wish }) {
                     </div>
 
                     {/* Info */}
-                    <div style={{ flex: 1 }}>
+                    <div style={{ flex: 1, minWidth: 0 }}>
                       <div onClick={() => navigate(`/product/${p._id}`)} style={{ fontSize: ".95rem", fontWeight: 500, marginBottom: ".5rem", cursor: "pointer" }}>{p.name}</div>
                       {item.size && <div style={{ fontSize: ".75rem", color: "var(--warm)", marginBottom: ".8rem" }}>Size: <strong style={{ color: "var(--dark)" }}>{item.size}</strong></div>}
-                      <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: "1rem", flexWrap: "wrap" }}>
                         <div style={{ display: "flex", alignItems: "center", border: "1px solid var(--border)" }}>
                           <button onClick={() => updateQty(item._id, item.quantity - 1)} style={{ width: 32, height: 32, border: "none", background: "none", cursor: "pointer", fontSize: "1rem" }}>−</button>
                           <span style={{ width: 32, textAlign: "center", fontSize: ".85rem" }}>{item.quantity}</span>
@@ -196,7 +245,7 @@ function BackendCart({ cart, setCart, wish }) {
             </div>
 
             {/* ORDER SUMMARY */}
-            <div style={{ background: "#fff", padding: "2rem", border: "1px solid var(--border)", position: "sticky", top: "80px" }}>
+            <div className="cart-aside">
               <div style={{ fontSize: ".65rem", letterSpacing: ".2em", textTransform: "uppercase", fontWeight: 600, marginBottom: "1.5rem" }}>Order Summary</div>
               <div style={{ display: "flex", justifyContent: "space-between", fontSize: ".82rem", marginBottom: ".8rem" }}>
                 <span style={{ color: "var(--warm)" }}>Subtotal ({items.length} item{items.length !== 1 ? "s" : ""})</span>
@@ -264,10 +313,11 @@ function LocalCart({ cart, setCart, wish }) {
   };
 
   return (
-    <div style={{ minHeight: "100vh", background: "var(--cream)" }}>
+    <div className="cart-page">
       <style>{SHARED_CSS}</style>
+      <style>{CART_CSS}</style>
       <SHNav cart={cart} wish={wish} />
-      <div style={{ maxWidth: 1000, margin: "0 auto", padding: "3rem 2rem" }}>
+      <div className="cart-wrap">
         <h1 style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: "2.2rem", fontWeight: 400, marginBottom: ".3rem" }}>Your Cart</h1>
         <div style={{ width: 36, height: 2, background: "var(--sage)", marginBottom: "2.5rem" }} />
 
@@ -281,11 +331,11 @@ function LocalCart({ cart, setCart, wish }) {
             </button>
           </div>
         ) : (
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 340px", gap: "3rem", alignItems: "flex-start" }}>
+          <div className="cart-grid">
             <div>
               {items.map((item) => (
-                <div key={`${item.id}-${item.size}`} style={{ display: "flex", gap: "1.2rem", padding: "1.5rem 0", borderBottom: "1px solid var(--border)" }}>
-                  <div onClick={() => navigate(`/product/${item.product.id}`)} style={{ width: 110, height: 140, flexShrink: 0, background: "#f0ece6", cursor: "pointer", overflow: "hidden" }}>
+                <div key={`${item.id}-${item.size}`} className="cart-item">
+                  <div className="cart-item-img" onClick={() => navigate(`/product/${item.product.id}`)}>
                     {item.product.img
                       ? <img src={item.product.img} alt={item.product.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
                       : <div style={{ width: "100%", height: "100%", background: `linear-gradient(${item.product.gradient})`, display: "flex", alignItems: "center", justifyContent: "center" }}>
@@ -293,11 +343,11 @@ function LocalCart({ cart, setCart, wish }) {
                       </div>
                     }
                   </div>
-                  <div style={{ flex: 1 }}>
+                  <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ fontSize: ".58rem", letterSpacing: ".15em", textTransform: "uppercase", color: "var(--warm)", marginBottom: ".3rem" }}>{item.product.brand}</div>
                     <div onClick={() => navigate(`/product/${item.product.id}`)} style={{ fontSize: ".95rem", fontWeight: 500, marginBottom: ".5rem", cursor: "pointer" }}>{item.product.name}</div>
                     <div style={{ fontSize: ".75rem", color: "var(--warm)", marginBottom: ".8rem" }}>Size: <strong style={{ color: "var(--dark)" }}>{item.size}</strong></div>
-                    <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: "1rem", flexWrap: "wrap" }}>
                       <div style={{ display: "flex", alignItems: "center", border: "1px solid var(--border)" }}>
                         <button onClick={() => updateQty(item.id, item.size, -1)} style={{ width: 32, height: 32, border: "none", background: "none", cursor: "pointer", fontSize: "1rem" }}>−</button>
                         <span style={{ width: 32, textAlign: "center", fontSize: ".85rem" }}>{item.qty}</span>
@@ -316,7 +366,7 @@ function LocalCart({ cart, setCart, wish }) {
               ))}
             </div>
 
-            <div style={{ background: "#fff", padding: "2rem", border: "1px solid var(--border)", position: "sticky", top: "80px" }}>
+            <div className="cart-aside">
               <div style={{ fontSize: ".65rem", letterSpacing: ".2em", textTransform: "uppercase", fontWeight: 600, marginBottom: "1.5rem" }}>Order Summary</div>
               <div style={{ display: "flex", justifyContent: "space-between", fontSize: ".82rem", marginBottom: ".8rem" }}>
                 <span style={{ color: "var(--warm)" }}>Subtotal ({items.length} item{items.length !== 1 ? "s" : ""})</span>
