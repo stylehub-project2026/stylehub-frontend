@@ -117,16 +117,16 @@ body { font-family:'DM Sans',sans-serif; background:var(--cream); color:var(--da
 .sh-btn-sm { padding:.38rem .9rem; font-size:.65rem; }
 
 /* SECTION TITLE */
-.sec-title { font-size: 1.8rem; font-weight:430; letter-spacing:.08em; text-align:center; margin-bottom:1.8rem; }
+.sec-title { font-size:1.8rem; font-weight:430; letter-spacing:.08em; text-align:center; margin-bottom:1.8rem; }
 .sec-title::after { content:''; display:block; width:40px; height:2px; background:var(--sage); margin:.6rem auto 0; }
 
 /* BRANDS */
-.brands-label { font-size:.8rem; font-weight:500;letter-spacing:.25em; text-transform:uppercase; color:var(--warm); }
+.brands-label { font-size:.8rem; font-weight:500; letter-spacing:.25em; text-transform:uppercase; color:var(--warm); }
 .brand-arrow { background:none; border:1.5px solid var(--border); width:34px; height:34px; border-radius:50%; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:all .2s; flex-shrink:0; }
 .brand-arrow:hover { border-color:var(--dark); background:var(--dark); color:#fff; }
 .brands-wrap { overflow:hidden; width:80%; }
 .brands-track { display:flex; transition:transform .6s cubic-bezier(.22,1,.36,1); }
-.brand-slide { min-width:25%; display:flex; align-items:center; justify-content:center; padding:.8rem 1rem; height:80px; width:25%;}
+.brand-slide { min-width:25%; display:flex; align-items:center; justify-content:center; padding:.8rem 1rem; height:80px; width:25%; }
 .brand-txt { font-family:'Cormorant Garamond',serif; font-size:1.4rem; font-weight:700; opacity:.5; cursor:pointer; transition:opacity .3s,transform .25s; white-space:nowrap; }
 .brand-txt:hover { opacity:1; transform:scale(1.08); }
 
@@ -139,7 +139,7 @@ body { font-family:'DM Sans',sans-serif; background:var(--cream); color:var(--da
 /* PRODUCT CARD */
 .pc { background:#fff; cursor:pointer; border:1px solid var(--border); transition:box-shadow .25s; height:100%; }
 .pc:hover { box-shadow:0 8px 32px rgba(26,26,24,.1); }
-.pc-img { position:relative; overflow:hidden; aspect-ratio:1/1;  background:#f0ece6; }
+.pc-img { position:relative; overflow:hidden; aspect-ratio:1/1; background:#f0ece6; }
 .pc-img img,.pc-ph { width:100%; height:100%; transition:transform .6s cubic-bezier(.22,1,.36,1); }
 .pc-img img { object-fit:cover; } .pc-ph { display:flex; align-items:center; justify-content:center; }
 .pc:hover .pc-img img,.pc:hover .pc-ph { transform:scale(1.06); }
@@ -154,10 +154,10 @@ body { font-family:'DM Sans',sans-serif; background:var(--cream); color:var(--da
 .p-old { font-size:.85rem; color:var(--warm); text-decoration:line-through; }
 .p-new { font-size:.84rem; font-weight:600; color:var(--red); } .p-reg { font-size:.78rem; font-weight:500; }
 
-/* TRENDING CARD */
-.tc { background:#fff; border:1px solid var(--border); transition:box-shadow .25s; }
+/* TRENDING CARD — FIX: flex column so all cards in a row match height */
+.tc { background:#fff; border:1px solid var(--border); transition:box-shadow .25s; display:flex; flex-direction:column; height:100%; }
 .tc:hover { box-shadow:0 6px 24px rgba(26,26,24,.1); }
-.tc-img { aspect-ratio:1/1; overflow:hidden; background:#f0ece6; position:relative; cursor:pointer; }
+.tc-img { aspect-ratio:1/1; overflow:hidden; background:#f0ece6; position:relative; cursor:pointer; flex-shrink:0; }
 .tc-img img,.tc-ph { width:100%; height:100%; transition:transform .5s cubic-bezier(.22,1,.36,1); }
 .tc-img img { object-fit:cover; } .tc-ph { display:flex; align-items:center; justify-content:center; }
 .tc:hover .tc-img img,.tc:hover .tc-ph { transform:scale(1.06); }
@@ -188,7 +188,7 @@ body { font-family:'DM Sans',sans-serif; background:var(--cream); color:var(--da
 
 /* CATEGORIES */
 .sh-cat { position:relative; overflow:hidden; aspect-ratio:1/1; cursor:pointer; text-decoration:none; border-radius:13px; display:block; }
-.cat-bg,.sh-cat img { width:100%; height:100%; object-fit:cover; object-position: center top;transition:transform .7s cubic-bezier(.22,1,.36,1); }
+.cat-bg,.sh-cat img { width:100%; height:100%; object-fit:cover; object-position:center top; transition:transform .7s cubic-bezier(.22,1,.36,1); }
 .sh-cat:hover .cat-bg,.sh-cat:hover img { transform:scale(1.08); }
 .cat-ov { position:absolute; inset:0; background:linear-gradient(transparent 45%,rgba(26,26,24,.68) 100%); }
 .cat-ct { position:absolute; bottom:0; left:0; right:0; padding:1.4rem; color:#fff; }
@@ -254,8 +254,7 @@ body { font-family:'DM Sans',sans-serif; background:var(--cream); color:var(--da
 /* Tablet: 768px - 1024px */
 @media(max-width:1024px) {
   .sh-hero { height:420px; }
-  /* Products section: keep 7rem top/bottom, reduce sides */
-  .products-section { padding-top:7rem !important; padding-bottom:7rem !important; padding-left:2rem !important; padding-right:2rem !important; }
+  .products-section { padding-top:5rem !important; padding-bottom:5rem !important; padding-left:2rem !important; padding-right:2rem !important; }
   .section-spacer-lg { margin-top:6rem !important; }
   .section-spacer-xl { margin-top:7rem !important; }
   .section-spacer-editorial { margin-top:7rem !important; margin-bottom:9rem !important; }
@@ -269,10 +268,9 @@ body { font-family:'DM Sans',sans-serif; background:var(--cream); color:var(--da
   .hero-sub { font-size:.75rem; margin-bottom:1rem; }
   .hero-ct { max-width:90%; }
 
-  /* Products section: KEEP 7rem top/bottom, only tighten left/right on mobile */
-  .products-section { padding-top:7rem !important; padding-bottom:7rem !important; padding-left:1rem !important; padding-right:1rem !important; }
+  /* FIX: reduced from 7rem to 2rem top/bottom on mobile */
+  .products-section { padding-top:2rem !important; padding-bottom:3rem !important; padding-left:1rem !important; padding-right:1rem !important; }
 
-  /* Section spacing: reduce top margins only (not the internal padding) */
   .section-spacer-lg { margin-top:4rem !important; }
   .section-spacer-xl { margin-top:5rem !important; }
   .section-spacer-editorial { margin-top:5rem !important; margin-bottom:6rem !important; }
@@ -304,7 +302,7 @@ body { font-family:'DM Sans',sans-serif; background:var(--cream); color:var(--da
   /* Category cards */
   .cat-name { font-size:1.1rem; }
 
-  /* Trending carousel horizontal padding */
+  /* Section padding */
   .trending-section { padding-left:1rem !important; padding-right:1rem !important; }
   .toppicks-section { padding-left:1rem !important; padding-right:1rem !important; }
   .categories-section { padding-left:1rem !important; padding-right:1rem !important; }
@@ -324,7 +322,10 @@ body { font-family:'DM Sans',sans-serif; background:var(--cream); color:var(--da
   .sh-btn { padding:.6rem 1.2rem; font-size:.65rem; }
   .sh-tabs { gap:1.2rem; }
   .sh-tab { font-size:.75rem; }
-  .products-section { padding-top:7rem !important; padding-bottom:7rem !important; padding-left:.75rem !important; padding-right:.75rem !important; }
+
+  /* FIX: reduced from 7rem to 1.5rem top/bottom on small mobile */
+  .products-section { padding-top:1.5rem !important; padding-bottom:2rem !important; padding-left:.75rem !important; padding-right:.75rem !important; }
+
   .brands-wrap { width:100%; }
   .brand-slide { min-width:50%; width:50%; }
   .sec-title { font-size:1.3rem; }
@@ -341,8 +342,8 @@ function PCard({ p, onOpen, addRef, d = 1, wish, toggleWish }) {
       <div className="pc-img">
         {p.img ? <img src={p.img} alt={p.name} /> : <div className="pc-ph" style={{ background: `linear-gradient(${p.gradient})` }}><span style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: "1rem", color: "rgba(255,255,255,.25)" }}>{p.brand}</span></div>}
         <div className="pc-ov" />
-        <button className={`pc-wish${wish.includes(p.id) ? " on" : ""}`} onClick={e => { e.stopPropagation(); toggleWish(p.id) }}><Heart on={wish.includes(p.id)} /></button>
-        <button className="pc-qv" onClick={e => { e.stopPropagation(); onOpen(p) }}>Quick View</button>
+        <button className={`pc-wish${wish.includes(p.id) ? " on" : ""}`} onClick={e => { e.stopPropagation(); toggleWish(p.id); }}><Heart on={wish.includes(p.id)} /></button>
+        <button className="pc-qv" onClick={e => { e.stopPropagation(); onOpen(p); }}>Quick View</button>
       </div>
       <div className="p-2">
         <div className="pc-brand mb-1" style={{ cursor: "pointer" }} onClick={e => { e.stopPropagation(); navigate(`/brand/${encodeURIComponent(p.brand)}`); }}>{p.brand}</div>
@@ -356,43 +357,56 @@ function PCard({ p, onOpen, addRef, d = 1, wish, toggleWish }) {
   );
 }
 
-// ─── TRENDING CARD ───
+// ─── TRENDING CARD — FIX: flex column layout, button pinned to bottom ───
 function TCard({ p, onOpen, addRef, d = 1, wish, toggleWish, onAdd }) {
   const [qty, setQty] = useState(0);
   const navigate = useNavigate();
   return (
-    <div className={`tc d${d}`} ref={addRef}>
+    <div
+      className={`tc d${d}`}
+      ref={addRef}
+      style={{ height: "100%", display: "flex", flexDirection: "column" }}
+    >
+      {/* Image — fixed aspect ratio, never grows */}
       <div className="tc-img" onClick={() => navigate(`/product/${p.id}`)}>
-        {p.img ? <img src={p.img} alt={p.name} /> : <div className="tc-ph" style={{ background: `linear-gradient(${p.gradient})` }}><span style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: "1rem", color: "rgba(255,255,255,.25)" }}>{p.brand}</span></div>}
-        <button className={`tc-w${wish.includes(p.id) ? " on" : ""}`} onClick={e => { e.stopPropagation(); toggleWish(p.id) }}><Heart on={wish.includes(p.id)} /></button>
+        {p.img
+          ? <img src={p.img} alt={p.name} />
+          : <div className="tc-ph" style={{ background: `linear-gradient(${p.gradient})` }}><span style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: "1rem", color: "rgba(255,255,255,.25)" }}>{p.brand}</span></div>
+        }
+        <button className={`tc-w${wish.includes(p.id) ? " on" : ""}`} onClick={e => { e.stopPropagation(); toggleWish(p.id); }}><Heart on={wish.includes(p.id)} /></button>
       </div>
-      <div className="p-2">
+
+      {/* Content — grows to fill card height, button always at bottom */}
+      <div className="p-2" style={{ flex: 1, display: "flex", flexDirection: "column" }}>
         <div className="tc-brand" style={{ cursor: "pointer" }} onClick={e => { e.stopPropagation(); navigate(`/brand/${encodeURIComponent(p.brand)}`); }}>{p.brand}</div>
         <div className="tc-name my-1">{p.name}</div>
         <div className="d-flex align-items-center gap-1 mb-1">
           {p.oldPrice && <span className="tc-old">{p.oldPrice}</span>}
           <span className={`tc-price${p.oldPrice ? " sale" : ""}`}>{p.price}</span>
         </div>
-        {qty === 0
-          ? <button className="tc-add" onClick={() => { setQty(1); onAdd(); }}>Add to Cart</button>
-          : <div className="tc-qty mt-1"><button onClick={() => setQty(q => Math.max(0, q - 1))}>−</button><span>{qty}</span><button onClick={() => setQty(q => q + 1)}>+</button></div>
-        }
+        {/* marginTop:auto pushes button to bottom of every card uniformly */}
+        <div style={{ marginTop: "auto" }}>
+          {qty === 0
+            ? <button className="tc-add" onClick={() => { setQty(1); onAdd(); }}>Add to Cart</button>
+            : <div className="tc-qty mt-1"><button onClick={() => setQty(q => Math.max(0, q - 1))}>−</button><span>{qty}</span><button onClick={() => setQty(q => q + 1)}>+</button></div>
+          }
+        </div>
       </div>
     </div>
   );
 }
 
-// ─── TRENDING CAROUSEL (responsive visible count) ───
+// ─── TRENDING CAROUSEL — FIX: alignItems stretch so all cards match height ───
 function TrendingCarousel({ products, onOpen, wish, toggleWish, onAdd }) {
   const [cur, setCur] = useState(0);
   const [visibleCount, setVisibleCount] = useState(4);
 
   useEffect(() => {
     const update = () => {
-      if (window.innerWidth < 480) setVisibleCount(2);
-      else if (window.innerWidth < 768) setVisibleCount(2);
+      if (window.innerWidth < 480)       setVisibleCount(2);
+      else if (window.innerWidth < 768)  setVisibleCount(2);
       else if (window.innerWidth < 1024) setVisibleCount(3);
-      else setVisibleCount(4);
+      else                               setVisibleCount(4);
     };
     update();
     window.addEventListener("resize", update);
@@ -409,18 +423,35 @@ function TrendingCarousel({ products, onOpen, wish, toggleWish, onAdd }) {
   }, [max]);
 
   if (!products.length) return null;
+
   return (
     <div style={{ position: "relative" }}>
       <div style={{ overflow: "hidden" }}>
-        <div style={{ display: "flex", transition: "transform .4s cubic-bezier(.22,1,.36,1)", transform: `translateX(-${cur * (100 / visibleCount)}%)` }}>
+        <div
+          style={{
+            display: "flex",
+            alignItems: "stretch",      /* all slide wrappers grow to tallest */
+            transition: "transform .4s cubic-bezier(.22,1,.36,1)",
+            transform: `translateX(-${cur * (100 / visibleCount)}%)`,
+          }}
+        >
           {products.map((p, i) => (
-            <div key={p.id} style={{ minWidth: `${100 / visibleCount}%`, padding: "0 .5rem", boxSizing: "border-box" }}>
-              <TCard p={p} onOpen={onOpen} addRef={() => { }} d={(i % 4) + 1} wish={wish} toggleWish={toggleWish} onAdd={onAdd} />
+            <div
+              key={p.id}
+              style={{
+                minWidth: `${100 / visibleCount}%`,
+                padding: "0 .5rem",
+                boxSizing: "border-box",
+                display: "flex",        /* lets TCard fill full column height */
+                flexDirection: "column",
+              }}
+            >
+              <TCard p={p} onOpen={onOpen} addRef={() => {}} d={(i % 4) + 1} wish={wish} toggleWish={toggleWish} onAdd={onAdd} />
             </div>
           ))}
         </div>
       </div>
-      {cur > 0 && <button className="h-arr l" onClick={() => setCur(c => c - 1)}>‹</button>}
+      {cur > 0   && <button className="h-arr l" onClick={() => setCur(c => c - 1)}>‹</button>}
       {cur < max && <button className="h-arr r" onClick={() => setCur(c => c + 1)}>›</button>}
     </div>
   );
@@ -451,7 +482,7 @@ function Modal({ p, onClose, onAdd }) {
           <div className="m-lbl mb-2">Size {!ss && <span style={{ color: "var(--red)", fontWeight: 400, fontSize: ".6rem", marginLeft: "6px" }}>— select size</span>}</div>
           <div className="d-flex flex-wrap gap-1 mb-4">{p.sizes.map(s => <button key={s} className={`sz${ss === s ? " on" : ""}`} onClick={() => setSs(s)}>{s}</button>)}</div>
           <div className="d-flex flex-column gap-2">
-            <button className="sh-btn sh-btn-dk justify-content-center" style={{ opacity: ss ? 1 : .45 }} onClick={() => { if (!ss) return; setDone(true); onAdd(); setTimeout(() => setDone(false), 1800) }}>{done ? "✓  Added to Bag" : "Add to Bag"}</button>
+            <button className="sh-btn sh-btn-dk justify-content-center" style={{ opacity: ss ? 1 : .45 }} onClick={() => { if (!ss) return; setDone(true); onAdd(); setTimeout(() => setDone(false), 1800); }}>{done ? "✓  Added to Bag" : "Add to Bag"}</button>
             <button className="sh-btn sh-btn-ol justify-content-center">♡  Save to Wishlist</button>
           </div>
         </div>
@@ -580,7 +611,7 @@ export default function App() {
     };
     return {
       best: interleaveByBrand(PRODUCTS.filter(p => p.tab === "best")),
-      new: interleaveByBrand(PRODUCTS.filter(p => p.tab === "new")),
+      new:  interleaveByBrand(PRODUCTS.filter(p => p.tab === "new")),
       sale: interleaveByBrand(PRODUCTS.filter(p => p.tab === "sale")),
       trend: interleaveByBrand(PRODUCTS.filter(p => p.tab === "trend")),
       picks: interleaveByBrand(PRODUCTS.filter(p => p.tab === "picks")),
@@ -598,7 +629,10 @@ export default function App() {
     });
     showToast("✓ Added to bag");
   };
-  const toggleWish = id => { setWish(w => w.includes(id) ? w.filter(x => x !== id) : [...w, id]); showToast(wish.includes(id) ? "Removed from wishlist" : "♥ Added to wishlist"); };
+  const toggleWish = id => {
+    setWish(w => w.includes(id) ? w.filter(x => x !== id) : [...w, id]);
+    showToast(wish.includes(id) ? "Removed from wishlist" : "♥ Added to wishlist");
+  };
 
   return (
     <Routes>
@@ -639,9 +673,12 @@ export default function App() {
           {/* BRANDS */}
           <BrandsCarousel />
 
-          {/* PRODUCTS — 7rem top/bottom always, only left/right shrinks on mobile */}
+          {/* PRODUCTS
+              FIX: removed "py-3 my-5" Bootstrap classes — they added ~48px
+              extra margin that fought the responsive CSS overrides.
+              The .products-section class now fully controls all spacing. */}
           <section
-            className="products-section py-3 my-5"
+            className="products-section"
             style={{ paddingTop: "7rem", paddingBottom: "7rem", paddingLeft: "7rem", paddingRight: "7rem" }}
           >
             <div className="sh-tabs reveal" ref={addRef}>
@@ -712,18 +749,6 @@ export default function App() {
             <TrendingCarousel products={homeProducts.trend} onOpen={setModal} wish={wish} toggleWish={toggleWish} onAdd={addToCart} />
           </section>
 
-
-
-
-
-
-
-
-
-
-
-
-          
           {/* EDITORIAL */}
           <div
             className="row g-3 editorial-section pt-3 reveal"
@@ -732,7 +757,7 @@ export default function App() {
           >
             {[
               { tag: "Editorial", title: "Discover Latest in Fashion", gradient: "145deg,#8a9a7a,#4a5c40", img: "/edit.png", href: "#" },
-              { tag: "Explore", title: "Explore Fashion New Era", gradient: "145deg,#c4a882,#8a7060", img: "/ban.jpg", href: "#" },
+              { tag: "Explore",   title: "Explore Fashion New Era",    gradient: "145deg,#c4a882,#8a7060", img: "/ban.jpg",  href: "#" },
             ].map((e, i) => (
               <div className="col-md-6" key={i}>
                 <a href={e.href} className="sh-ed">
@@ -748,7 +773,7 @@ export default function App() {
           <div className="trust-bar d-flex justify-content-center gap-5 py-4 border-top reveal flex-wrap" ref={addRef}>
             {[
               { icon: "🚚", label: "100% Free Shipping", sub: "Free shipping on all orders" },
-              { icon: "↩", label: "Easy Returns", sub: "30-day hassle-free returns" },
+              { icon: "↩",  label: "Easy Returns",       sub: "30-day hassle-free returns" },
               { icon: "🎧", label: "24/7 Online Support", sub: "We're here whenever you need us" },
             ].map((t, i) => (
               <div key={i} className="text-center" style={{ maxWidth: 180 }}>
