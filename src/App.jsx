@@ -323,7 +323,7 @@ function PCard({ p, onOpen, addRef, d = 1, wish, toggleWish }) {
   );
 }
 
-// ─── TRENDING CARD — FIX: flex column layout, button pinned to bottom ───
+// ─── TRENDING CARD ───
 function TCard({ p, onOpen, addRef, d = 1, wish, toggleWish, onAdd }) {
   const [qty, setQty] = useState(0);
   const navigate = useNavigate();
@@ -333,7 +333,6 @@ function TCard({ p, onOpen, addRef, d = 1, wish, toggleWish, onAdd }) {
       ref={addRef}
       style={{ height: "100%", display: "flex", flexDirection: "column" }}
     >
-      {/* Image — fixed aspect ratio, never grows */}
       <div className="tc-img" onClick={() => navigate(`/product/${p.id}`)}>
         {p.img
           ? <img src={p.img} alt={p.name} />
@@ -341,8 +340,6 @@ function TCard({ p, onOpen, addRef, d = 1, wish, toggleWish, onAdd }) {
         }
         <button className={`tc-w${wish.includes(p.id) ? " on" : ""}`} onClick={e => { e.stopPropagation(); toggleWish(p.id); }}><Heart on={wish.includes(p.id)} /></button>
       </div>
-
-      {/* Content — grows to fill card height, button always at bottom */}
       <div className="p-2" style={{ flex: 1, display: "flex", flexDirection: "column" }}>
         <div className="tc-brand" style={{ cursor: "pointer" }} onClick={e => { e.stopPropagation(); navigate(`/brand/${encodeURIComponent(p.brand)}`); }}>{p.brand}</div>
         <div className="tc-name my-1">{p.name}</div>
@@ -350,7 +347,6 @@ function TCard({ p, onOpen, addRef, d = 1, wish, toggleWish, onAdd }) {
           {p.oldPrice && <span className="tc-old">{p.oldPrice}</span>}
           <span className={`tc-price${p.oldPrice ? " sale" : ""}`}>{p.price}</span>
         </div>
-        {/* marginTop:auto pushes button to bottom of every card uniformly */}
         <div style={{ marginTop: "auto" }}>
           {qty === 0
             ? <button className="tc-add" onClick={() => { setQty(1); onAdd(); }}>Add to Cart</button>
@@ -362,7 +358,7 @@ function TCard({ p, onOpen, addRef, d = 1, wish, toggleWish, onAdd }) {
   );
 }
 
-// ─── TRENDING CAROUSEL — FIX: alignItems stretch so all cards match height ───
+// ─── TRENDING CAROUSEL ───
 function TrendingCarousel({ products, onOpen, wish, toggleWish, onAdd }) {
   const [cur, setCur] = useState(0);
   const [visibleCount, setVisibleCount] = useState(4);
@@ -396,7 +392,7 @@ function TrendingCarousel({ products, onOpen, wish, toggleWish, onAdd }) {
         <div
           style={{
             display: "flex",
-            alignItems: "stretch",      /* all slide wrappers grow to tallest */
+            alignItems: "stretch",
             transition: "transform .4s cubic-bezier(.22,1,.36,1)",
             transform: `translateX(-${cur * (100 / visibleCount)}%)`,
           }}
@@ -408,7 +404,7 @@ function TrendingCarousel({ products, onOpen, wish, toggleWish, onAdd }) {
                 minWidth: `${100 / visibleCount}%`,
                 padding: "0 .5rem",
                 boxSizing: "border-box",
-                display: "flex",        /* lets TCard fill full column height */
+                display: "flex",
                 flexDirection: "column",
               }}
             >
@@ -563,7 +559,7 @@ export default function App() {
 
   const [toast, setToast] = useState("");
 
-  // ─── HOMEPAGE PRODUCTS ───
+  // ─── HOMEPAGE PRODUCTS (object keyed by tab) ───
   const [homeProducts] = useState(() => {
     const interleaveByBrand = (arr) => {
       const byBrand = {};
@@ -576,13 +572,14 @@ export default function App() {
       return result;
     };
     return {
-      best: interleaveByBrand(PRODUCTS.filter(p => p.tab === "best")),
-      new:  interleaveByBrand(PRODUCTS.filter(p => p.tab === "new")),
-      sale: interleaveByBrand(PRODUCTS.filter(p => p.tab === "sale")),
+      best:  interleaveByBrand(PRODUCTS.filter(p => p.tab === "best")),
+      new:   interleaveByBrand(PRODUCTS.filter(p => p.tab === "new")),
+      sale:  interleaveByBrand(PRODUCTS.filter(p => p.tab === "sale")),
       trend: interleaveByBrand(PRODUCTS.filter(p => p.tab === "trend")),
       picks: interleaveByBrand(PRODUCTS.filter(p => p.tab === "picks")),
     };
   });
+
   const addRef = useScrollReveal();
   const location = useLocation();
 
@@ -639,28 +636,22 @@ export default function App() {
           {/* BRANDS */}
           <BrandsCarousel />
 
-          {/* PRODUCTS */}
-      <section className="products-section py-3 my-1">
-        <div className="sh-tabs reveal" ref={addRef}>
-          {[["best","Best Sellers"],["new","New Arrivals"],["sale","Sale"]].map(([key,label])=>(
-            <div key={key} className={`sh-tab${tab===key?" on":""}`} onClick={()=>setTab(key)}>{label}</div>
-          ))}
-        </div>
-        <div className="row row-cols-2 row-cols-md-3 g-3">
-          {homeProducts.filter(p=>p.tab===tab).slice(0,6).map((p,i)=>(
-            <div className="col" key={p.id}>
-              <PCard p={p} onOpen={setModal} addRef={addRef} d={(i%3)+1} wish={wish} toggleWish={toggleWish}/>
+          {/* PRODUCTS — fixed: homeProducts is an object, use homeProducts[tab] */}
+          <section className="products-section py-3 my-1">
+            <div className="sh-tabs reveal" ref={addRef}>
+              {[["best","Best Sellers"],["new","New Arrivals"],["sale","Sale"]].map(([key,label]) => (
+                <div key={key} className={`sh-tab${tab === key ? " on" : ""}`} onClick={() => setTab(key)}>{label}</div>
+              ))}
             </div>
-          ))}
-        </div>
-      </section>
+            <div className="row row-cols-2 row-cols-md-3 g-3">
+              {(homeProducts[tab] || []).slice(0, 6).map((p, i) => (
+                <div className="col" key={p.id}>
+                  <PCard p={p} onOpen={setModal} addRef={addRef} d={(i % 3) + 1} wish={wish} toggleWish={toggleWish} />
+                </div>
+              ))}
+            </div>
+          </section>
 
-
-          
-          
-          
-          
-          
           {/* JOIN */}
           <div
             className="sh-join join-section text-center reveal py-5"
@@ -706,11 +697,17 @@ export default function App() {
             </div>
           </section>
 
-          {/* TRENDING */}
-      <section className="px-4 py-4 mobile-mt-sm" style={{marginTop:"6rem"}}>
-        <div className="sec-title reveal" ref={addRef}>Trending Now</div>
-        <TrendingCarousel products={homeProducts.filter(p=>p.tab==="trend")} onOpen={setModal} wish={wish} toggleWish={toggleWish} onAdd={addToCart}/>
-      </section>
+          {/* TRENDING — fixed: homeProducts is an object, use homeProducts.trend */}
+          <section className="px-4 py-4 mobile-mt-sm" style={{ marginTop: "6rem" }}>
+            <div className="sec-title reveal" ref={addRef}>Trending Now</div>
+            <TrendingCarousel
+              products={homeProducts.trend || []}
+              onOpen={setModal}
+              wish={wish}
+              toggleWish={toggleWish}
+              onAdd={addToCart}
+            />
+          </section>
 
           {/* EDITORIAL */}
           <div
