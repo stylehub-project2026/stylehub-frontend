@@ -716,8 +716,8 @@ export default function App() {
             style={{ marginTop: "8rem", marginBottom: "12rem", paddingLeft: "1.5rem", paddingRight: "1.5rem" }}
           >
             {[
-              { tag: "Editorial", title: "Discover Latest in Fashion", gradient: "145deg,#8a9a7a,#4a5c40", img: "/edit.png", href: "#" },
-              { tag: "Explore",   title: "Explore Fashion New Era",    gradient: "145deg,#c4a882,#8a7060", img: "/ban.jpg",  href: "#" },
+              { tag: "Editorial", title: "Discover Latest in Fashion", gradient: "145deg,#8a9a7a,#4a5c40", img: "/beni.png", href: "/women" },
+              { tag: "Explore",   title: "Explore Fashion New Era",    gradient: "145deg,#c4a882,#8a7060", img: "/bano.png",  href: "/brand/27" },
             ].map((e, i) => (
               <div className="col-md-6" key={i}>
                 <a href={e.href} className="sh-ed">
