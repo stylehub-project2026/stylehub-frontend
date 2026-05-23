@@ -617,6 +617,33 @@ function DashboardView({ setActiveNav }) {
         ))}
       </div>
 
+      {/* ── Brand Page URL Card ── */}
+      {(() => {
+        const _seller = (() => { try { return JSON.parse(localStorage.getItem("seller") || "{}"); } catch { return {}; } })();
+        const _brand = _seller.brandName || _seller.storeName || _seller.name || "";
+        const _url = `https://stylehub-frontend-ten.vercel.app/brand/${encodeURIComponent(_brand)}`;
+        return (
+          <div style={{ background: "linear-gradient(135deg, #1a1a18 0%, #2d2d2a 100%)", borderRadius: 12, padding: "1.2rem 1.6rem", marginBottom: "1.8rem", display: "flex", alignItems: "center", justifyContent: "space-between", gap: "1rem", flexWrap: "wrap" }}>
+            <div>
+              <div style={{ fontSize: ".58rem", letterSpacing: ".25em", textTransform: "uppercase", color: "rgba(255,255,255,.45)", marginBottom: ".35rem" }}>
+                Your Brand Page — Live Now 🟢
+              </div>
+              <a href={_url} target="_blank" rel="noreferrer"
+                style={{ fontSize: ".82rem", color: "#92A079", wordBreak: "break-all", textDecoration: "none", fontWeight: 500 }}
+                onMouseEnter={e => e.target.style.textDecoration = "underline"}
+                onMouseLeave={e => e.target.style.textDecoration = "none"}>
+                {_url}
+              </a>
+            </div>
+            <button
+              onClick={() => { navigator.clipboard.writeText(_url); }}
+              style={{ background: "#92A079", color: "#fff", border: "none", padding: ".5rem 1.1rem", borderRadius: 6, fontSize: ".65rem", letterSpacing: ".1em", textTransform: "uppercase", fontWeight: 600, cursor: "pointer", fontFamily: "inherit", flexShrink: 0, whiteSpace: "nowrap" }}>
+              Copy Link
+            </button>
+          </div>
+        );
+      })()}
+
       <div className="dash-content">
         <div className="dash-card">
           <div className="dash-card-header">
