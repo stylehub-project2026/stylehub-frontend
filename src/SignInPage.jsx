@@ -27,45 +27,8 @@ const CSS = `
 
 body { font-family: var(--font); background: #f5f7f0; }
 
-/* ── NAVBAR ── */
-.sh-nav {
-  position: fixed; top:0; left:0; right:0; z-index:1000;
-  background: #fff;
-  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
-  height: 68px;
-  display: flex; align-items: center;
-  padding: 0 2.5rem;
-  gap: 1rem;
-  justify-content: space-between;
-}
-.sh-nav-logo {
-  display:flex; align-items:center; gap:10px; text-decoration:none;
-  font-weight:800; font-size:1.3rem; color: var(--green-dark); letter-spacing:.5px;
-}
-.sh-nav-logo .logo-dot { color: var(--green); }
-.sh-nav-links { display:flex; align-items:center; gap:2px; }
-.sh-nav-links a {
-  font-size:.8rem; font-weight:500; color:#444;
-  padding:.45rem .7rem; border-radius:6px;
-  text-decoration:none; white-space:nowrap;
-  transition: color .2s, background .2s;
-}
-.sh-nav-links a:hover { color: var(--green); background: var(--green-light); }
-.badge-sale { background:#e74c3c; color:#fff; font-size:.55rem; font-weight:700; padding:1px 5px; border-radius:3px; margin-left:3px; vertical-align:middle; }
-.badge-hot  { background:#f39c12; color:#fff; font-size:.55rem; font-weight:700; padding:1px 5px; border-radius:3px; margin-left:3px; vertical-align:middle; }
-.sh-nav-right { display:flex; align-items:center; gap:1rem; }
-.sh-nav-search {
-  border:1.5px solid var(--border); border-radius:22px;
-  padding:.38rem 1rem; font-size:.8rem; font-family:var(--font);
-  outline:none; width:190px; transition:border-color .2s;
-}
-.sh-nav-search:focus { border-color: var(--green); }
-.sh-nav-icons { display:flex; gap:1.1rem; }
-.sh-nav-icons a { color:#444; font-size:1rem; text-decoration:none; transition:color .2s; }
-.sh-nav-icons a:hover { color: var(--green); }
-
 /* ── PAGE WRAPPER ── */
-.sh-page { min-height:100vh; padding-top:68px; display:flex; flex-direction:column; }
+.sh-page { min-height:100vh; display:flex; flex-direction:column; }
 
 /* ── AUTH SECTION ── */
 .auth-section {
@@ -299,7 +262,6 @@ input[type="password"]::-webkit-credentials-auto-fill-button { visibility:hidden
 @media(max-width:1024px) {
   .auth-section { gap:40px; padding:2.5rem 2rem; }
   .auth-image { display:none; }
-  .sh-nav-links { display:none; }
   .sh-f-grid { grid-template-columns:1fr 1fr; gap:2rem; }
 }
 
@@ -329,7 +291,6 @@ input[type="password"]::-webkit-credentials-auto-fill-button { visibility:hidden
 ════════════════════════════ */
 @media(max-width:600px) {
   .auth-card { padding:1.8rem 1.2rem !important; }
-  .sh-nav-search { display:none; }
 }
 
 /* ════════════════════════════
