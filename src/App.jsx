@@ -24,6 +24,8 @@ import Checkout from "./checkout";
 import BuildOutfit from "./BuildOutfit";
 import AboutUs from "./AboutUs";
 import ContactPage from "./ContactPage";
+import ChatWidget from "./ChatWidget";
+import AdminChat from "./AdminChat";
 
 import { saveCart, saveWishlist, sellerSignOut } from "./api";
 
@@ -632,159 +634,163 @@ export default function App() {
   };
 
   return (
-    <Routes>
-      <Route path="/product/:id" element={<ProductDetail cart={cart} setCart={setCart} wish={wish} setWish={setWish} />} />
-      <Route path="/cart" element={<Cart cart={cart} setCart={setCart} wish={wish} setWish={setWish} />} />
-      <Route path="/checkout" element={<Checkout cart={cart} setCart={setCart} wish={wish} setWish={setWish} />} />
-      <Route path="/kids" element={<Kids cart={cart} setCart={setCart} wish={wish} setWish={setWish} />} />
-      <Route path="/women" element={<Women cart={cart} setCart={setCart} wish={wish} setWish={setWish} />} />
-      <Route path="/signin" element={<SignIn cart={cart} wish={wish} />} />
-      <Route path="/reset-password" element={<ResetPasswordPage />} />
-      <Route path="/brand/marble" element={<MarbleBrand cart={cart} setCart={setCart} wish={wish} setWish={setWish} products={backendProducts} />} />
-      <Route path="/brand/salty" element={<Salty cart={cart} setCart={setCart} wish={wish} setWish={setWish} products={backendProducts} />} />
-      <Route path="/brand/ninos" element={<Ninos cart={cart} setCart={setCart} wish={wish} setWish={setWish} products={backendProducts} />} />
-      <Route path="/brand/27" element={<TwentySeven cart={cart} setCart={setCart} wish={wish} setWish={setWish} products={backendProducts} />} />
-      <Route path="/brand/blackcloset" element={<BlackCloset cart={cart} setCart={setCart} wish={wish} setWish={setWish} products={backendProducts} />} />
-      <Route path="/brand/:brandSlug" element={<SellerBrandPage cart={cart} wish={wish} setWish={setWish} />} />
-      <Route path="/wishlist" element={<Wishlist cart={cart} setCart={setCart} wish={wish} setWish={setWish} />} />
-      <Route path="/profile" element={<ProfilePage cart={cart} wish={wish} />} />
-      <Route path="/men" element={<MenPage cart={cart} setCart={setCart} wish={wish} setWish={setWish} />} />
-      <Route path="/menpage" element={<MenPage cart={cart} setCart={setCart} wish={wish} setWish={setWish} />} />
-      <Route path="/seller" element={sellerLoggedIn ? <SellerDashboard onLogout={handleSellerLogout} /> : <Seller onSellerLoggedIn={handleSellerLogin} cart={cart} wish={wish} />} />
-      <Route path="/seller/dashboard" element={sellerLoggedIn ? <SellerDashboard onLogout={handleSellerLogout} /> : <Seller onSellerLoggedIn={handleSellerLogin} cart={cart} wish={wish} />} />
-      <Route path="/buildoutfit" element={<BuildOutfit cart={cart} setCart={setCart} wish={wish} setWish={setWish} />} />
-      <Route path="/BuildOutfit" element={<BuildOutfit cart={cart} setCart={setCart} wish={wish} setWish={setWish} />} />
-      <Route path="/aboutus" element={<AboutUs cart={cart} wish={wish} />} />
-      <Route path="/contact" element={<ContactPage cart={cart} wish={wish} />} />
+    <>
+      <Routes>
+        <Route path="/product/:id" element={<ProductDetail cart={cart} setCart={setCart} wish={wish} setWish={setWish} />} />
+        <Route path="/cart" element={<Cart cart={cart} setCart={setCart} wish={wish} setWish={setWish} />} />
+        <Route path="/checkout" element={<Checkout cart={cart} setCart={setCart} wish={wish} setWish={setWish} />} />
+        <Route path="/kids" element={<Kids cart={cart} setCart={setCart} wish={wish} setWish={setWish} />} />
+        <Route path="/women" element={<Women cart={cart} setCart={setCart} wish={wish} setWish={setWish} />} />
+        <Route path="/signin" element={<SignIn cart={cart} wish={wish} />} />
+        <Route path="/reset-password" element={<ResetPasswordPage />} />
+        <Route path="/brand/marble" element={<MarbleBrand cart={cart} setCart={setCart} wish={wish} setWish={setWish} products={backendProducts} />} />
+        <Route path="/brand/salty" element={<Salty cart={cart} setCart={setCart} wish={wish} setWish={setWish} products={backendProducts} />} />
+        <Route path="/brand/ninos" element={<Ninos cart={cart} setCart={setCart} wish={wish} setWish={setWish} products={backendProducts} />} />
+        <Route path="/brand/27" element={<TwentySeven cart={cart} setCart={setCart} wish={wish} setWish={setWish} products={backendProducts} />} />
+        <Route path="/brand/blackcloset" element={<BlackCloset cart={cart} setCart={setCart} wish={wish} setWish={setWish} products={backendProducts} />} />
+        <Route path="/brand/:brandSlug" element={<SellerBrandPage cart={cart} wish={wish} setWish={setWish} />} />
+        <Route path="/wishlist" element={<Wishlist cart={cart} setCart={setCart} wish={wish} setWish={setWish} />} />
+        <Route path="/profile" element={<ProfilePage cart={cart} wish={wish} />} />
+        <Route path="/men" element={<MenPage cart={cart} setCart={setCart} wish={wish} setWish={setWish} />} />
+        <Route path="/menpage" element={<MenPage cart={cart} setCart={setCart} wish={wish} setWish={setWish} />} />
+        <Route path="/seller" element={sellerLoggedIn ? <SellerDashboard onLogout={handleSellerLogout} /> : <Seller onSellerLoggedIn={handleSellerLogin} cart={cart} wish={wish} />} />
+        <Route path="/seller/dashboard" element={sellerLoggedIn ? <SellerDashboard onLogout={handleSellerLogout} /> : <Seller onSellerLoggedIn={handleSellerLogin} cart={cart} wish={wish} />} />
+        <Route path="/buildoutfit" element={<BuildOutfit cart={cart} setCart={setCart} wish={wish} setWish={setWish} />} />
+        <Route path="/BuildOutfit" element={<BuildOutfit cart={cart} setCart={setCart} wish={wish} setWish={setWish} />} />
+        <Route path="/aboutus" element={<AboutUs cart={cart} wish={wish} />} />
+        <Route path="/contact" element={<ContactPage cart={cart} wish={wish} />} />
+        <Route path="/admin/chat" element={<AdminChat />} />
 
-      <Route path="/" element={
-        <div key={location.key}>
-          <style>{CSS}</style>
+        <Route path="/" element={
+          <div key={location.key}>
+            <style>{CSS}</style>
 
-          {/* NAV */}
-          <SHNav cart={cart} wish={wish} />
+            {/* NAV */}
+            <SHNav cart={cart} wish={wish} />
 
-          {/* HERO */}
-          <HeroCarousel />
+            {/* HERO */}
+            <HeroCarousel />
 
-          {/* BRANDS */}
-          <BrandsCarousel />
+            {/* BRANDS */}
+            <BrandsCarousel />
 
-          {/* PRODUCTS — fixed: homeProducts is an object, use homeProducts[tab] */}
-          <section className="products-section py-3 my-1">
-            <div className="sh-tabs reveal" ref={addRef}>
-              {[["best", "Best Sellers"], ["new", "New Arrivals"], ["sale", "Sale"]].map(([key, label]) => (
-                <div key={key} className={`sh-tab${tab === key ? " on" : ""}`} onClick={() => setTab(key)}>{label}</div>
-              ))}
+            {/* PRODUCTS — fixed: homeProducts is an object, use homeProducts[tab] */}
+            <section className="products-section py-3 my-1">
+              <div className="sh-tabs reveal" ref={addRef}>
+                {[["best", "Best Sellers"], ["new", "New Arrivals"], ["sale", "Sale"]].map(([key, label]) => (
+                  <div key={key} className={`sh-tab${tab === key ? " on" : ""}`} onClick={() => setTab(key)}>{label}</div>
+                ))}
+              </div>
+              <div className="row row-cols-2 row-cols-md-3 g-3">
+                {(homeProducts[tab] || []).slice(0, 6).map((p, i) => (
+                  <div className="col" key={p.id}>
+                    <PCard p={p} onOpen={setModal} addRef={addRef} d={(i % 3) + 1} wish={wish} toggleWish={toggleWish} />
+                  </div>
+                ))}
+              </div>
+            </section>
+
+            {/* JOIN */}
+            <div
+              className="sh-join join-section text-center reveal py-5"
+              ref={addRef}
+              style={{ marginTop: "7rem", marginLeft: "1rem", marginRight: "1rem" }}
+            >
+              <h3 className="mb-2">Join Style Hub</h3>
+              <a href="/seller">Sell with us ›</a>
             </div>
-            <div className="row row-cols-2 row-cols-md-3 g-3">
-              {(homeProducts[tab] || []).slice(0, 6).map((p, i) => (
-                <div className="col" key={p.id}>
-                  <PCard p={p} onOpen={setModal} addRef={addRef} d={(i % 3) + 1} wish={wish} toggleWish={toggleWish} />
-                </div>
-              ))}
-            </div>
-          </section>
 
-          {/* JOIN */}
-          <div
-            className="sh-join join-section text-center reveal py-5"
-            ref={addRef}
-            style={{ marginTop: "7rem", marginLeft: "1rem", marginRight: "1rem" }}
-          >
-            <h3 className="mb-2">Join Style Hub</h3>
-            <a href="/seller">Sell with us ›</a>
-          </div>
-
-          {/* WHO WE ARE */}
-          <div
-            className="row g-0 who-section reveal"
-            ref={addRef}
-            style={{ marginTop: "8rem", marginLeft: "1rem", marginRight: "1rem" }}
-          >
-            <div className="col-md-6 who-left p-5 d-flex flex-column justify-content-center">
-              <h3 className="mb-3">Who We Are?</h3>
-              <p className="mb-4">We support local Egyptian fashion brands and help them reach customers across Egypt — all in one place.</p>
-              <div><button className="sh-btn sh-btn-ol sh-btn-sm">Learn more ›</button></div>
+            {/* WHO WE ARE */}
+            <div
+              className="row g-0 who-section reveal"
+              ref={addRef}
+              style={{ marginTop: "8rem", marginLeft: "1rem", marginRight: "1rem" }}
+            >
+              <div className="col-md-6 who-left p-5 d-flex flex-column justify-content-center">
+                <h3 className="mb-3">Who We Are?</h3>
+                <p className="mb-4">We support local Egyptian fashion brands and help them reach customers across Egypt — all in one place.</p>
+                <div><button className="sh-btn sh-btn-ol sh-btn-sm">Learn more ›</button></div>
+              </div>
+              <div className="col-md-6 who-right">
+                <img src="/who.jpg" alt="support local" />
+              </div>
             </div>
-            <div className="col-md-6 who-right">
-              <img src="/who.jpg" alt="support local" />
-            </div>
-          </div>
 
-          {/* CATEGORIES */}
-          <section
-            className="categories-section py-4"
-            style={{ marginTop: "8rem", paddingLeft: "1.5rem", paddingRight: "1.5rem" }}
-          >
-            <div className="sec-title reveal" ref={addRef}>Shop By Categories</div>
-            <div className="row g-3">
-              {CATS.map((c, i) => (
-                <div className="col-md-4" key={c.name}>
-                  <a href={c.link} className={`sh-cat revealed d${i + 1}`} ref={addRef}>
-                    {c.img ? <img src={c.img} alt={c.name} /> : <div className="cat-bg d-flex align-items-center justify-content-center" style={{ background: `linear-gradient(${c.gradient})`, height: "100%" }}><span style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: "4rem", color: "rgba(255,255,255,.15)", fontWeight: 300 }}>{c.name[0]}</span></div>}
-                    <div className="cat-ov" />
-                    <div className="cat-ct"><div className="cat-name">{c.name}</div><div className="cat-sub mt-1">Shop Now →</div></div>
+            {/* CATEGORIES */}
+            <section
+              className="categories-section py-4"
+              style={{ marginTop: "8rem", paddingLeft: "1.5rem", paddingRight: "1.5rem" }}
+            >
+              <div className="sec-title reveal" ref={addRef}>Shop By Categories</div>
+              <div className="row g-3">
+                {CATS.map((c, i) => (
+                  <div className="col-md-4" key={c.name}>
+                    <a href={c.link} className={`sh-cat revealed d${i + 1}`} ref={addRef}>
+                      {c.img ? <img src={c.img} alt={c.name} /> : <div className="cat-bg d-flex align-items-center justify-content-center" style={{ background: `linear-gradient(${c.gradient})`, height: "100%" }}><span style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: "4rem", color: "rgba(255,255,255,.15)", fontWeight: 300 }}>{c.name[0]}</span></div>}
+                      <div className="cat-ov" />
+                      <div className="cat-ct"><div className="cat-name">{c.name}</div><div className="cat-sub mt-1">Shop Now →</div></div>
+                    </a>
+                  </div>
+                ))}
+              </div>
+            </section>
+
+            {/* TRENDING — fixed: homeProducts is an object, use homeProducts.trend */}
+            <section className="px-4 py-4 mobile-mt-sm" style={{ marginTop: "6rem" }}>
+              <div className="sec-title reveal" ref={addRef}>Trending Now</div>
+              <TrendingCarousel
+                products={homeProducts.trend || []}
+                onOpen={setModal}
+                wish={wish}
+                toggleWish={toggleWish}
+                onAdd={addToCart}
+              />
+            </section>
+
+            {/* EDITORIAL */}
+            <div
+              className="row g-3 editorial-section pt-3 reveal"
+              ref={addRef}
+              style={{ marginTop: "8rem", marginBottom: "12rem", paddingLeft: "1.5rem", paddingRight: "1.5rem" }}
+            >
+              {[
+                { tag: "Editorial", title: "Discover Latest in Fashion", gradient: "145deg,#8a9a7a,#4a5c40", img: "/beni.png", href: "/women" },
+                { tag: "Explore", title: "Explore Fashion New Era", gradient: "145deg,#c4a882,#8a7060", img: "/bano.png", href: "/brand/27" },
+              ].map((e, i) => (
+                <div className="col-md-6" key={i}>
+                  <a href={e.href} className="sh-ed">
+                    {e.img ? <img src={e.img} alt={e.title} /> : <div className="ed-bg" style={{ background: `linear-gradient(${e.gradient})` }} />}
+                    <div className="ed-ov" />
+                    <div className="ed-ct"><div className="ed-tag mb-1">{e.tag}</div><div className="ed-title">{e.title}</div></div>
                   </a>
                 </div>
               ))}
             </div>
-          </section>
 
-          {/* TRENDING — fixed: homeProducts is an object, use homeProducts.trend */}
-          <section className="px-4 py-4 mobile-mt-sm" style={{ marginTop: "6rem" }}>
-            <div className="sec-title reveal" ref={addRef}>Trending Now</div>
-            <TrendingCarousel
-              products={homeProducts.trend || []}
-              onOpen={setModal}
-              wish={wish}
-              toggleWish={toggleWish}
-              onAdd={addToCart}
-            />
-          </section>
+            {/* TRUST */}
+            <div className="trust-bar d-flex justify-content-center gap-5 py-4 border-top reveal flex-wrap" ref={addRef}>
+              {[
+                { icon: "🚚", label: "100% Free Shipping", sub: "Free shipping on all orders" },
+                { icon: "↩", label: "Easy Returns", sub: "30-day hassle-free returns" },
+                { icon: "🎧", label: "24/7 Online Support", sub: "We're here whenever you need us" },
+              ].map((t, i) => (
+                <div key={i} className="text-center" style={{ maxWidth: 180 }}>
+                  <div className="trust-icon mb-2">{t.icon}</div>
+                  <div className="trust-label mb-1">{t.label}</div>
+                  <div className="trust-sub">{t.sub}</div>
+                </div>
+              ))}
+            </div>
 
-          {/* EDITORIAL */}
-          <div
-            className="row g-3 editorial-section pt-3 reveal"
-            ref={addRef}
-            style={{ marginTop: "8rem", marginBottom: "12rem", paddingLeft: "1.5rem", paddingRight: "1.5rem" }}
-          >
-            {[
-              { tag: "Editorial", title: "Discover Latest in Fashion", gradient: "145deg,#8a9a7a,#4a5c40", img: "/beni.png", href: "/women" },
-              { tag: "Explore", title: "Explore Fashion New Era", gradient: "145deg,#c4a882,#8a7060", img: "/bano.png", href: "/brand/27" },
-            ].map((e, i) => (
-              <div className="col-md-6" key={i}>
-                <a href={e.href} className="sh-ed">
-                  {e.img ? <img src={e.img} alt={e.title} /> : <div className="ed-bg" style={{ background: `linear-gradient(${e.gradient})` }} />}
-                  <div className="ed-ov" />
-                  <div className="ed-ct"><div className="ed-tag mb-1">{e.tag}</div><div className="ed-title">{e.title}</div></div>
-                </a>
-              </div>
-            ))}
+            {/* FOOTER */}
+            <SHFooter addRef={addRef} />
+
+            {modal && <Modal p={modal} onClose={() => setModal(null)} onAdd={addToCart} />}
+            <div className={`sh-toast${toast ? " on" : ""}`}>{toast}</div>
           </div>
-
-          {/* TRUST */}
-          <div className="trust-bar d-flex justify-content-center gap-5 py-4 border-top reveal flex-wrap" ref={addRef}>
-            {[
-              { icon: "🚚", label: "100% Free Shipping", sub: "Free shipping on all orders" },
-              { icon: "↩", label: "Easy Returns", sub: "30-day hassle-free returns" },
-              { icon: "🎧", label: "24/7 Online Support", sub: "We're here whenever you need us" },
-            ].map((t, i) => (
-              <div key={i} className="text-center" style={{ maxWidth: 180 }}>
-                <div className="trust-icon mb-2">{t.icon}</div>
-                <div className="trust-label mb-1">{t.label}</div>
-                <div className="trust-sub">{t.sub}</div>
-              </div>
-            ))}
-          </div>
-
-          {/* FOOTER */}
-          <SHFooter addRef={addRef} />
-
-          {modal && <Modal p={modal} onClose={() => setModal(null)} onAdd={addToCart} />}
-          <div className={`sh-toast${toast ? " on" : ""}`}>{toast}</div>
-        </div>
-      } />
-    </Routes>
+        } />
+      </Routes>
+      <ChatWidget />
+    </>
   );
 }

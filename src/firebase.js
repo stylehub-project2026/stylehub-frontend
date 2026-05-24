@@ -1,5 +1,6 @@
 import { initializeApp } from "firebase/app";
 import { getAuth, GoogleAuthProvider, FacebookAuthProvider, signInWithPopup } from "firebase/auth";
+import { getFirestore } from "firebase/firestore";
 
 const firebaseConfig = {
     apiKey: "AIzaSyALETSPylzXEcYgg__jC4URI0MekZhvJEM",
@@ -13,6 +14,7 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
+export const db = getFirestore(app);
 
 const googleProvider = new GoogleAuthProvider();
 const facebookProvider = new FacebookAuthProvider();
@@ -21,12 +23,10 @@ facebookProvider.addScope('public_profile');
 
 export const signInWithGoogle = async () => {
     const result = await signInWithPopup(auth, googleProvider);
-    const idToken = await result.user.getIdToken();
-    return idToken;
+    return await result.user.getIdToken();
 };
 
 export const signInWithFacebook = async () => {
     const result = await signInWithPopup(auth, facebookProvider);
-    const idToken = await result.user.getIdToken();
-    return idToken;
+    return await result.user.getIdToken();
 };
