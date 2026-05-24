@@ -13,7 +13,7 @@ const BRAND = {
   heroOverlay: "rgba(255,255,255,.55)",
 };
 
-const SZ = { gridCardRatio: "4/4" };
+const SZ = { gridCardRatio: "4/4", shopCardH: 220 };
 const API = "https://stylehub-backend-tau.vercel.app/api";
 
 // ─── HEART ICON ──────────────────────────────────────────────────────────────
@@ -139,7 +139,9 @@ export default function MarbleBrand({ cart, wish = [], setWish }) {
       <style>{SHARED_CSS + PAGE_CSS}</style>
       <SHNav cart={cart} wish={wish} />
 
-      {/* ── HERO ── */}
+      {/* ════════════════════════════════
+          1. HERO
+      ════════════════════════════════ */}
       <section className="hero-section">
         <img src={BRAND.heroBg} alt="" aria-hidden
           style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", opacity: .08, borderRadius: 10 }}
@@ -160,22 +162,53 @@ export default function MarbleBrand({ cart, wish = [], setWish }) {
         </div>
       </section>
 
-      {/* ── POPULAR SECTION ── */}
+      {/* ════════════════════════════════
+          2. SHOP BY MARBLE  (grey bg)
+      ════════════════════════════════ */}
+      <section style={{ background: "#D8D4CE", padding: "4rem 6%", borderTop: "1px solid rgba(26,26,24,.08)", borderBottom: "1px solid rgba(26,26,24,.08)" }}>
+        <h2 style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: "clamp(1.6rem,2.5vw,2.2rem)", fontWeight: 400, textAlign: "center", marginBottom: "2.5rem", letterSpacing: ".04em" }}>
+          Shop by {BRAND.name}
+        </h2>
+        <div className="marble-shop-grid">
+          {allProducts.slice(0, 4).map((p, i) => (
+            <div key={p.id} className={`reveal d${i + 1}`} ref={addRef}
+              style={{ cursor: "pointer", textAlign: "center" }}
+              onClick={() => navigate(`/product/${p.id}`)}>
+              <div style={{ height: SZ.shopCardH, borderRadius: 5, overflow: "hidden", background: "#fff", marginBottom: ".90rem", border: "1px solid var(--border)" }}>
+                <img src={p.img} alt={p.name}
+                  style={{ width: "100%", height: "100%", objectFit: "cover", transition: "transform .5s" }}
+                  onMouseEnter={e => e.target.style.transform = "scale(1.06)"}
+                  onMouseLeave={e => e.target.style.transform = "scale(1)"}
+                  onError={e => e.target.style.display = "none"} />
+              </div>
+              <div style={{ fontSize: ".80rem", fontWeight: 500, marginBottom: ".18rem" }}>{p.name}</div>
+              <div style={{ fontSize: ".72rem", color: "var(--warm)" }}>{p.price}</div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ════════════════════════════════
+          3. SEE WHAT'S POPULAR
+      ════════════════════════════════ */}
       <section style={{ background: "#ffffff", padding: "5rem 6%", borderBottom: "2px solid rgba(26,26,24,.12)" }}>
         <div className="popular-grid">
           <div className="reveal" ref={addRef}>
             <div style={{ fontSize: ".58rem", letterSpacing: ".3em", textTransform: "uppercase", color: "var(--warm)", marginBottom: "1rem" }}>Marble Collection</div>
-            <h2 style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: "clamp(1.9rem,3vw,2.8rem)", fontWeight: 400, lineHeight: 1.2, marginBottom: "1.2rem" }}>Shop By Marble</h2>
+            <h2 style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: "clamp(1.9rem,3vw,2.8rem)", fontWeight: 400, lineHeight: 1.2, marginBottom: "1.2rem" }}>See What's Popular</h2>
             <p style={{ fontSize: ".86rem", lineHeight: 1.85, color: "#555252", marginBottom: "2rem", maxWidth: 400 }}>{BRAND.desc}</p>
             <button onClick={scrollGrid} className="marble-cta-btn">Browse All</button>
           </div>
-          <div style={{ position: "relative", minHeight: "300px" }}>
+          {/* blob — hidden on mobile via CSS */}
+          <div className="popular-blob" style={{ position: "relative", minHeight: "300px" }}>
             <div style={{ position: "absolute", right: "-6%", top: "-22%", width: "52%", height: "144%", background: "var(--dark)", borderRadius: "60% 0 0 60%", zIndex: 0 }} />
           </div>
         </div>
       </section>
 
-      {/* ── PRODUCTS ── */}
+      {/* ════════════════════════════════
+          4. ALL PRODUCTS — filters + grid
+      ════════════════════════════════ */}
       <div className="brand-layout">
         <button className="filter-toggle-btn" onClick={() => setFilterOpen(o => !o)}>
           {filterOpen ? "✕ Close Filters" : "⚙ Filters & Sort"}
@@ -271,6 +304,8 @@ const PAGE_CSS = `
   font-family:'DM Sans',sans-serif; border-radius:3px; transition:background .2s;
 }
 .marble-cta-btn:hover { background:#92A079; }
+
+/* Hero */
 .hero-section {
   position:relative; min-height:420px; overflow:hidden;
   background:#ffffff; display:flex; align-items:center;
@@ -288,31 +323,58 @@ const PAGE_CSS = `
   box-shadow:0 8px 32px rgba(26,26,24,.12);
   background:#fff; display:flex; align-items:center; justify-content:center;
 }
+
+/* Shop by grid */
+.marble-shop-grid {
+  display:grid; grid-template-columns:repeat(4,1fr); gap:1rem;
+}
+
+/* Popular */
 .popular-grid { display:grid; grid-template-columns:1fr 1fr; gap:5rem; align-items:center; }
+.popular-blob { position:relative; min-height:300px; }
+
+/* Products */
 .brand-layout { display:flex; gap:2.5rem; padding:3rem 6%; align-items:flex-start; background:var(--cream); }
 .brand-sidebar { width:185px; flex-shrink:0; position:sticky; top:70px; }
 .product-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:1.4rem; }
 .filter-toggle-btn { display:none; }
 
+/* ── TABLET ── */
 @media(max-width:1024px) {
+  .marble-shop-grid { grid-template-columns:repeat(2,1fr); }
   .product-grid { grid-template-columns:repeat(2,1fr); }
   .hero-logo { width:150px; height:150px; }
   .hero-inner { gap:2.5rem; }
 }
+
+/* ── MOBILE ── */
 @media(max-width:768px) {
-  .hero-section { min-height:unset; margin:1rem; padding:2rem 1.5rem; }
+  /* Hero */
+  .hero-section { min-height:unset; margin:0.6rem; padding:2rem 1.2rem 2.2rem; }
   .hero-inner { flex-direction:column; align-items:center; text-align:center; gap:1.5rem; padding:0; }
-  .hero-logo { width:120px; height:120px; }
-  .popular-grid { grid-template-columns:1fr; gap:2rem; }
-  .brand-layout { flex-direction:column; padding:1.5rem 4%; gap:0; }
+  .hero-logo { width:110px; height:110px; }
+
+  /* Shop by grid */
+  .marble-shop-grid { grid-template-columns:repeat(2,1fr); gap:0.75rem; }
+
+  /* Popular — single column, blob hidden, no overflow */
+  .popular-grid { grid-template-columns:1fr; gap:0; }
+  .popular-blob { display:none; }
+
+  /* Products */
+  .brand-layout { flex-direction:column; padding:1.2rem 4%; gap:0; }
   .brand-sidebar { width:100%; position:static; display:none; padding-bottom:1rem; border-bottom:1px solid var(--border); margin-bottom:1.5rem; }
   .brand-sidebar.sidebar-open { display:block; }
   .filter-toggle-btn { display:block; width:100%; padding:.65rem 1rem; margin-bottom:1rem; background:var(--dark); color:#fff; border:none; border-radius:4px; font-size:.75rem; font-family:'DM Sans',sans-serif; letter-spacing:.1em; text-transform:uppercase; cursor:pointer; font-weight:600; }
   .product-grid { grid-template-columns:repeat(2,1fr); gap:.8rem; }
 }
+
+/* ── SMALL MOBILE ── */
 @media(max-width:480px) {
+  .marble-shop-grid { grid-template-columns:repeat(2,1fr); gap:0.5rem; }
   .product-grid { grid-template-columns:repeat(2,1fr); gap:.6rem; }
   .hero-logo { width:90px; height:90px; }
+  .hero-section { margin:0.4rem; }
   .brand-layout { padding:1rem 3%; }
 }
 `;
