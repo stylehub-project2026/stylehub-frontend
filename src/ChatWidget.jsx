@@ -2,8 +2,9 @@ import { useState, useEffect, useRef } from "react";
 import { db } from "./firebase";
 import {
     collection, addDoc, onSnapshot,
-    orderBy, query, serverTimestamp
+    orderBy, query, serverTimestamp, doc, setDoc
 } from "firebase/firestore";
+
 
 const ADMIN_NAME = "StyleHub Support";
 
@@ -37,6 +38,14 @@ export default function ChatWidget() {
 
     const send = async () => {
         if (!text.trim()) return;
+
+        // عشان الـ admin يشوف الـ session
+        await setDoc(doc(db, "chats", sessionId), {
+            userName,
+            lastMessage: text.trim(),
+            updatedAt: serverTimestamp(),
+        }, { merge: true });
+
         await addDoc(collection(db, "chats", sessionId, "messages"), {
             text: text.trim(),
             sender: "customer",
