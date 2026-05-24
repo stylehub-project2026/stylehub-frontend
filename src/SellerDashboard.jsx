@@ -1443,6 +1443,9 @@ function SettingsView() {
   const [confirmPw, setConfirmPw] = useState("");
   const [pwMsg, setPwMsg] = useState("");
   const [pwSaving, setPwSaving] = useState(false);
+  const [showCurrentPw, setShowCurrentPw] = useState(false);
+  const [showNewPw, setShowNewPw] = useState(false);
+  const [showConfirmPw, setShowConfirmPw] = useState(false);
 
   const changePassword = async () => {
     if (!currentPw || !newPw || !confirmPw) { setPwMsg("✗ Fill all fields."); return; }
@@ -1527,15 +1530,30 @@ function SettingsView() {
           <h3><i className="fas fa-lock" /> Change Password</h3>
           <div className="settings-row">
             <span className="settings-label">Current Password</span>
-            <input className="settings-input" type="password" value={currentPw} onChange={e => setCurrentPw(e.target.value)} placeholder="••••••••" />
+            <div style={{ position: "relative", display: "flex", alignItems: "center" }}>
+              <input className="settings-input" type={showCurrentPw ? "text" : "password"} value={currentPw} onChange={e => setCurrentPw(e.target.value)} placeholder="Enter current password" style={{ paddingRight: "2.2rem" }} />
+              <span onClick={() => setShowCurrentPw(v => !v)} style={{ position: "absolute", right: "0.6rem", cursor: "pointer", color: "#888", fontSize: "1rem" }}>
+                <i className={`fas ${showCurrentPw ? "fa-eye-slash" : "fa-eye"}`} />
+              </span>
+            </div>
           </div>
           <div className="settings-row">
             <span className="settings-label">New Password</span>
-            <input className="settings-input" type="password" value={newPw} onChange={e => setNewPw(e.target.value)} placeholder="••••••••" />
+            <div style={{ position: "relative", display: "flex", alignItems: "center" }}>
+              <input className="settings-input" type={showNewPw ? "text" : "password"} value={newPw} onChange={e => setNewPw(e.target.value)} placeholder="Enter new password" style={{ paddingRight: "2.2rem" }} />
+              <span onClick={() => setShowNewPw(v => !v)} style={{ position: "absolute", right: "0.6rem", cursor: "pointer", color: "#888", fontSize: "1rem" }}>
+                <i className={`fas ${showNewPw ? "fa-eye-slash" : "fa-eye"}`} />
+              </span>
+            </div>
           </div>
           <div className="settings-row">
             <span className="settings-label">Confirm Password</span>
-            <input className="settings-input" type="password" value={confirmPw} onChange={e => setConfirmPw(e.target.value)} placeholder="••••••••" />
+            <div style={{ position: "relative", display: "flex", alignItems: "center" }}>
+              <input className="settings-input" type={showConfirmPw ? "text" : "password"} value={confirmPw} onChange={e => setConfirmPw(e.target.value)} placeholder="Confirm new password" style={{ paddingRight: "2.2rem" }} />
+              <span onClick={() => setShowConfirmPw(v => !v)} style={{ position: "absolute", right: "0.6rem", cursor: "pointer", color: "#888", fontSize: "1rem" }}>
+                <i className={`fas ${showConfirmPw ? "fa-eye-slash" : "fa-eye"}`} />
+              </span>
+            </div>
           </div>
           {pwMsg && <div style={{ fontSize: ".82rem", marginTop: ".6rem", color: pwMsg.startsWith("✓") ? "var(--green-dark)" : "#c0392b" }}>{pwMsg}</div>}
           <button className="settings-btn" onClick={changePassword} disabled={pwSaving}>
