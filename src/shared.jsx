@@ -303,6 +303,21 @@ export function SHNav({ cart = [], wish = [] }) {
   const navigate = useNavigate();
   const [searchOpen, setSearchOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [navBrands, setNavBrands] = useState(BRANDS);
+
+  useEffect(() => {
+    fetch("https://stylehub-backend-tau.vercel.app/api/sellers")
+      .then(r => r.json())
+      .then(d => {
+        if (d.success && d.data.length > 0) {
+          setNavBrands(d.data.map(s => ({
+            name: s.brandName,
+            href: `/brand/${s.brandName}`,
+          })));
+        }
+      })
+      .catch(() => { });
+  }, []);
 
   return (
     <nav className="sh-nav sticky-top d-flex align-items-center justify-content-between px-4" style={{ position: "relative" }}>
@@ -319,7 +334,7 @@ export function SHNav({ cart = [], wish = [] }) {
             </a>
             {l.dropdown && (
               <div className="dropdown">
-                {BRANDS.map(b => (
+                {navBrands.map(b => (
                   <a key={b.name} href={b.href || "#"}
                     onClick={e => { if (b.href && b.href !== "#") { e.preventDefault(); navigate(b.href); } }}>
                     {b.name}
@@ -359,7 +374,7 @@ export function SHNav({ cart = [], wish = [] }) {
               </a>
               {l.dropdown && (
                 <div style={{ paddingLeft: "1rem" }}>
-                  {BRANDS.map(b => (
+                  {navBrands.map(b => (
                     <a key={b.name} href={b.href || "#"} onClick={() => setMenuOpen(false)} style={{ display: "block", padding: ".45rem 0", color: "var(--warm)", textDecoration: "none", fontSize: ".78rem" }}>
                       {b.name}
                     </a>

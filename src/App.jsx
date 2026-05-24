@@ -457,6 +457,23 @@ function Modal({ p, onClose, onAdd }) {
 function BrandsCarousel() {
   const [idx, setIdx] = useState(0);
   const [slidesVisible, setSlidesVisible] = useState(4);
+  const [brands, setBrands] = useState(BRANDS); // fallback للـ hardcoded
+
+  useEffect(() => {
+    fetch("https://stylehub-backend-tau.vercel.app/api/sellers")
+      .then(r => r.json())
+      .then(data => {
+        if (data.success && data.data.length > 0) {
+          const fetched = data.data.map(s => ({
+            name: s.brandName,
+            logo: s.logo || null,
+            href: `/brand/${s.brandName}`,
+          }));
+          setBrands(fetched);
+        }
+      })
+      .catch(() => { }); // لو فشل يفضل الـ hardcoded
+  }, []);
 
   useEffect(() => {
     const update = () => {
@@ -468,8 +485,11 @@ function BrandsCarousel() {
     return () => window.removeEventListener("resize", update);
   }, []);
 
-  const max = Math.max(0, BRANDS.length - slidesVisible);
-  useEffect(() => { const t = setInterval(() => setIdx(i => i >= max ? 0 : i + 1), 2500); return () => clearInterval(t); }, [max]);
+  const max = Math.max(0, brands.length - slidesVisible);
+  useEffect(() => {
+    const t = setInterval(() => setIdx(i => i >= max ? 0 : i + 1), 2500);
+    return () => clearInterval(t);
+  }, [max]);
 
   return (
     <section className="py-4 border-bottom bg-white">
@@ -478,10 +498,12 @@ function BrandsCarousel() {
         <button className="brand-arrow" onClick={() => setIdx(i => i <= 0 ? max : i - 1)}>‹</button>
         <div className="brands-wrap">
           <div className="brands-track" style={{ transform: `translateX(-${idx * (100 / slidesVisible)}%)` }}>
-            {BRANDS.map((b, i) => (
+            {brands.map((b, i) => (
               <div key={i} className="brand-slide" style={{ minWidth: `${100 / slidesVisible}%`, width: `${100 / slidesVisible}%` }}>
                 <a href={b.href} style={{ textDecoration: "none", color: "inherit" }}>
-                  {b.logo ? <img src={b.logo} alt={b.name} style={{ height: "50px", width: "130px", objectFit: "contain" }} /> : <span className="brand-txt">{b.name}</span>}
+                  {b.logo
+                    ? <img src={b.logo} alt={b.name} style={{ height: "50px", width: "130px", objectFit: "contain" }} />
+                    : <span className="brand-txt">{b.name}</span>}
                 </a>
               </div>
             ))}
