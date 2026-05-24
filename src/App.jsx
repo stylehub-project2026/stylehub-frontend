@@ -454,6 +454,18 @@ function Modal({ p, onClose, onAdd }) {
 }
 
 // ─── BRANDS CAROUSEL ───
+const LOGO_MAP = {
+  "marble": "/marble.jpg",
+  "blackcloset": "/bb.jpg",
+  "black closet": "/bb.jpg",
+  "antika": "/antika.jpg",
+  "أنتيكا": "/antika.jpg",
+  "salty": "/saltyy.jpg",
+  "ninos": "/ninos.jpg",
+  "27": "/27.jpg",
+  "twenty seven": "/27.jpg",
+};
+
 function BrandsCarousel() {
   const [idx, setIdx] = useState(0);
   const [slidesVisible, setSlidesVisible] = useState(4);
@@ -464,16 +476,11 @@ function BrandsCarousel() {
       .then(r => r.json())
       .then(data => {
         if (data.success && data.data.length > 0) {
-          const fetched = data.data.map(s => {
-            const hardcoded = BRANDS.find(
-              b => b.name.toLowerCase() === s.brandName.toLowerCase()
-            );
-            return {
-              name: s.brandName,
-              logo: s.logo || hardcoded?.logo || null,
-              href: `/brand/${s.brandName}`,
-            };
-          });
+          const fetched = data.data.map(s => ({
+            name: s.brandName,
+            logo: s.logo || LOGO_MAP[s.brandName.toLowerCase()] || null,
+            href: `/brand/${s.brandName}`,
+          }));
           setBrands(fetched);
         }
       })
