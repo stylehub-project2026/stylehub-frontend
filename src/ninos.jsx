@@ -164,7 +164,33 @@ export default function NinosBrand({ cart, wish = [], setWish }) {
       </section>
 
       {/* ════════════════════════════════
-          2. SEE WHAT'S POPULAR
+          2. SHOP BY NINOS  (grey bg)
+      ════════════════════════════════ */}
+      <section style={{ background: "#D8D4CE", padding: "4rem 6%", borderTop: "1px solid rgba(26,26,24,.08)", borderBottom: "1px solid rgba(26,26,24,.08)" }}>
+        <h2 style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: "clamp(1.6rem,2.5vw,2.2rem)", fontWeight: 400, textAlign: "center", marginBottom: "2.5rem", letterSpacing: ".04em" }}>
+          Shop by {BRAND.name}
+        </h2>
+        <div className="ninos-shop-grid" style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: "1rem" }}>
+          {allProducts.slice(0, 4).map((p, i) => (
+            <div key={p.id} className={`reveal d${i + 1}`} ref={addRef}
+              style={{ cursor: "pointer", textAlign: "center" }}
+              onClick={() => navigate(`/product/${p.id}`)}>
+              <div style={{ height: SZ.shopCardH, borderRadius: 5, overflow: "hidden", background: "#fff", marginBottom: ".90rem", border: "1px solid var(--border)" }}>
+                <img src={p.img} alt={p.name}
+                  style={{ width: "100%", height: "100%", objectFit: "cover", transition: "transform .5s" }}
+                  onMouseEnter={e => e.target.style.transform = "scale(1.06)"}
+                  onMouseLeave={e => e.target.style.transform = "scale(1)"}
+                  onError={e => e.target.style.display = "none"} />
+              </div>
+              <div style={{ fontSize: ".80rem", fontWeight: 500, marginBottom: ".18rem" }}>{p.name}</div>
+              <div style={{ fontSize: ".72rem", color: "var(--warm)" }}>{p.price}</div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ════════════════════════════════
+          3. SEE WHAT'S POPULAR
       ════════════════════════════════ */}
       <section style={{ background: "#ffffff", padding: "5rem 6%", borderBottom: "2px solid rgba(26,26,24,.12)" }}>
         <div className="popular-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "5rem", alignItems: "center" }}>
@@ -186,7 +212,7 @@ export default function NinosBrand({ cart, wish = [], setWish }) {
       </section>
 
       {/* ════════════════════════════════
-          3. ALL PRODUCTS — filters + grid
+          4. ALL PRODUCTS — filters + grid
       ════════════════════════════════ */}
       <div className="products-layout" style={{ display: "flex", gap: "2.5rem", padding: "3rem 6%", alignItems: "flex-start", background: "var(--cream)" }}>
 
@@ -352,6 +378,9 @@ const PAGE_CSS = `
    TABLET  (≤1024px)
 ════════════════════════════ */
 @media (max-width: 1024px) {
+  .ninos-shop-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
   .product-grid {
     grid-template-columns: repeat(2, 1fr) !important;
   }
@@ -388,6 +417,12 @@ const PAGE_CSS = `
   }
   .ninos-hero-desc {
     display: none !important;
+  }
+
+  /* Shop grid */
+  .ninos-shop-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 0.75rem !important;
   }
 
   /* Popular section */
@@ -465,6 +500,10 @@ const PAGE_CSS = `
    SMALL MOBILE  (≤480px)
 ════════════════════════════ */
 @media (max-width: 480px) {
+  .ninos-shop-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 0.5rem !important;
+  }
   .product-grid {
     grid-template-columns: repeat(2, 1fr) !important;
     gap: 0.6rem !important;
