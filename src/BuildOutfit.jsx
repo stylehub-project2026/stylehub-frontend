@@ -1,9 +1,6 @@
-import { useMemo, useState, useEffect, Suspense } from "react";
+import { useMemo, useState, useEffect } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { PRODUCTS, SHARED_CSS, SHFooter, SHNav } from "./shared";
-import { Canvas } from "@react-three/fiber";
-import { OrbitControls } from "@react-three/drei";
-import * as THREE from "three";
 
 const API = "https://stylehub-backend-tau.vercel.app/api";
 
@@ -106,86 +103,66 @@ const TOP_PRODUCT_IDS    = [4, 51, 110, 107, 102, 101, 108, 109, 111, 112, 115, 
 const BOTTOM_PRODUCT_IDS = [104, 100, 8, 103, 105, 106, 114, 113];
 const COLORS = ["#c4956a","#a7b08a","#5a6249","#d4b896","#8b7355","#4a5e3a","#b8c4a8","#6b7a5e","#c9a96e","#7d9b76","#3d5a4a","#e8d5b7"];
 
-// ── 3D Mannequin ──
-function MannequinBody({ top, bottom, body }) {
-  const topColor    = top?.color    || "#a7b08a";
-  const bottomColor = bottom?.color || "#6b7a5e";
-
-  const h  = body?.height || 170;
-  const w  = body?.weight || 70;
-  const ch = body?.chest  || 88;
-  const wa = body?.waist  || 70;
-  const hi = body?.hips   || 96;
-
-  const heightScale = 0.85 + ((h  - 140) / 55)  * 0.30;
-  const chestScale  = 0.85 + ((ch - 75)  / 50)  * 0.30;
-  const waistScale  = 0.75 + ((wa - 55)  / 50)  * 0.35;
-  const hipsScale   = 0.85 + ((hi - 80)  / 50)  * 0.30;
-  const weightScale = 0.85 + ((w  - 45)  / 85)  * 0.30;
-  const bodyW       = Math.max(0.7, Math.min(1.4, (chestScale + weightScale) / 2));
-
+// ── Fashion Silhouette SVG ──
+function FashionSilhouette() {
   return (
-    <group position={[0, -1.2 * heightScale, 0]} scale={[1, heightScale, 1]}>
-      <mesh position={[0, 3.15, 0]}><sphereGeometry args={[0.22, 32, 32]} /><meshStandardMaterial color="#d4b896" roughness={0.6} /></mesh>
-      <mesh position={[0, 2.88, 0]}><cylinderGeometry args={[0.09, 0.10, 0.22, 16]} /><meshStandardMaterial color="#d4b896" roughness={0.6} /></mesh>
-      <mesh position={[0, 2.35, 0]} scale={[bodyW * chestScale, 1, 0.52]}><capsuleGeometry args={[0.38, 0.65, 8, 32]} /><meshStandardMaterial color={topColor} roughness={0.55} /></mesh>
-      <mesh position={[-0.62 * bodyW, 2.28, 0]} rotation={[0, 0, 0.18]} scale={[0.13, 0.7, 0.13]}><capsuleGeometry args={[0.3, 1.0, 8, 16]} /><meshStandardMaterial color={topColor} roughness={0.6} /></mesh>
-      <mesh position={[0.62 * bodyW, 2.28, 0]}  rotation={[0, 0,-0.18]} scale={[0.13, 0.7, 0.13]}><capsuleGeometry args={[0.3, 1.0, 8, 16]} /><meshStandardMaterial color={topColor} roughness={0.6} /></mesh>
-      <mesh position={[0, 1.55, 0]} scale={[bodyW * hipsScale, 1, 0.48]}><capsuleGeometry args={[0.36, 0.22, 8, 32]} /><meshStandardMaterial color={bottomColor} roughness={0.55} /></mesh>
-      <mesh position={[-0.22 * bodyW, 0.88, 0]} scale={[0.19 * hipsScale, 1, 0.19]}><capsuleGeometry args={[0.32, 1.0, 8, 32]} /><meshStandardMaterial color={bottomColor} roughness={0.55} /></mesh>
-      <mesh position={[0.22 * bodyW,  0.88, 0]} scale={[0.19 * hipsScale, 1, 0.19]}><capsuleGeometry args={[0.32, 1.0, 8, 32]} /><meshStandardMaterial color={bottomColor} roughness={0.55} /></mesh>
-      <mesh position={[-0.22 * bodyW, 0.18, 0.08]} scale={[0.22, 0.08, 0.42]}><boxGeometry args={[1,1,1]} /><meshStandardMaterial color="#6b6560" roughness={0.8} /></mesh>
-      <mesh position={[0.22 * bodyW,  0.18, 0.08]} scale={[0.22, 0.08, 0.42]}><boxGeometry args={[1,1,1]} /><meshStandardMaterial color="#6b6560" roughness={0.8} /></mesh>
-    </group>
+    <svg viewBox="0 0 160 380" fill="none" xmlns="http://www.w3.org/2000/svg"
+      style={{ width: "55%", height: "auto", opacity: 0.18 }}>
+      {/* Head */}
+      <ellipse cx="80" cy="36" rx="22" ry="26" fill="white" />
+      {/* Neck */}
+      <rect x="73" y="60" width="14" height="18" rx="6" fill="white" />
+      {/* Shoulders */}
+      <path d="M30 90 Q50 72 80 78 Q110 72 130 90 L125 150 Q110 158 80 160 Q50 158 35 150 Z" fill="white" />
+      {/* Arms */}
+      <path d="M35 95 Q18 130 20 175" stroke="white" strokeWidth="14" strokeLinecap="round" />
+      <path d="M125 95 Q142 130 140 175" stroke="white" strokeWidth="14" strokeLinecap="round" />
+      {/* Torso lower */}
+      <path d="M38 148 Q50 200 46 230 L114 230 Q110 200 122 148 Q100 162 80 162 Q60 162 38 148 Z" fill="white" />
+      {/* Hips */}
+      <path d="M46 228 Q36 246 34 260 L126 260 Q124 246 114 228 Z" fill="white" />
+      {/* Legs */}
+      <rect x="40" y="258" width="32" height="110" rx="14" fill="white" />
+      <rect x="88" y="258" width="32" height="110" rx="14" fill="white" />
+      {/* Feet */}
+      <ellipse cx="56" cy="372" rx="20" ry="8" fill="white" opacity="0.6" />
+      <ellipse cx="104" cy="372" rx="20" ry="8" fill="white" opacity="0.6" />
+    </svg>
   );
 }
 
-// ── 3D Stage + AI toggle ──
-function SilhouettePreview({ selectedTop, selectedBottom, body, viewMode, setViewMode, aiImage, aiLoading, onGenerateAI }) {
-  const topItem    = selectedTop    ? { color: selectedTop.color    || "#a7b08a" } : null;
-  const bottomItem = selectedBottom ? { color: selectedBottom.color || "#5a6249" } : null;
-
+// ── Stage (Placeholder + AI) ──
+function SilhouettePreview({ selectedTop, selectedBottom, aiImage, aiLoading, onGenerateAI }) {
   return (
-    <div className="bo-stage bo-soft" style={{ position: "relative", background: "linear-gradient(180deg,#3d3c39 0%,#2e2d2b 100%)" }}>
+    <div className="bo-stage bo-soft" style={{ position: "relative", background: "linear-gradient(180deg,#3d3c39 0%,#2e2d2b 100%)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
 
-      {/* View toggle */}
+      {/* AI button */}
       <div className="bo-view-toggle">
-        <button className={`bo-ai-btn${viewMode === "3d" ? " on" : ""}`} type="button" onClick={() => setViewMode("3d")}>
-          3D
-        </button>
         <button
-          className={`bo-ai-btn${viewMode === "ai" ? " on" : ""}`}
+          className="bo-ai-btn on"
           type="button"
           onClick={onGenerateAI}
           disabled={aiLoading}
         >
-          {aiLoading ? "Generating…" : "✦ AI Look"}
+          {aiLoading ? "Generating…" : "✦ Generate AI Look"}
         </button>
       </div>
 
       {/* Content */}
-      {viewMode === "3d" || (!aiImage && !aiLoading) ? (
-        <>
-          <div style={{ position:"absolute", top:"2.3rem", left:0, right:0, textAlign:"center", fontSize:".52rem", letterSpacing:".22em", textTransform:"uppercase", color:"rgba(255,255,255,.25)", zIndex:10, pointerEvents:"none" }}>
-            3D Outfit Preview · Drag to rotate
-          </div>
-          <Canvas camera={{ position:[0,1.6,5.0], fov:40 }} style={{ height:"100%", width:"100%" }}>
-            <ambientLight intensity={1.2} />
-            <directionalLight position={[3,5,4]}   intensity={1.5} />
-            <directionalLight position={[-3,2,-2]} intensity={0.4} />
-            <Suspense fallback={null}>
-              <MannequinBody top={topItem} bottom={bottomItem} body={body} />
-            </Suspense>
-            <OrbitControls enablePan={false} minDistance={3.5} maxDistance={7} />
-          </Canvas>
-        </>
-      ) : aiLoading ? (
+      {aiLoading ? (
         <div className="bo-ai-loading">
           <div className="bo-ai-spinner" />
           <span>Creating your AI look…</span>
         </div>
-      ) : (
+      ) : aiImage ? (
         <img src={aiImage} alt="AI generated outfit" className="bo-ai-img" />
+      ) : (
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", height: "100%", gap: "1rem" }}>
+          <FashionSilhouette />
+          <div style={{ fontSize: ".62rem", letterSpacing: ".2em", textTransform: "uppercase", color: "rgba(255,255,255,.22)", textAlign: "center" }}>
+            Select items &amp; generate AI look
+          </div>
+        </div>
       )}
 
       {/* Selected items strip */}
@@ -195,7 +172,7 @@ function SilhouettePreview({ selectedTop, selectedBottom, body, viewMode, setVie
             {selectedTop && <>
               <div style={{ fontSize:".52rem", letterSpacing:".14em", textTransform:"uppercase", color:"rgba(255,255,255,.4)" }}>Top</div>
               <div style={{ fontSize:".68rem", color:"#fff", fontWeight:500, lineHeight:1.3, whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis" }}>{selectedTop.name}</div>
-              <div style={{ fontSize:".6rem",  color:"rgba(255,255,255,.5)" }}>{selectedTop.price}</div>
+              <div style={{ fontSize:".6rem", color:"rgba(255,255,255,.5)" }}>{selectedTop.price}</div>
             </>}
           </div>
           <div style={{ width:"1px", background:"rgba(255,255,255,.15)", flexShrink:0 }} />
@@ -203,7 +180,7 @@ function SilhouettePreview({ selectedTop, selectedBottom, body, viewMode, setVie
             {selectedBottom && <>
               <div style={{ fontSize:".52rem", letterSpacing:".14em", textTransform:"uppercase", color:"rgba(255,255,255,.4)" }}>Bottom</div>
               <div style={{ fontSize:".68rem", color:"#fff", fontWeight:500, lineHeight:1.3, whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis" }}>{selectedBottom.name}</div>
-              <div style={{ fontSize:".6rem",  color:"rgba(255,255,255,.5)" }}>{selectedBottom.price}</div>
+              <div style={{ fontSize:".6rem", color:"rgba(255,255,255,.5)" }}>{selectedBottom.price}</div>
             </>}
           </div>
         </div>
@@ -335,7 +312,6 @@ export default function BuildOutfit({ cart = [], setCart, wish = [], setWish }) 
   });
 
   // AI state
-  const [viewMode,  setViewMode]  = useState("3d");
   const [aiImage,   setAiImage]   = useState(null);
   const [aiLoading, setAiLoading] = useState(false);
   const [aiError,   setAiError]   = useState(null);
@@ -395,7 +371,6 @@ export default function BuildOutfit({ cart = [], setCart, wish = [], setWish }) 
   const selectProduct = (item, type) => {
     if (type === "top") setSelectedTop(item); else setSelectedBottom(item);
     setAiImage(null);
-    setViewMode("3d");
   };
 
   const toggleHeart = (item, e) => {
@@ -415,7 +390,6 @@ export default function BuildOutfit({ cart = [], setCart, wish = [], setWish }) 
   };
 
   const generateAI = async () => {
-    setViewMode("ai");
     setAiLoading(true);
     setAiError(null);
     try {
@@ -432,11 +406,9 @@ export default function BuildOutfit({ cart = [], setCart, wish = [], setWish }) 
         setAiImage(data.imageUrl);
       } else {
         setAiError(data.message || "AI generation failed.");
-        setViewMode("3d");
       }
     } catch {
       setAiError("AI generation unavailable. Make sure the backend has OPENAI_API_KEY configured.");
-      setViewMode("3d");
     } finally {
       setAiLoading(false);
     }
@@ -474,9 +446,6 @@ export default function BuildOutfit({ cart = [], setCart, wish = [], setWish }) 
             <SilhouettePreview
               selectedTop={selectedTop}
               selectedBottom={selectedBottom}
-              body={body}
-              viewMode={viewMode}
-              setViewMode={setViewMode}
               aiImage={aiImage}
               aiLoading={aiLoading}
               onGenerateAI={generateAI}
