@@ -464,11 +464,16 @@ function BrandsCarousel() {
       .then(r => r.json())
       .then(data => {
         if (data.success && data.data.length > 0) {
-          const fetched = data.data.map(s => ({
-            name: s.brandName,
-            logo: s.logo || null,
-            href: `/brand/${s.brandName}`,
-          }));
+          const fetched = data.data.map(s => {
+            const hardcoded = BRANDS.find(
+              b => b.name.toLowerCase() === s.brandName.toLowerCase()
+            );
+            return {
+              name: s.brandName,
+              logo: s.logo || hardcoded?.logo || null,
+              href: `/brand/${s.brandName}`,
+            };
+          });
           setBrands(fetched);
         }
       })
