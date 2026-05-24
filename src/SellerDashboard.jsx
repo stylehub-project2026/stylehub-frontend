@@ -1446,6 +1446,14 @@ function SettingsView() {
   const [showCurrentPw, setShowCurrentPw] = useState(false);
   const [showNewPw, setShowNewPw] = useState(false);
   const [showConfirmPw, setShowConfirmPw] = useState(false);
+  // ── Shipping ──
+  const [freeShippingAbove, setFreeShippingAbove] = useState(() => localStorage.getItem("freeShippingAbove") || "500");
+  const [shippingMsg, setShippingMsg] = useState("");
+  const updateShipping = () => {
+    localStorage.setItem("freeShippingAbove", freeShippingAbove);
+    setShippingMsg("✓ Shipping updated!");
+    setTimeout(() => setShippingMsg(""), 3000);
+  };
 
   const changePassword = async () => {
     if (!currentPw || !newPw || !confirmPw) { setPwMsg("✗ Fill all fields."); return; }
@@ -1587,9 +1595,10 @@ function SettingsView() {
           </div>
           <div className="settings-row">
             <span className="settings-label">Free Shipping Above</span>
-            <input className="settings-input" type="text" defaultValue="EGP 500" />
+            <input className="settings-input" type="text" value={freeShippingAbove} onChange={e => setFreeShippingAbove(e.target.value)} placeholder="e.g. 500" />
           </div>
-          <button className="settings-btn">Update Shipping</button>
+          <button className="settings-btn" onClick={updateShipping}>Update Shipping</button>
+          {shippingMsg && <div style={{ fontSize: ".82rem", marginTop: ".6rem", color: "var(--green-dark)" }}>{shippingMsg}</div>}
         </div>
 
         {/* ── PAYMENT ── */}
