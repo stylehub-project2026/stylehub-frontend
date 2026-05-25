@@ -90,142 +90,207 @@ const BOTTOM_PRODUCT_IDS = [104, 100, 8, 103, 105, 106, 114, 113];
 
 // ── Silhouette Preview ──
 function SilhouettePreview({ selectedTop, selectedBottom, body }) {
-  const h  = body?.height || 170;
-  const w  = body?.weight || 70;
-  const ch = body?.chest  || 88;
-  const wa = body?.waist  || 70;
-  const hi = body?.hips   || 96;
+  const h = body?.height || 170;
+  const w = body?.weight || 70;
+  const ch = body?.chest || 88;
+  const wa = body?.waist || 70;
+  const hi = body?.hips || 96;
 
-  // Normalize each measurement to [0,1]
-  const heightN = Math.min(1, Math.max(0, (h  - 140) / 55));
-  const weightN = Math.min(1, Math.max(0, (w  -  45) / 85));
-  const chestN  = Math.min(1, Math.max(0, (ch -  75) / 50));
-  const waistN  = Math.min(1, Math.max(0, (wa -  55) / 50));
-  const hipsN   = Math.min(1, Math.max(0, (hi -  80) / 50));
+  // HEIGHT: 140cm → 0.80 | 170cm → 1.0 | 195cm → 1.18
+  const heightScale = 0.80 + ((h - 140) / 55) * 0.38;
 
-  // SVG canvas
-  const VW = 200, VH = 520;
-  const cx = VW / 2;
+  // WIDTH: weight dominant, chest + hips add detail
+  const widthScale = Math.min(1.55, Math.max(0.70,
+    0.75
+    + ((w - 45) / 85) * 0.58
+    + ((ch - 75) / 50) * 0.10
+    + ((hi - 80) / 50) * 0.10
+  ));
 
-  // Head
-  const headR  = 24;
-  const headCY = 38;
-  const neckHW = 9;
-  const neckTopY = headCY + headR - 2;
-  const neckBotY = neckTopY + 16;
-  const shoulderY = neckBotY + 6;
+  // The SVG body occupies 68% width and 88% height of the stage,
+  // centered at 50%/50%. We compute the scaled body's actual pixel
+  // footprint so clothes can be placed relative to it.
+  //
+  // Body SVG natural proportions (approximate, tweak to match your SVG):
+  //   head top  → ~3%  of SVG height
+  //   shoulders → ~14% of SVG height
+  //   waist     → ~46% of SVG height
+  //   hips end  → ~62% of SVG height
+  //   feet      → ~98% of SVG height
+  //
+  // After scaleY(heightScale) the SVG still renders at 88% stage height
+  // visually, but its content shifts. We translate everything through the
+  // same transform origin (center of stage) as the body SVG uses.
 
-  // Body length driven by height
-  const feetY  = VH * (0.82 + heightN * 0.16);
-  const bodyH  = feetY - shoulderY;
+  // ─────────────────────────────────────────────────────────────────────────
+  // 🎛 BODY-PART FITTING WIDTHS
+  // These values connect the sliders to the preview more naturally:
+  // - chest affects the upper garment width
+  // - waist affects the middle narrowing
+  // - hips affects the bottom garment width
+  // - weight still influences the general body silhouette
+  // ─────────────────────────────────────────────────────────────────────────
+  const shoulderScale = Math.min(1.45, Math.max(0.82,
+    widthScale * (0.9 + ((ch - 75) / 50) * 0.35)
+  ));
 
-  // Key Y anchors
-  const chestY  = shoulderY + bodyH * 0.20;
-  const waistY  = shoulderY + bodyH * 0.40;
-  const hipTopY = shoulderY + bodyH * 0.52;
-  const hipBotY = shoulderY + bodyH * 0.62;
-  const crotchY = shoulderY + bodyH * 0.64;
-  const kneeY   = shoulderY + bodyH * 0.82;
+  const waistScale = Math.min(1.35, Math.max(0.75,
+    widthScale * (0.85 + ((wa - 55) / 50) * 0.28)
+  ));
 
-  // Half-widths — each measurement drives its own region
-  const bulk       = 1 + weightN * 0.28;
-  const shoulderHW = (28 + chestN * 10) * bulk;
-  const chestHW    = (24 + chestN * 12) * bulk;
-  const waistHW    = (16 + waistN * 12) * bulk;
-  const hipHW      = (26 + hipsN  * 14) * bulk;
-  const legHW      = 10  * bulk;
+  const hipsScale = Math.min(1.5, Math.max(0.82,
+    widthScale * (0.9 + ((hi - 80) / 50) * 0.32)
+  ));
 
-  // Parametric body path
-  const path = [
-    `M ${cx - shoulderHW} ${shoulderY}`,
-    `C ${cx - shoulderHW} ${chestY - 15}, ${cx - chestHW - 4} ${chestY - 5}, ${cx - chestHW} ${chestY}`,
-    `C ${cx - chestHW} ${waistY - 25}, ${cx - waistHW} ${waistY - 8}, ${cx - waistHW} ${waistY}`,
-    `C ${cx - waistHW} ${hipTopY - 5}, ${cx - hipHW} ${hipTopY + 5}, ${cx - hipHW} ${hipTopY}`,
-    `C ${cx - hipHW} ${hipBotY}, ${cx - legHW - 4} ${crotchY - 4}, ${cx - legHW} ${crotchY}`,
-    `C ${cx - legHW} ${kneeY - 10}, ${cx - legHW + 1} ${kneeY}, ${cx - legHW + 1} ${kneeY}`,
-    `L ${cx - legHW + 1} ${feetY}`,
-    `L ${cx + legHW - 1} ${feetY}`,
-    `L ${cx + legHW - 1} ${kneeY}`,
-    `C ${cx + legHW - 1} ${kneeY - 10}, ${cx + legHW} ${crotchY - 4}, ${cx + legHW + 4} ${crotchY}`,
-    `C ${cx + hipHW} ${hipBotY}, ${cx + hipHW} ${hipTopY + 5}, ${cx + hipHW} ${hipTopY}`,
-    `C ${cx + hipHW} ${hipTopY - 5}, ${cx + waistHW} ${waistY - 8}, ${cx + waistHW} ${waistY}`,
-    `C ${cx + waistHW} ${waistY - 25}, ${cx + chestHW} ${chestY - 5}, ${cx + chestHW} ${chestY}`,
-    `C ${cx + chestHW + 4} ${chestY - 5}, ${cx + shoulderHW} ${shoulderY + 10}, ${cx + shoulderHW} ${shoulderY}`,
-    `L ${cx + neckHW} ${neckBotY}`,
-    `L ${cx + neckHW} ${neckTopY}`,
-    `L ${cx - neckHW} ${neckTopY}`,
-    `L ${cx - neckHW} ${neckBotY}`,
-    `L ${cx - shoulderHW} ${shoulderY} Z`,
-  ].join(' ');
+  const topWidthPct = 68 * ((shoulderScale * 0.7) + (waistScale * 0.3));
+  const bottomWidthPct = 68 * ((hipsScale * 0.75) + (waistScale * 0.25));
 
-  // Garment positioning derived from body coordinates
-  const shoulderPct = (shoulderY / VH) * 100;
-  const waistPct    = (waistY    / VH) * 100;
-  const hipBotPct   = (hipBotY   / VH) * 100;
-  const feetPct     = (feetY     / VH) * 100;
+  // The body SVG is centered at top:50% / left:50% with translate(-50%,-50%).
+  // Its rendered height on screen = 88% of stage height × heightScale.
+  // Its rendered top edge (in stage %) = 50% - (88% * heightScale / 2)
+  const bodyTopPct = 50 - (88 * heightScale) / 2;
+  const bodyHeightPct = 88 * heightScale;
 
-  const topGarmentTop    = shoulderPct;
-  const topGarmentHeight = (waistPct - shoulderPct) * 1.45;
-  const bottomGarmentTop = waistPct - (hipBotPct - waistPct) * 0.18;
-  const bottomGarmentH   = feetPct - bottomGarmentTop;
-  const clothWidthPct    = (hipHW * 2 / VW) * 100 * 1.12;
+  // Anchor positions within the SVG content (as fraction of SVG height):
+  const SVG_SHOULDER_FRAC = 0.14;
+  const SVG_WAIST_FRAC = 0.46;
+  const SVG_HIPS_END_FRAC = 0.63;
+  const SVG_FEET_FRAC = 0.97;
+
+  // Convert to stage % coordinates
+  const shoulderTopPct = bodyTopPct + bodyHeightPct * SVG_SHOULDER_FRAC;
+  const waistPct = bodyTopPct + bodyHeightPct * SVG_WAIST_FRAC;
+  const hipsEndPct = bodyTopPct + bodyHeightPct * SVG_HIPS_END_FRAC;
+  const feetPct = bodyTopPct + bodyHeightPct * SVG_FEET_FRAC;
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // 🎛  TOP GARMENT HEIGHT
+  //     Multiplier controls how far down the top stretches:
+  //       1.08 = just below waist (default crop)
+  //       1.45 = stomach / belly button  ← current
+  //       1.70 = hip level (long shirt / tunic)
+  //       2.00 = very long top / dress-like
+  //     Increase the number → longer top, decrease → shorter/more cropped
+  // ─────────────────────────────────────────────────────────────────────────
+  const topGarmentTop = shoulderTopPct;
+  const topGarmentHeight = (waistPct - shoulderTopPct) * 1.45; // ← change multiplier here
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // 🎛  BOTTOM GARMENT HEIGHT & VERTICAL POSITION
+  //     bottomGarmentTop  → how high up the bottom starts (overlap with top)
+  //       0.18 = slight overlap ← current | 0.30 = more overlap | 0.0 = no overlap
+  //     bottomGarmentHeight → auto (reaches feet). To shorten (e.g. shorts):
+  //       replace `feetPct - bottomGarmentTop`
+  //       with e.g. `(feetPct - bottomGarmentTop) * 0.55`  for knee-length
+  // ─────────────────────────────────────────────────────────────────────────
+  const bottomGarmentTop = waistPct - (hipsEndPct - waistPct) * 0.18; // ← change 0.18 for overlap
+  const bottomGarmentHeight = feetPct - bottomGarmentTop;                 // ← multiply by 0.0–1.0 to shorten
 
   return (
     <div className="bo-stage bo-soft" style={{
       position: "relative",
       background: "radial-gradient(circle at 48% 16%, rgba(255,255,255,.06), transparent 30%), linear-gradient(180deg,#3d3c39 0%,#2e2d2b 100%)",
     }}>
+      {/* Label */}
       <div style={{
         position: "absolute", top: "1rem", left: 0, right: 0, textAlign: "center",
         fontSize: ".55rem", letterSpacing: ".22em", textTransform: "uppercase",
         color: "rgba(255,255,255,.28)", zIndex: 10, pointerEvents: "none",
       }}>Outfit Preview</div>
 
-      {/* ── Parametric body SVG ── */}
+      {/* ── Body silhouette SVG — positioned at the same top/height as the virtual body
+           so shoulders (14% of SVG) land exactly on topGarmentTop,
+           and feet (97% of SVG) land exactly on feetPct. ── */}
       <svg
-        viewBox={`0 0 ${VW} ${VH}`}
+        viewBox="0 0 278.8 984.46"
         preserveAspectRatio="xMidYMid meet"
         style={{
-          position: "absolute", top: 0, left: 0,
-          width: "100%", height: "100%",
-          zIndex: 0, pointerEvents: "none",
+          position: "absolute",
+          top: `${bodyTopPct}%`,
+          left: "50%",
+          transform: "translateX(-50%)",
+          height: `${bodyHeightPct}%`,
+          width: "auto",
+          zIndex: 0,
+          pointerEvents: "none",
+          opacity: 0.18,
         }}
       >
-        <path d={path} fill="rgba(180,172,158,0.22)" stroke="rgba(200,195,185,0.35)" strokeWidth="1" />
-        <circle cx={cx} cy={headCY} r={headR} fill="rgba(180,172,158,0.22)" stroke="rgba(200,195,185,0.35)" strokeWidth="1" />
+        <g transform="translate(-37.897 -34.052)">
+          <path
+            d="m184.31 39.407c-2.4389 0.07883-3.6559 0.08033-4.8797 0.09384v0.09384c-1.2004-0.01201-2.3939-0.01652-4.7858-0.09384-39.289 0.35904-38.803 67.435-24.68 87.834 6.2768 12.553-0.0248 25.123-1.5953 37.677-16.296 15.257-69.012 9.9299-77.324 23.554-11.016 22.636-25.015 136.57-19.237 154.93-16.753 28.277 18.096 142.43 18.064 163.56-9.0447 52.676 14.379 68.409 26.932 68.409-0.0643-9.9139-18.388-22.691-12.715-33.876 4.7717-3.0742 3.5556 2.2366 11.402 6.9442-0.30838-3.7707-0.54017-7.8508-0.79764-12.012-1.0503-9.341-2.0133-18.776-2.7214-28.199-0.23254-1.3091-0.47227-2.5421-0.75071-3.7067-6.2768-9.4151 4.4727-102.43-2.4398-135.65 10.211-26.909 17.287-117.63 15.718-131.75 5.6409 38.15 2.7223 104.48 4.692 130.86-18.836 34.879-21.187 87.444-17.22 140.24 1.4124 7.9512 2.1093 18.309 2.7214 28.199 8.0075 71.217 24.235 137.21 22.991 154.18-14.061 68.619 4.1043 184.01 4.9735 196.13-0.93338 11.217-6.8215 27.589-2.5806 34.533-5.673 24.069-12.496 28.199-7.7887 42.322 4.7076 14.123 40.519 21.29 47.061 12.574 2.0358-13.221-3.1281-50.215-7.8356-56.492 2.5025-5.3754 8.2537-21.518 3.1436-37.677 9.3101-15.257 20.802-146.51 16.328-160.23 4.3089-6.181 8.8609-37.541 4.1742-46.035 0.38087-4.1414 1.1622-122.16 3.0964-124.92 3.4167-11.146 2.284-11.021 4.42-0.15238 2.1818 3.8267 1.7454 121.17 2.1263 125.31-4.6867 8.4948-1.1408 39.519 3.1681 45.7-4.4742 13.72 7.0181 144.97 16.328 160.23-5.1101 16.159 0.6411 32.301 3.1436 37.677-4.7076 6.2768-9.8715 43.27-7.8356 56.492 6.5421 8.715 42.353 1.5482 47.061-12.575 4.7075-14.123-2.1158-18.253-7.7887-42.322 4.2409-6.9446-1.6472-23.316-2.5806-34.533 0.8692-12.119 19.035-127.51 4.9735-196.13-1.2442-16.971 14.983-82.962 22.991-154.18 0.61204-9.89 1.3089-20.248 2.7214-28.199 3.9676-52.8 1.616-105.36-17.22-140.24 1.9697-26.377-0.94894-92.709 4.692-130.86-1.5692 14.123 5.5068 104.84 15.718 131.75-6.9126 33.218 3.8369 126.23-2.4398 135.65-0.27843 1.1646-0.51817 2.3976-0.75071 3.7067-0.70803 9.4225-1.6711 18.858-2.7214 28.199-0.25747 4.1607-0.48926 8.2408-0.79763 12.012 7.8459-4.7076 6.6298-10.018 11.402-6.9442 5.673 11.186-12.651 23.962-12.715 33.876 12.553 0 35.977-15.734 26.932-68.409-0.032-21.131 34.818-135.29 18.064-163.56 5.778-18.363-8.2208-132.29-19.237-154.93-8.3126-13.624-61.028-8.2966-77.324-23.554-1.5705-12.553-7.872-25.123-1.5953-37.677 14.123-20.399 14.609-87.475-24.68-87.834z"
+            style={{ fill: "rgba(210,205,190,0.9)", stroke: "none" }}
+          />
+        </g>
       </svg>
 
       {/* ── TOP garment ── */}
       <div style={{
         position: "absolute",
-        top: `${topGarmentTop}%`, left: "50%",
+        top: `${topGarmentTop}%`,
+        left: "50%",
         transform: "translateX(-50%)",
-        width: `${clothWidthPct}%`, height: `${topGarmentHeight}%`,
-        zIndex: 2, display: "flex", alignItems: "flex-start", justifyContent: "center",
+        width: `${topWidthPct}%`,
+        height: `${topGarmentHeight}%`,
+        zIndex: 2,
+        display: "flex", alignItems: "flex-start", justifyContent: "center",
         transition: "all .35s ease",
       }}>
         {selectedTop ? (
-          <img key={selectedTop.id} src={selectedTop.img3d || selectedTop.img} alt={selectedTop.name}
-            style={{ width: "100%", height: "100%", objectFit: "fill", filter: "drop-shadow(0 8px 20px rgba(0,0,0,.6))", animation: "fadeInUp .3s ease" }} />
+          <img
+            key={selectedTop.id}
+            src={selectedTop.img3d || selectedTop.img}
+            alt={selectedTop.name}
+            style={{
+              width: "100%", height: "100%",
+              objectFit: "fill",
+              filter: "drop-shadow(0 8px 20px rgba(0,0,0,.6))",
+              animation: "fadeInUp .3s ease",
+            }}
+          />
         ) : (
-          <div style={{ width: "80%", height: "75%", border: "1.5px dashed rgba(255,255,255,.12)", borderRadius: 6, display: "flex", alignItems: "center", justifyContent: "center", color: "rgba(255,255,255,.2)", fontSize: ".58rem", letterSpacing: ".12em", textTransform: "uppercase" }}>Choose Top</div>
+          <div style={{
+            width: "80%", height: "75%",
+            border: "1.5px dashed rgba(255,255,255,.12)", borderRadius: 6,
+            display: "flex", alignItems: "center", justifyContent: "center",
+            color: "rgba(255,255,255,.2)", fontSize: ".58rem",
+            letterSpacing: ".12em", textTransform: "uppercase",
+          }}>Choose Top</div>
         )}
       </div>
 
       {/* ── BOTTOM garment ── */}
       <div style={{
         position: "absolute",
-        top: `${bottomGarmentTop}%`, left: "50%",
+        top: `${bottomGarmentTop}%`,
+        left: "50%",
         transform: "translateX(-50%)",
-        width: `${clothWidthPct}%`, height: `${bottomGarmentH}%`,
-        zIndex: 1, display: "flex", alignItems: "flex-start", justifyContent: "center",
+        width: `${bottomWidthPct}%`,
+        height: `${bottomGarmentHeight}%`,
+        zIndex: 1,
+        display: "flex", alignItems: "flex-start", justifyContent: "center",
         transition: "all .35s ease",
       }}>
         {selectedBottom ? (
-          <img key={selectedBottom.id} src={selectedBottom.img3d || selectedBottom.img} alt={selectedBottom.name}
-            style={{ width: "100%", height: "100%", objectFit: "fill", filter: "drop-shadow(0 6px 16px rgba(0,0,0,.5))", animation: "fadeInDown .3s ease" }} />
+          <img
+            key={selectedBottom.id}
+            src={selectedBottom.img3d || selectedBottom.img}
+            alt={selectedBottom.name}
+            style={{
+              width: "100%", height: "100%",
+              objectFit: "fill",
+              filter: "drop-shadow(0 6px 16px rgba(0,0,0,.5))",
+              animation: "fadeInDown .3s ease",
+            }}
+          />
         ) : (
-          <div style={{ width: "75%", height: "70%", border: "1.5px dashed rgba(255,255,255,.12)", borderRadius: 6, display: "flex", alignItems: "center", justifyContent: "center", color: "rgba(255,255,255,.2)", fontSize: ".58rem", letterSpacing: ".12em", textTransform: "uppercase" }}>Choose Bottom</div>
+          <div style={{
+            width: "75%", height: "70%",
+            border: "1.5px dashed rgba(255,255,255,.12)", borderRadius: 6,
+            display: "flex", alignItems: "center", justifyContent: "center",
+            color: "rgba(255,255,255,.2)", fontSize: ".58rem",
+            letterSpacing: ".12em", textTransform: "uppercase",
+          }}>Choose Bottom</div>
         )}
       </div>
 
@@ -235,7 +300,8 @@ function SilhouettePreview({ selectedTop, selectedBottom, body }) {
           position: "absolute", bottom: 0, left: 0, right: 0,
           background: "linear-gradient(transparent,rgba(0,0,0,.75))",
           padding: ".6rem .8rem .7rem",
-          display: "flex", justifyContent: "space-between", gap: ".5rem", zIndex: 10,
+          display: "flex", justifyContent: "space-between", gap: ".5rem",
+          zIndex: 10,
         }}>
           <div style={{ flex: 1 }}>
             {selectedTop && <>
