@@ -23,15 +23,7 @@ const HERO_SLIDES = [
         bg: "#ede9e0",
         fullBg: true,
     },
-    {
-        ey: "End of Season Deals",
-        h1: "Men",
-        sub: "Up to 50% off selected items from local designers.",
-        btn: "Explore Sale",
-        img: "/ChatGPT Image May 23, 2026, 07_22_56 PM.png",
-        bg: "#f0ece8",
-        fullBg: true,
-    },
+    
 ];
 
 // ── Category name → type tag used in products ──
@@ -42,9 +34,9 @@ const CAT_TYPE_MAP = {
 };
 
 const CATEGORIES = [
-    { name: "Pants",   img: "https://twentysevenegy.myshopify.com/cdn/shop/files/022A2473.jpg?v=1768003189&width=980", count: "24 styles" },
-    { name: "Hoodies", img: "https://m.media-amazon.com/images/I/61pyF5Fn+qL._AC_SY445_SX342_QL70_ML2_.jpg",          count: "18 styles" },
-    { name: "Jackets", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTtGWEsZvzeQ6zJL-0wsuiw6mKMZryONXoHyw&s", count: "12 styles" },
+    { name: "Pants",   img: "https://twentysevenegy.myshopify.com/cdn/shop/files/022A2473.jpg?v=1768003189&width=980", count: "10 styles" },
+    { name: "Hoodies", img: "https://m.media-amazon.com/images/I/61pyF5Fn+qL._AC_SY445_SX342_QL70_ML2_.jpg",          count: "12 styles" },
+    { name: "Jackets", img: "/men-jacket,jpeg", count: "11 styles" },
 ];
 
 /* ══════════════════════════════════════════ HELPERS ══════════════════════════════════════════ */
