@@ -10,7 +10,7 @@ const HERO_SLIDES = [
     fullBanner: true,
     img: "/sec2.jpg",
     // ── eyebrow text appears above the Discover button ──
-    eyebrow: "New Collection · 2025",
+    h1: "Effortless Fashion Starts Here· 2026",
     btn: "Discover",
     // ── action: what clicking the button does ──
     // "scroll-all"  → smoothly scrolls to the All Products section
@@ -24,6 +24,7 @@ const HERO_SLIDES = [
     h1: "Style That\nSpeaks for You",
     sub: "The most coveted pieces from Egypt's boldest local designers.",
     btn: "Shop the Edit",
+    img: "/cover2.jpg",
     action: "scroll-all",          // ← change to "link:/edit" etc. as needed
   },
   {
