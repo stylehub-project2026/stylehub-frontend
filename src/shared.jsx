@@ -36,7 +36,7 @@ const Heart = ({ on }) => (
 );
 
 export const BRANDS = [
-  { name: "27", logo: "/27.jpg", href: "/brand/27" },
+  { name: "27", logo: "/27.jpg", href: "/brand/TwentySeven" },
   { name: "MARBLE", logo: "/marble.jpg", href: "/brand/marble" },
   { name: "أنتيكا", logo: "/antika.jpg", href: "/brand/Antika" },
   { name: "salty", logo: "/saltyy.jpg", href: "/brand/salty" },
