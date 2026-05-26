@@ -19,7 +19,7 @@ const HERO_SLIDES = [
         h1: "Men",
         sub: "Up to 50% off selected items from local designers.",
         btn: "Explore Sale",
-        img: "/men-slider.avif",
+        img: "/REM.jpeg",
         bg: "#ede9e0",
         fullBg: true,
     },
@@ -485,7 +485,7 @@ export default function MenPage({ cart = [], setCart, wish = [], setWish }) {
         .hero-img { width: 50%; height: 480px; overflow: hidden; }
         .hero-img img { width: 100%; height: 100%; object-fit: cover; object-position: center; }
         .hero-h1  { font-family: var(--fd); font-size: clamp(1.6rem, 3.5vw, 3rem); font-weight: 700; line-height: 1.15; color: var(--c-dark); margin-bottom: .9rem; }
-        .hero-sub { font-size: .85rem; color: var(--c-gray); line-height: 1.65; max-width: 300px; margin-bottom: 1.8rem; }
+        .hero-sub { font-size: .99rem; color: var(--c-gray); line-height: 1.65; max-width: 300px; margin-bottom: 1.8rem; }
         .hero-arrow { position: absolute; top: 50%; transform: translateY(-50%); width: 38px; height: 38px; border-radius: 50%; background: #fff; border: 1px solid var(--c-gray-lt); display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: var(--sh-sm); z-index: 5; transition: all .3s; font-size: .85rem; }
         .hero-arrow:hover { background: var(--c-dark); color: #fff; }
         .hero-arrow.p { left: 1rem; } .hero-arrow.n { right: 1rem; }
