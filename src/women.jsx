@@ -10,7 +10,9 @@ const HERO_SLIDES = [
     fullBanner: true,
     img: "/sec2.jpg",
     // ── eyebrow text appears above the Discover button ──
-    h1: "Effortless Fashion Starts Here· 2026",
+     eyebrow: "NEW SEASON 2026",
+    h1: "Effortless Fashion Starts Here",
+
     btn: "Discover",
     // ── action: what clicking the button does ──
     // "scroll-all"  → smoothly scrolls to the All Products section
