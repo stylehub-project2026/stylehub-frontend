@@ -249,13 +249,26 @@ function SilhouettePreview({ selectedTop, selectedBottom, body }) {
             }}
           />
         ) : (
-          <div style={{
-            width: "80%", height: "75%",
-            border: "1.5px dashed rgba(255,255,255,.12)", borderRadius: 6,
-            display: "flex", alignItems: "center", justifyContent: "center",
-            color: "rgba(255,255,255,.2)", fontSize: ".58rem",
-            letterSpacing: ".12em", textTransform: "uppercase",
-          }}>Choose Top</div>
+          <div
+            style={{
+              width: "80%",
+              height: "75%",
+              border: "1.5px dashed rgba(255,255,255,.12)",
+              borderRadius: "6px",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: "6px",
+              color: "rgba(255,255,255,.2)",
+              fontSize: ".58rem",
+              letterSpacing: ".12em",
+              textTransform: "uppercase",
+            }}
+          >
+            <span style={{ fontSize: "1.2rem" }}>＋</span>
+            Choose Top
+          </div>
         )}
       </div>
 
