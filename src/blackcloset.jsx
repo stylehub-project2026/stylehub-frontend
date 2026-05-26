@@ -6,7 +6,7 @@ import { SHNav, SHFooter, SHARED_CSS, useScrollReveal } from "./shared";
 // ─── BRAND CONFIG ────────────────────────────────────────────────────────────
 const BRAND = {
   name: "Black Closet",
-  desc: "Black Closet is a clothing brand that blends classic, Old Money aesthetics with modern streetwear. The brand focuses on creating stylish everyday pieces such as hoodies, baggy jeans, polos and sweaters — combining comfort with a refined yet edgy look for people who appreciate timeless style with a modern urban twist.",
+  desc:"BlackCloset Egypt is a fashion brand focused on modern, elegant, and trend-driven styles that blend comfort with individuality. Offering carefully curated collections, the brand aims to deliver versatile pieces that fit everyday wear while maintaining a stylish and contemporary aesthetic.",
   logo: "/blackcloset%20logo.jpg",
   heroBg: "",
   accentColor: "#1a1a1a",
