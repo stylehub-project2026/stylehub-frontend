@@ -4,21 +4,14 @@ import { SHNav, SHFooter, SHARED_CSS, PRODUCTS } from "./shared";
 
 const API = "https://stylehub-backend-tau.vercel.app/api";
 
-// ─── RESPONSIVE CSS ───
 const PRODUCT_CSS = `
-/* Main two-column grid */
 .pd-grid { display:grid; grid-template-columns:52% 48%; gap:0; }
 .pd-left { display:flex; gap:.75rem; padding:1rem 2rem 4rem 4%; }
 .pd-right { padding:2rem 6% 4rem 3rem; }
-.pd-breadcrumb {
-  padding:1rem 5%; font-size:.7rem; color:var(--warm);
-  font-family:'DM Sans',sans-serif; display:flex; gap:.5rem; align-items:center;
-}
+.pd-breadcrumb { padding:1rem 5%; font-size:.7rem; color:var(--warm); font-family:'DM Sans',sans-serif; display:flex; gap:.5rem; align-items:center; }
 .pd-also-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:1.5rem; }
 .pd-reviews-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:1.2rem; }
 .pd-section { padding:3rem 5%; }
-
-/* ── Tablet / iPad (≤1024px) ── */
 @media(max-width:1024px){
   .pd-grid { grid-template-columns:1fr; }
   .pd-left { padding:1rem 1.5rem 2rem; aspect-ratio:unset !important; min-height:420px; }
@@ -27,8 +20,6 @@ const PRODUCT_CSS = `
   .pd-reviews-grid { grid-template-columns:repeat(2,1fr); }
   .pd-section { padding:2.5rem 1.5rem; }
 }
-
-/* ── Mobile (≤768px) ── */
 @media(max-width:768px){
   .pd-left { padding:1rem 1rem 1.5rem; gap:.5rem; min-height:360px; }
   .pd-right { padding:1rem 1rem 2.5rem; }
@@ -36,8 +27,6 @@ const PRODUCT_CSS = `
   .pd-reviews-grid { grid-template-columns:1fr; }
   .pd-section { padding:2rem 1rem; }
 }
-
-/* ── Small mobile (≤480px) ── */
 @media(max-width:480px){
   .pd-left { padding:.75rem .75rem 1rem; min-height:300px; }
   .pd-right { padding:.75rem .75rem 2rem; }
@@ -59,64 +48,92 @@ const StarIcon = ({ filled }) => (
   </svg>
 );
 
-/* ─── Mini Product Card (used in thumbnails + You May Also Like) ─── */
 function ProductCard({ p, getImageUrl, onClick }) {
   const [hovered, setHovered] = useState(false);
   const rawPrice = parseInt(String(p.price || "").replace(/[^0-9]/g, ""), 10);
   const rawOld = p.oldPrice ? parseInt(String(p.oldPrice).replace(/[^0-9]/g, ""), 10) : null;
   const isOnSale = !!rawOld;
-
   return (
-    <div
-      onClick={onClick}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-      style={{ cursor: "pointer", display: "flex", flexDirection: "column" }}
-    >
-      {/* Image */}
+    <div onClick={onClick} onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)} style={{ cursor: "pointer", display: "flex", flexDirection: "column" }}>
       <div style={{ position: "relative", aspectRatio: "3/4", overflow: "hidden", background: "#f0ece6", marginBottom: ".6rem" }}>
-        <img
-          src={getImageUrl(p.img)}
-          alt={p.name}
-          onError={e => (e.target.style.display = "none")}
-          style={{
-            width: "100%", height: "100%", objectFit: "cover",
-            transform: hovered ? "scale(1.04)" : "scale(1)",
-            transition: "transform .4s ease",
-          }}
-        />
-        {isOnSale && (
-          <div style={{
-            position: "absolute", top: ".6rem", left: ".6rem",
-            background: "var(--red)", color: "#fff",
-            fontSize: ".55rem", letterSpacing: ".1em",
-            padding: ".25rem .55rem", fontWeight: 700, fontFamily: "'DM Sans',sans-serif",
-          }}>SALE</div>
-        )}
+        <img src={getImageUrl(p.img)} alt={p.name} onError={e => (e.target.style.display = "none")}
+          style={{ width: "100%", height: "100%", objectFit: "cover", transform: hovered ? "scale(1.04)" : "scale(1)", transition: "transform .4s ease" }} />
+        {isOnSale && <div style={{ position: "absolute", top: ".6rem", left: ".6rem", background: "var(--red)", color: "#fff", fontSize: ".55rem", letterSpacing: ".1em", padding: ".25rem .55rem", fontWeight: 700, fontFamily: "'DM Sans',sans-serif" }}>SALE</div>}
       </div>
-
-      {/* Info */}
-      <div style={{ fontSize: ".6rem", letterSpacing: ".15em", textTransform: "uppercase", color: "var(--warm)", fontFamily: "'DM Sans',sans-serif", marginBottom: ".2rem" }}>
-        {p.brand}
-      </div>
-      <div style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: ".95rem", color: "var(--dark)", marginBottom: ".3rem", lineHeight: 1.2 }}>
-        {p.name}
-      </div>
+      <div style={{ fontSize: ".6rem", letterSpacing: ".15em", textTransform: "uppercase", color: "var(--warm)", fontFamily: "'DM Sans',sans-serif", marginBottom: ".2rem" }}>{p.brand}</div>
+      <div style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: ".95rem", color: "var(--dark)", marginBottom: ".3rem", lineHeight: 1.2 }}>{p.name}</div>
       <div style={{ display: "flex", gap: ".5rem", alignItems: "center" }}>
         {isOnSale ? (
           <>
-            <span style={{ fontFamily: "'DM Sans',sans-serif", fontSize: ".75rem", color: "var(--red)", fontWeight: 600 }}>
-              LE {rawPrice.toLocaleString()}
-            </span>
-            <span style={{ fontFamily: "'DM Sans',sans-serif", fontSize: ".7rem", color: "var(--warm)", textDecoration: "line-through" }}>
-              LE {rawOld.toLocaleString()}
-            </span>
+            <span style={{ fontFamily: "'DM Sans',sans-serif", fontSize: ".75rem", color: "var(--red)", fontWeight: 600 }}>LE {rawPrice.toLocaleString()}</span>
+            <span style={{ fontFamily: "'DM Sans',sans-serif", fontSize: ".7rem", color: "var(--warm)", textDecoration: "line-through" }}>LE {rawOld.toLocaleString()}</span>
           </>
         ) : (
-          <span style={{ fontFamily: "'DM Sans',sans-serif", fontSize: ".75rem", color: "var(--dark)", fontWeight: 600 }}>
-            LE {rawPrice.toLocaleString()}
-          </span>
+          <span style={{ fontFamily: "'DM Sans',sans-serif", fontSize: ".75rem", color: "var(--dark)", fontWeight: 600 }}>LE {rawPrice.toLocaleString()}</span>
         )}
+      </div>
+    </div>
+  );
+}
+
+function SizeGuidePopup({ onClose }) {
+  useEffect(() => {
+    document.body.style.overflow = "hidden";
+    return () => { document.body.style.overflow = ""; };
+  }, []);
+
+  return (
+    <div onClick={onClose} style={{ position: "fixed", inset: 0, background: "rgba(26,26,24,.65)", zIndex: 900, display: "flex", alignItems: "center", justifyContent: "center", padding: "1rem" }}>
+      <div onClick={e => e.stopPropagation()} style={{ background: "#fff", maxWidth: 580, width: "100%", padding: "2.5rem", position: "relative", borderRadius: 4, maxHeight: "90vh", overflowY: "auto" }}>
+        <button onClick={onClose} style={{ position: "absolute", top: "1rem", right: "1rem", background: "none", border: "none", cursor: "pointer", fontSize: "1.2rem", color: "var(--warm)" }}>✕</button>
+        <div style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: "1.8rem", fontWeight: 400, marginBottom: ".4rem" }}>Size Guide</div>
+        <div style={{ width: 40, height: 2, background: "var(--sage)", marginBottom: "1.8rem" }} />
+
+        <div style={{ marginBottom: "1.8rem" }}>
+          <div style={{ fontSize: ".6rem", letterSpacing: ".2em", textTransform: "uppercase", fontWeight: 600, color: "var(--warm)", marginBottom: ".8rem", fontFamily: "'DM Sans',sans-serif" }}>Women & Men</div>
+          <table style={{ width: "100%", borderCollapse: "collapse", fontFamily: "'DM Sans',sans-serif", fontSize: ".75rem" }}>
+            <thead>
+              <tr style={{ background: "var(--cream)" }}>
+                {["Size", "Chest (cm)", "Waist (cm)", "Hips (cm)"].map(h => (
+                  <th key={h} style={{ padding: ".6rem .8rem", textAlign: "left", fontWeight: 600, borderBottom: "1px solid var(--border)", color: "var(--dark)" }}>{h}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {[["XS","80–84","60–64","86–90"],["S","84–88","64–68","90–94"],["M","88–92","68–72","94–98"],["L","92–96","72–76","98–102"],["XL","96–100","76–80","102–106"]].map(([size,...vals]) => (
+                <tr key={size} style={{ borderBottom: "1px solid var(--border)" }}>
+                  <td style={{ padding: ".55rem .8rem", fontWeight: 600 }}>{size}</td>
+                  {vals.map((v, i) => <td key={i} style={{ padding: ".55rem .8rem", color: "var(--warm)" }}>{v}</td>)}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        <div>
+          <div style={{ fontSize: ".6rem", letterSpacing: ".2em", textTransform: "uppercase", fontWeight: 600, color: "var(--warm)", marginBottom: ".8rem", fontFamily: "'DM Sans',sans-serif" }}>Kids</div>
+          <table style={{ width: "100%", borderCollapse: "collapse", fontFamily: "'DM Sans',sans-serif", fontSize: ".75rem" }}>
+            <thead>
+              <tr style={{ background: "var(--cream)" }}>
+                {["Size", "Age", "Height (cm)", "Chest (cm)"].map(h => (
+                  <th key={h} style={{ padding: ".6rem .8rem", textAlign: "left", fontWeight: 600, borderBottom: "1px solid var(--border)", color: "var(--dark)" }}>{h}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {[["4Y","3–4","98–104","54–56"],["6Y","5–6","110–116","57–59"],["8Y","7–8","122–128","60–63"],["10Y","9–10","134–140","64–67"],["12Y","11–12","146–152","68–72"],["14Y","13–14","158–164","73–77"]].map(([size,...vals]) => (
+                <tr key={size} style={{ borderBottom: "1px solid var(--border)" }}>
+                  <td style={{ padding: ".55rem .8rem", fontWeight: 600 }}>{size}</td>
+                  {vals.map((v, i) => <td key={i} style={{ padding: ".55rem .8rem", color: "var(--warm)" }}>{v}</td>)}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        <p style={{ fontFamily: "'DM Sans',sans-serif", fontSize: ".7rem", color: "var(--warm)", marginTop: "1.2rem", lineHeight: 1.7 }}>
+          Sizes may vary slightly between brands. If you are between sizes, we recommend sizing up.
+        </p>
       </div>
     </div>
   );
@@ -138,6 +155,7 @@ export default function ProductDetail({ cart, setCart, wish, setWish }) {
   const [reviewComment, setReviewComment] = useState("");
   const [reviewMsg, setReviewMsg] = useState(null);
   const [submittingReview, setSubmittingReview] = useState(false);
+  const [sizeGuideOpen, setSizeGuideOpen] = useState(false);
 
   const getImageUrl = (img) => {
     if (!img) return null;
@@ -152,48 +170,29 @@ export default function ProductDetail({ cart, setCart, wish, setWish }) {
     const local = PRODUCTS.find(p => String(p.id) === String(id));
     if (local) {
       setProduct({
-        id: local.id,
-        _id: local.id,
-        name: local.name,
-        brand: local.brand,
-        price: local.oldPrice
-          ? parseInt(String(local.oldPrice).replace(/[^0-9]/g, ""), 10)
-          : parseInt(String(local.price).replace(/[^0-9]/g, ""), 10),
-        salePrice: local.oldPrice
-          ? parseInt(String(local.price).replace(/[^0-9]/g, ""), 10)
-          : null,
-        description: local.desc || "",
-        sizes: local.sizes || [],
-        colors: local.colors || [],
+        id: local.id, _id: local.id, name: local.name, brand: local.brand,
+        price: local.oldPrice ? parseInt(String(local.oldPrice).replace(/[^0-9]/g, ""), 10) : parseInt(String(local.price).replace(/[^0-9]/g, ""), 10),
+        salePrice: local.oldPrice ? parseInt(String(local.price).replace(/[^0-9]/g, ""), 10) : null,
+        description: local.desc || "", sizes: local.sizes || [], colors: local.colors || [],
         images: [local.img, ...(local.imgs || [])].filter(Boolean),
-        rating: local.rating || 0,
-        reviewCount: local.reviews || 0,
-        stock: 99,
-        category: local.category || "",
-        tags: [],
+        rating: local.rating || 0, reviewCount: local.reviews || 0, stock: 99,
+        category: local.category || "", tags: [],
       });
       setLoading(false);
       return;
     }
-
     fetch(`${API}/products/${id}`)
       .then(r => r.json())
       .then(data => {
         const raw = data.data?.product;
         if (!raw) return;
         setProduct({
-          id: raw._id,
-          _id: raw._id,
-          name: raw.name,
+          id: raw._id, _id: raw._id, name: raw.name,
           brand: raw.seller?.brandName || "StyleHub",
-          price: raw.price,
-          salePrice: raw.salePrice,
-          description: raw.description,
+          price: raw.price, salePrice: raw.salePrice, description: raw.description,
           sizes: (raw.sizes || []).map(s => typeof s === "object" ? s.name || String(s) : s),
           colors: (raw.colors || []).map(c => typeof c === "object" ? c.hex || c.value || String(c) : c),
-          images: raw.images || [],
-          rating: raw.avgRating || 0,
-          reviewCount: raw.reviewCount || 0,
+          images: raw.images || [], rating: raw.avgRating || 0, reviewCount: raw.reviewCount || 0,
           stock: raw.stock || 0,
           category: typeof raw.category === "object" ? raw.category?.name || "" : raw.category || "",
           tags: raw.tags || [],
@@ -213,9 +212,7 @@ export default function ProductDetail({ cart, setCart, wish, setWish }) {
       .catch(() => { });
   }, [id]);
 
-  const toggleWish = () => {
-    setWish(w => w.includes(id) ? w.filter(x => x !== id) : [...w, id]);
-  };
+  const toggleWish = () => setWish(w => w.includes(id) ? w.filter(x => x !== id) : [...w, id]);
 
   const handleAddToCart = async () => {
     if (product.sizes.length > 0 && !selectedSize) { setSizeError(true); return; }
@@ -255,7 +252,7 @@ export default function ProductDetail({ cart, setCart, wish, setWish }) {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || "Failed to submit.");
-      setReviewMsg({ type: "success", text: "Review submitted! Thank you 🎉" });
+      setReviewMsg({ type: "success", text: "Review submitted! Thank you" });
       setReviewRating(0);
       setReviewComment("");
       fetch(`${API}/products/${id}/reviews`).then(r => r.json()).then(d => setReviews(d.data?.reviews || [])).catch(() => { });
@@ -285,21 +282,12 @@ export default function ProductDetail({ cart, setCart, wish, setWish }) {
   const isWished = wish?.includes(id);
   const discountPct = product.salePrice ? Math.round((1 - product.salePrice / product.price) * 100) : null;
 
-  /* ── "You May Also Like" — same brand, exclude current ── */
- const BRAND_ALIAS = {
-  "twenty seven": "27",
-  "marble": "MARBLE",
-  "antika": "Antika",
-  "ninos": "NINOS",
-  "salty": "Salty",
-  "blackcloset": "Salty",
-};
-
-const normalizedBrand = BRAND_ALIAS[product.brand?.toLowerCase()] || product.brand;
-
-const sameBrandProducts = PRODUCTS
-  .filter(p => p.brand === normalizedBrand && String(p.id) !== String(id))
-  .slice(0, 4);
+  const BRAND_ALIAS = {
+    "twenty seven": "27", "marble": "MARBLE", "antika": "Antika",
+    "ninos": "NINOS", "salty": "Salty", "blackcloset": "Salty",
+  };
+  const normalizedBrand = BRAND_ALIAS[product.brand?.toLowerCase()] || product.brand;
+  const sameBrandProducts = PRODUCTS.filter(p => p.brand === normalizedBrand && String(p.id) !== String(id)).slice(0, 4);
 
   return (
     <div style={{ minHeight: "100vh", background: "var(--cream)" }}>
@@ -307,7 +295,6 @@ const sameBrandProducts = PRODUCTS
       <style>{PRODUCT_CSS}</style>
       <SHNav cart={cart} wish={wish} />
 
-      {/* Breadcrumb */}
       <div className="pd-breadcrumb">
         <span onClick={() => navigate("/")} style={{ cursor: "pointer" }}>Home</span>
         <span>›</span>
@@ -316,47 +303,20 @@ const sameBrandProducts = PRODUCTS
         <span style={{ color: "var(--dark)" }}>{product.name}</span>
       </div>
 
-      {/* Main Content */}
       <div className="pd-grid">
-
-        {/* LEFT — Images */}
         <div className="pd-left" style={{ aspectRatio: "3/4" }}>
-
-          {/* Thumbnail strip — vertical column on the left */}
           {allImages.length > 1 && (
             <div style={{ display: "flex", flexDirection: "column", gap: ".7rem", width: 72, flexShrink: 0, overflowY: "auto" }}>
               {allImages.map((img, i) => (
-                <div
-                  key={i}
-                  onClick={() => setSelectedImg(i)}
-                  style={{
-                    width: 72,
-                    aspectRatio: "3/4",
-                    flexShrink: 0,
-                    overflow: "hidden",
-                    background: "#f0ece6",
-                    cursor: "pointer",
-                    outline: selectedImg === i ? "2px solid var(--dark)" : "2px solid transparent",
-                    outlineOffset: "-2px",
-                    transition: "outline .15s",
-                  }}
-                >
-                  <img
-                    src={getImageUrl(img)}
-                    alt={`${product.name} view ${i + 1}`}
-                    style={{
-                      width: "100%", height: "100%", objectFit: "cover",
-                      transform: selectedImg === i ? "scale(1.05)" : "scale(1)",
-                      transition: "transform .3s ease",
-                    }}
-                    onError={e => e.target.style.display = "none"}
-                  />
+                <div key={i} onClick={() => setSelectedImg(i)}
+                  style={{ width: 72, aspectRatio: "3/4", flexShrink: 0, overflow: "hidden", background: "#f0ece6", cursor: "pointer", outline: selectedImg === i ? "2px solid var(--dark)" : "2px solid transparent", outlineOffset: "-2px", transition: "outline .15s" }}>
+                  <img src={getImageUrl(img)} alt={`${product.name} view ${i + 1}`}
+                    style={{ width: "100%", height: "100%", objectFit: "cover", transform: selectedImg === i ? "scale(1.05)" : "scale(1)", transition: "transform .3s ease" }}
+                    onError={e => e.target.style.display = "none"} />
                 </div>
               ))}
             </div>
           )}
-
-          {/* Main Image */}
           <div style={{ flex: 1, overflow: "hidden", background: "#f0ece6", position: "relative" }}>
             {allImages[selectedImg] ? (
               <img src={getImageUrl(allImages[selectedImg])} alt={product.name}
@@ -367,24 +327,16 @@ const sameBrandProducts = PRODUCTS
                 <span style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: "3rem", color: "rgba(26,26,24,.1)" }}>{product.brand[0]}</span>
               </div>
             )}
-            {discountPct && (
-              <div style={{ position: "absolute", top: "1rem", left: "1rem", background: "var(--red)", color: "#fff", fontSize: ".6rem", letterSpacing: ".1em", padding: ".3rem .7rem", fontWeight: 700 }}>SALE</div>
-            )}
+            {discountPct && <div style={{ position: "absolute", top: "1rem", left: "1rem", background: "var(--red)", color: "#fff", fontSize: ".6rem", letterSpacing: ".1em", padding: ".3rem .7rem", fontWeight: 700 }}>SALE</div>}
           </div>
-
         </div>
 
-        {/* RIGHT — Info */}
         <div className="pd-right">
-          <div style={{ fontSize: ".65rem", letterSpacing: ".2em", textTransform: "uppercase", color: "var(--warm)", marginBottom: ".5rem", fontFamily: "'DM Sans',sans-serif" }}>
-            {product.brand}
-          </div>
-          <h1 style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: "2.2rem", fontWeight: 400, lineHeight: 1.2, marginBottom: "1rem", color: "var(--dark)" }}>
-            {product.name}
-          </h1>
+          <div style={{ fontSize: ".65rem", letterSpacing: ".2em", textTransform: "uppercase", color: "var(--warm)", marginBottom: ".5rem", fontFamily: "'DM Sans',sans-serif" }}>{product.brand}</div>
+          <h1 style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: "2.2rem", fontWeight: 400, lineHeight: 1.2, marginBottom: "1rem", color: "var(--dark)" }}>{product.name}</h1>
           <div style={{ display: "flex", alignItems: "center", gap: ".5rem", marginBottom: "1.2rem" }}>
             <div style={{ display: "flex", gap: ".1rem" }}>
-              {[1, 2, 3, 4, 5].map(i => <StarIcon key={i} filled={i <= Math.round(product.rating)} />)}
+              {[1,2,3,4,5].map(i => <StarIcon key={i} filled={i <= Math.round(product.rating)} />)}
             </div>
             <span style={{ fontSize: ".72rem", color: "var(--warm)", fontFamily: "'DM Sans',sans-serif" }}>
               {product.rating.toFixed(1)} · {product.reviewCount} review{product.reviewCount !== 1 ? "s" : ""}
@@ -394,16 +346,8 @@ const sameBrandProducts = PRODUCTS
             <span style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: "1.8rem", fontWeight: 600, color: product.salePrice ? "var(--red)" : "var(--dark)" }}>
               LE {(product.salePrice || product.price)?.toLocaleString()}
             </span>
-            {product.salePrice && (
-              <span style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: "1.3rem", color: "var(--warm)", textDecoration: "line-through" }}>
-                LE {product.price?.toLocaleString()}
-              </span>
-            )}
-            {discountPct && (
-              <span style={{ background: "var(--red)", color: "#fff", fontSize: ".6rem", padding: ".2rem .5rem", fontWeight: 700, fontFamily: "'DM Sans',sans-serif" }}>
-                -{discountPct}%
-              </span>
-            )}
+            {product.salePrice && <span style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: "1.3rem", color: "var(--warm)", textDecoration: "line-through" }}>LE {product.price?.toLocaleString()}</span>}
+            {discountPct && <span style={{ background: "var(--red)", color: "#fff", fontSize: ".6rem", padding: ".2rem .5rem", fontWeight: 700, fontFamily: "'DM Sans',sans-serif" }}>-{discountPct}%</span>}
           </div>
           <div style={{ height: 1, background: "var(--border)", marginBottom: "1.5rem" }} />
 
@@ -438,7 +382,7 @@ const sameBrandProducts = PRODUCTS
 
           <button onClick={handleAddToCart}
             style={{ width: "100%", background: addedToCart ? "var(--sage)" : "var(--dark)", color: "#fff", border: "none", padding: "1rem", fontSize: ".72rem", letterSpacing: ".15em", textTransform: "uppercase", cursor: "pointer", fontFamily: "'DM Sans',sans-serif", marginBottom: ".8rem", transition: "background .3s" }}>
-            {addedToCart ? "✓ ADDED TO BAG" : "ADD TO BAG"}
+            {addedToCart ? "ADDED TO BAG" : "ADD TO BAG"}
           </button>
 
           <button onClick={toggleWish}
@@ -458,90 +402,67 @@ const sameBrandProducts = PRODUCTS
           {[
             { title: "Product Details", content: product.description || "No description available." },
             { title: "Shipping & Returns", content: "Free shipping on orders above LE 500. Returns accepted within 14 days." },
-            { title: "Size Guide", content: "XS: 0-2 | S: 4-6 | M: 8-10 | L: 12-14 | XL: 16-18" },
             { title: "Brand Info", content: `${product.brand} — available exclusively on StyleHub.` },
           ].map(({ title, content }) => (
             <AccordionItem key={title} title={title} content={content} />
           ))}
+
+          {/* Size Guide — opens popup */}
+          <div style={{ borderBottom: "1px solid var(--border)" }}>
+            <div onClick={() => setSizeGuideOpen(true)}
+              style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: ".9rem 0", cursor: "pointer" }}>
+              <span style={{ fontSize: ".75rem", letterSpacing: ".1em", textTransform: "uppercase", fontWeight: 600, fontFamily: "'DM Sans',sans-serif", color: "var(--dark)" }}>Size Guide</span>
+              <span style={{ fontSize: "1.2rem", color: "var(--warm)" }}>+</span>
+            </div>
+          </div>
         </div>
       </div>
 
-      {/* ════════════════════════════════════════════
-          YOU MAY ALSO LIKE
-      ════════════════════════════════════════════ */}
       {sameBrandProducts.length > 0 && (
         <div className="pd-section" style={{ borderTop: "1px solid var(--border)", background: "var(--cream)" }}>
           <div style={{ maxWidth: 1200, margin: "0 auto" }}>
             <div style={{ marginBottom: "2rem" }}>
-              <h2 style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: "2rem", fontWeight: 400, color: "var(--dark)", marginBottom: ".4rem" }}>
-                You May Also Like
-              </h2>
+              <h2 style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: "2rem", fontWeight: 400, color: "var(--dark)", marginBottom: ".4rem" }}>You May Also Like</h2>
               <div style={{ width: 40, height: 2, background: "var(--warm)" }} />
             </div>
             <div className="pd-also-grid">
               {sameBrandProducts.map(p => (
-                <ProductCard
-                  key={p.id}
-                  p={p}
-                  getImageUrl={(img) => {
-                    if (!img) return null;
-                    if (img.startsWith("http")) return img;
-                    return img;
-                  }}
-                  onClick={() => navigate(`/product/${p.id}`)}
-                />
+                <ProductCard key={p.id} p={p}
+                  getImageUrl={(img) => { if (!img) return null; if (img.startsWith("http")) return img; return img; }}
+                  onClick={() => navigate(`/product/${p.id}`)} />
               ))}
             </div>
           </div>
         </div>
       )}
 
-      {/* ════════════════════════════════════════════
-          REVIEWS SECTION
-      ════════════════════════════════════════════ */}
       <div className="pd-section" style={{ borderTop: "1px solid var(--border)", background: "#fff" }}>
         <div style={{ maxWidth: 1200, margin: "0 auto" }}>
-
-          {/* Review Form */}
           <div style={{ background: "var(--cream)", border: "1px solid var(--border)", borderRadius: 8, padding: "2rem", marginBottom: "2.5rem" }}>
             {isLoggedIn ? (
               <>
                 <div style={{ marginBottom: "1.2rem" }}>
                   <div style={{ fontSize: ".62rem", letterSpacing: ".18em", textTransform: "uppercase", fontWeight: 700, color: "var(--dark)", marginBottom: ".6rem", fontFamily: "'DM Sans',sans-serif" }}>Your Rating</div>
                   <div style={{ display: "flex", gap: ".3rem" }}>
-                    {[1, 2, 3, 4, 5].map(i => (
-                      <button key={i} type="button"
-                        onClick={() => setReviewRating(i)}
-                        onMouseEnter={() => setReviewHover(i)}
-                        onMouseLeave={() => setReviewHover(0)}
-                        style={{ background: "none", border: "none", cursor: "pointer", padding: 0 }}>
-                        <svg width="26" height="26" viewBox="0 0 24 24"
-                          fill={(reviewHover || reviewRating) >= i ? "#c8a96e" : "none"}
-                          stroke="#c8a96e" strokeWidth="1.5">
+                    {[1,2,3,4,5].map(i => (
+                      <button key={i} type="button" onClick={() => setReviewRating(i)} onMouseEnter={() => setReviewHover(i)} onMouseLeave={() => setReviewHover(0)} style={{ background: "none", border: "none", cursor: "pointer", padding: 0 }}>
+                        <svg width="26" height="26" viewBox="0 0 24 24" fill={(reviewHover || reviewRating) >= i ? "#c8a96e" : "none"} stroke="#c8a96e" strokeWidth="1.5">
                           <polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26" />
                         </svg>
                       </button>
                     ))}
                   </div>
                 </div>
-
                 <div style={{ marginBottom: "1rem" }}>
                   <div style={{ fontSize: ".62rem", letterSpacing: ".18em", textTransform: "uppercase", fontWeight: 700, color: "var(--dark)", marginBottom: ".6rem", fontFamily: "'DM Sans',sans-serif" }}>Your Comment</div>
-                  <textarea
-                    value={reviewComment}
-                    onChange={e => setReviewComment(e.target.value)}
-                    placeholder="Share your thoughts..."
-                    rows={4}
-                    style={{ width: "100%", padding: ".8rem", border: "1px solid var(--border)", fontFamily: "'DM Sans',sans-serif", fontSize: ".85rem", resize: "vertical", outline: "none", background: "#fff", borderRadius: 4, lineHeight: 1.6, boxSizing: "border-box" }}
-                  />
+                  <textarea value={reviewComment} onChange={e => setReviewComment(e.target.value)} placeholder="Share your thoughts..." rows={4}
+                    style={{ width: "100%", padding: ".8rem", border: "1px solid var(--border)", fontFamily: "'DM Sans',sans-serif", fontSize: ".85rem", resize: "vertical", outline: "none", background: "#fff", borderRadius: 4, lineHeight: 1.6, boxSizing: "border-box" }} />
                 </div>
-
                 {reviewMsg && (
                   <div style={{ padding: ".6rem 1rem", borderRadius: 4, marginBottom: "1rem", fontSize: ".8rem", fontFamily: "'DM Sans',sans-serif", background: reviewMsg.type === "success" ? "#edf7ee" : "#fdf0ee", color: reviewMsg.type === "success" ? "#2d7a35" : "#c0392b" }}>
                     {reviewMsg.text}
                   </div>
                 )}
-
                 <button onClick={submitReview} disabled={submittingReview}
                   style={{ background: "var(--dark)", color: "#fff", border: "none", padding: ".7rem 2rem", fontSize: ".68rem", letterSpacing: ".14em", textTransform: "uppercase", cursor: submittingReview ? "not-allowed" : "pointer", fontFamily: "'DM Sans',sans-serif", opacity: submittingReview ? .6 : 1, borderRadius: 3 }}>
                   {submittingReview ? "Submitting..." : "Submit Review"}
@@ -558,7 +479,6 @@ const sameBrandProducts = PRODUCTS
             )}
           </div>
 
-          {/* Existing Reviews */}
           {reviews.length > 0 && (
             <>
               <h2 style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: "1.6rem", fontWeight: 400, marginBottom: "1.5rem" }}>Customer Reviews</h2>
@@ -566,7 +486,7 @@ const sameBrandProducts = PRODUCTS
                 {reviews.map(r => (
                   <div key={r._id} style={{ padding: "1.2rem", border: "1px solid var(--border)", background: "var(--cream)", borderRadius: 4 }}>
                     <div style={{ display: "flex", gap: ".1rem", marginBottom: ".5rem" }}>
-                      {[1, 2, 3, 4, 5].map(i => <StarIcon key={i} filled={i <= r.rating} />)}
+                      {[1,2,3,4,5].map(i => <StarIcon key={i} filled={i <= r.rating} />)}
                     </div>
                     {r.comment && <p style={{ fontSize: ".8rem", color: "#555", lineHeight: 1.6, marginBottom: ".5rem" }}>{r.comment}</p>}
                     <div style={{ fontSize: ".65rem", color: "var(--warm)", fontFamily: "'DM Sans',sans-serif" }}>
@@ -581,6 +501,8 @@ const sameBrandProducts = PRODUCTS
       </div>
 
       <SHFooter />
+
+      {sizeGuideOpen && <SizeGuidePopup onClose={() => setSizeGuideOpen(false)} />}
     </div>
   );
 }
@@ -589,8 +511,7 @@ function AccordionItem({ title, content }) {
   const [open, setOpen] = useState(false);
   return (
     <div style={{ borderBottom: "1px solid var(--border)" }}>
-      <div onClick={() => setOpen(o => !o)}
-        style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: ".9rem 0", cursor: "pointer" }}>
+      <div onClick={() => setOpen(o => !o)} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: ".9rem 0", cursor: "pointer" }}>
         <span style={{ fontSize: ".75rem", letterSpacing: ".1em", textTransform: "uppercase", fontWeight: 600, fontFamily: "'DM Sans',sans-serif", color: "var(--dark)" }}>{title}</span>
         <span style={{ fontSize: "1.2rem", color: "var(--warm)", transition: "transform .2s", transform: open ? "rotate(45deg)" : "none" }}>+</span>
       </div>
