@@ -432,41 +432,45 @@ export default function ProductDetail({ cart, setCart, wish, setWish }) {
       </div>
 
       {/* YOU MAY ALSO LIKE */}
-      {(sameBrandProducts.length > 0 || backendSimilar.length > 0) && (
-        <div className="pd-section" style={{ borderTop: "1px solid var(--border)", background: "var(--cream)" }}>
-          <div style={{ maxWidth: 1200, margin: "0 auto" }}>
-            <div style={{ marginBottom: "2rem" }}>
-              <h2 style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: "2rem", fontWeight: 400, color: "var(--dark)", marginBottom: ".4rem" }}>You May Also Like</h2>
-              <div style={{ width: 40, height: 2, background: "var(--warm)" }} />
-            </div>
-            <div className="pd-also-grid">
-              {sameBrandProducts.map(p => (
-                <ProductCard key={p.id} p={p}
-                  getImageUrl={(img) => { if (!img) return null; if (img.startsWith("http")) return img; return img; }}
-                  onClick={() => navigate(`/product/${p.id}`)} />
-              ))}
-              {backendSimilar.map(p => (
-                <ProductCard key={p._id}
-                  p={{
-                    id: p._id,
-                    name: p.name,
-                    brand: p.seller?.brandName || product.brand,
-                    price: `LE ${p.price?.toLocaleString()}`,
-                    oldPrice: p.salePrice ? `LE ${p.salePrice?.toLocaleString()}` : null,
-                    img: p.images?.[0] || null,
-                  }}
-                  getImageUrl={(img) => {
-                    if (!img) return null;
-                    if (img.startsWith("http")) return img;
-                    return `https://stylehub-backend-tau.vercel.app${img}`;
-                  }}
-                  onClick={() => navigate(`/product/${p._id}`)} />
-              ))}
-            </div>
-          </div>
+{(() => {
+  const allSimilar = [...sameBrandProducts, ...backendSimilar].slice(0, 4);
+  return allSimilar.length > 0 && (
+    <div className="pd-section" style={{ borderTop: "1px solid var(--border)", background: "var(--cream)" }}>
+      <div style={{ maxWidth: 1200, margin: "0 auto" }}>
+        <div style={{ marginBottom: "2rem" }}>
+          <h2 style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: "2rem", fontWeight: 400, color: "var(--dark)", marginBottom: ".4rem" }}>You May Also Like</h2>
+          <div style={{ width: 40, height: 2, background: "var(--warm)" }} />
         </div>
-      )}
+        <div className="pd-also-grid">
+          {allSimilar.map(p => {
+            const isBackend = !p.img && !!p.images;
+            return (
+              <ProductCard
+                key={p.id || p._id}
+                p={isBackend ? {
+                  id: p._id, name: p.name,
+                  brand: p.seller?.brandName || product.brand,
+                  price: `LE ${p.price?.toLocaleString()}`,
+                  oldPrice: p.salePrice ? `LE ${p.salePrice?.toLocaleString()}` : null,
+                  img: p.images?.[0] || null,
+                } : p}
+                getImageUrl={(img) => {
+                  if (!img) return null;
+                  if (img.startsWith("http")) return img;
+                  return isBackend ? `https://stylehub-backend-tau.vercel.app${img}` : img;
+                }}
+                onClick={() => navigate(`/product/${p._id || p.id}`)}
+              />
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+})()}
 
+
+      
       {/* REVIEWS */}
       <div className="pd-section" style={{ borderTop: "1px solid var(--border)", background: "#fff" }}>
         <div style={{ maxWidth: 1200, margin: "0 auto" }}>
