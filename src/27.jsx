@@ -97,7 +97,7 @@ export default function TwentySevenBrand({ cart, wish = [], setWish }) {
   const scrollGrid = () => document.getElementById("b27-grid")?.scrollIntoView({ behavior: "smooth" });
 
   useEffect(() => {
-    fetch(`${API}/products?brand=Twenty seven&limit=100`)
+    fetch(`${API}/products?brand=Twenty Seven&limit=100`)
       .then(r => r.json())
       .then(data => {
         const prods = (data.data?.products || []).map(p => ({
