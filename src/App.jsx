@@ -646,7 +646,7 @@ export default function App() {
         <Route path="/brand/marble" element={<MarbleBrand cart={cart} setCart={setCart} wish={wish} setWish={setWish} products={backendProducts} />} />
         <Route path="/brand/salty" element={<Salty cart={cart} setCart={setCart} wish={wish} setWish={setWish} products={backendProducts} />} />
         <Route path="/brand/ninos" element={<Ninos cart={cart} setCart={setCart} wish={wish} setWish={setWish} products={backendProducts} />} />
-        <Route path="/brand/TwentySeven" element={<27 cart={cart} setCart={setCart} wish={wish} setWish={setWish} products={backendProducts} />} />
+        <Route path="/brand/TwentySeven" element={<TwentySeven cart={cart} setCart={setCart} wish={wish} setWish={setWish} products={backendProducts} />} />
         <Route path="/brand/blackcloset" element={<BlackCloset cart={cart} setCart={setCart} wish={wish} setWish={setWish} products={backendProducts} />} />
         <Route path="/brand/:brandSlug" element={<SellerBrandPage cart={cart} wish={wish} setWish={setWish} />} />
         <Route path="/wishlist" element={<Wishlist cart={cart} setCart={setCart} wish={wish} setWish={setWish} />} />
