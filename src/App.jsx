@@ -17,6 +17,7 @@ import MenPage from "./MenPageNew";
 import Kids from "./kids";
 import ProductDetail from "./ProductDetail";
 import SignIn from "./SignInPage";
+import SellerSupport from "./SellerSupport";
 import Seller from "./SellerAuthPage";
 import SellerDashboard from "./SellerDashboard";
 import ResetPasswordPage from "./ResetPasswordPage";
@@ -650,6 +651,7 @@ export default function App() {
         <Route path="/brand/TwentySeven" element={<TwentySeven cart={cart} setCart={setCart} wish={wish} setWish={setWish} products={backendProducts} />} />
         <Route path="/brand/blackcloset" element={<BlackCloset cart={cart} setCart={setCart} wish={wish} setWish={setWish} products={backendProducts} />} />
        <Route path="/brand/Antika" element={<Antika cart={cart} setCart={setCart} wish={wish} setWish={setWish} products={backendProducts} />} />
+        <Route path="/seller-support" element={<SellerSupport cart={cart} wish={wish} />} />
         <Route path="/brand/:brandSlug" element={<SellerBrandPage cart={cart} wish={wish} setWish={setWish} />} />
         <Route path="/wishlist" element={<Wishlist cart={cart} setCart={setCart} wish={wish} setWish={setWish} />} />
         <Route path="/profile" element={<ProfilePage cart={cart} wish={wish} />} />
