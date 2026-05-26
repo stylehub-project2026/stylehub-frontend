@@ -402,7 +402,12 @@ export function SHFooter() {
           </a>
           <p className="f-about mb-3">Your destination for Egypt's finest local fashion brands.</p>
           <div className="d-flex gap-2">
-            {["F", "IG"].map(s => <a key={s} href="#" className="f-soc">{s}</a>)}
+            <div className="d-flex gap-2">
+  <a href="https://www.facebook.com/share/18ztJYRk3q/?mibextid=wwXIfr" className="f-soc" target="_blank" rel="noopener noreferrer">F</a>
+  <a href="https://www.instagram.com/stylehub7500?igsh=MTE2bm1uYXoyZmFndw%3D%3D&utm_source=qr" className="f-soc" target="_blank" rel="noopener noreferrer">IG</a>
+</div>
+         
+          
           </div>
         </div>
         {FOOTER_COLS.map((col, i) => (
