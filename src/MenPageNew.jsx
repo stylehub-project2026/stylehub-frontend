@@ -550,9 +550,6 @@ export default function MenPage({ cart = [], setCart, wish = [], setWish }) {
         .sale-ban-inner img { width: 100%; height: 520px; object-fit: cover; object-position: top center; display: block; }
         .sale-ban-text { position: absolute; bottom: 0; left: 0; right: 0; padding: 2rem 3rem; background: linear-gradient(transparent, rgba(0,0,0,.45)); text-align: center; }
         .sale-ban-text h2 { font-family: var(--fh); font-size: clamp(1.8rem, 6vw, 5rem); font-weight: 900; color: #fff; letter-spacing: 4px; line-height: 1; margin: 0; text-transform: uppercase; }
-        .sale-sub { color: rgba(255,255,255,.8); font-size: .8rem; letter-spacing: .15em; text-transform: uppercase; margin-bottom: .5rem; }
-        .sale-cta-btn { background: #fff; color: var(--c-dark); border: none; padding: .6rem 1.8rem; font-size: .75rem; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; cursor: pointer; border-radius: 3px; margin-top: 1rem; transition: all .3s; }
-        .sale-cta-btn:hover { background: var(--c-olive); color: #fff; }
 
         /* ── TRENDING ── */
         .trend-g { display: grid; grid-template-columns: repeat(3,1fr); gap: 1.8rem; }
@@ -773,9 +770,7 @@ export default function MenPage({ cart = [], setCart, wish = [], setWish }) {
                 <div className="sale-ban-inner">
                     <img src="/men-section-page.png" alt="End of Season Sale" />
                     <div className="sale-ban-text">
-                        <p className="sale-sub">Limited Time Only</p>
                         <h2>END OF SEASON SALE</h2>
-                        <button className="sale-cta-btn">Shop the Sale →</button>
                     </div>
                 </div>
             </section>
@@ -801,13 +796,11 @@ export default function MenPage({ cart = [], setCart, wish = [], setWish }) {
 
             {/* ══════════════════════════════════════════
                 ALL PRODUCTS + FILTERS
-                (same pattern as women page)
             ══════════════════════════════════════════ */}
             <section ref={allProductsRef} style={{ background: "var(--c-cream)", padding: "3rem 5%" }}>
                 <h2 className="sec-title reveal" ref={addRef}>All Products</h2>
                 <div className="sec-line reveal" ref={addRef} />
 
-                {/* Active type badge — shows which category was clicked */}
                 {selType !== "all" && (
                     <div style={{ display: "flex", justifyContent: "center", marginBottom: "1rem" }}>
                         <span className="m-active-type-badge">
@@ -817,7 +810,6 @@ export default function MenPage({ cart = [], setCart, wish = [], setWish }) {
                     </div>
                 )}
 
-                {/* Mobile filter bar */}
                 <div className="m-filter-bar">
                     <button className="m-filter-btn" onClick={() => setDrawerOpen(true)}>
                         <i className="bi bi-sliders" />
@@ -836,7 +828,6 @@ export default function MenPage({ cart = [], setCart, wish = [], setWish }) {
                     )}
                 </div>
 
-                {/* Mobile filter drawer */}
                 {drawerOpen && (
                     <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.45)", zIndex: 900 }} onClick={() => setDrawerOpen(false)}>
                         <div className={`m-filter-drawer ${drawerOpen ? "open" : ""}`} onClick={e => e.stopPropagation()}>
@@ -856,14 +847,11 @@ export default function MenPage({ cart = [], setCart, wish = [], setWish }) {
                     </div>
                 )}
 
-                {/* Layout: sidebar + grid */}
                 <div className="m-ap-layout">
-                    {/* Desktop sidebar */}
                     <div className="m-ap-sidebar">
                         <FilterContent {...filterProps} />
                     </div>
 
-                    {/* Products */}
                     <div style={{ flex: 1, minWidth: 0 }}>
                         <div style={{ fontSize: ".7rem", color: "var(--c-gray)", marginBottom: "1rem", letterSpacing: ".04em" }}>
                             {filtered.length} product{filtered.length !== 1 ? "s" : ""}{totalPages > 1 ? ` — page ${filterPage} of ${totalPages}` : ""}
@@ -902,7 +890,6 @@ export default function MenPage({ cart = [], setCart, wish = [], setWish }) {
                             </div>
                         )}
 
-                        {/* Pagination */}
                         {totalPages > 1 && (
                             <div style={{ display: "flex", justifyContent: "center", gap: ".45rem", padding: "2.5rem 0", flexWrap: "wrap" }}>
                                 <button onClick={() => setFilterPage(p => Math.max(1, p - 1))} disabled={filterPage === 1} style={{ width: 34, height: 34, borderRadius: "50%", border: "1px solid var(--c-gray-lt)", background: "none", cursor: filterPage === 1 ? "not-allowed" : "pointer", opacity: filterPage === 1 ? .4 : 1, fontSize: "1rem" }}>‹</button>
