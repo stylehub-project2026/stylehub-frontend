@@ -167,6 +167,7 @@ export default function ProductDetail({ cart, setCart, wish, setWish }) {
   };
 
   useEffect(() => {
+     window.scrollTo(0, 0); 
     setLoading(true);
     const local = PRODUCTS.find(p => String(p.id) === String(id));
     if (local) {
