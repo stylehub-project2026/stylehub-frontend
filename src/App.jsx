@@ -662,7 +662,7 @@ export default function App() {
         <Route path="/buildoutfit" element={<BuildOutfit cart={cart} setCart={setCart} wish={wish} setWish={setWish} />} />
         <Route path="/BuildOutfit" element={<BuildOutfit cart={cart} setCart={setCart} wish={wish} setWish={setWish} />} />
         <Route path="/aboutus" element={<AboutUs cart={cart} wish={wish} />} />
-        <Route path="/contact" element={<ContactPage cart={cart} wish={wish} />} />
+        <Route path="/ContactPage" element={<ContactPage cart={cart} wish={wish} />} />
         <Route path="/admin/chat" element={<AdminChat />} />
 
         <Route path="/" element={
