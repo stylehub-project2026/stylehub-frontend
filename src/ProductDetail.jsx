@@ -191,7 +191,10 @@ export default function ProductDetail({ cart, setCart, wish, setWish }) {
         setProduct({
           id: raw._id, _id: raw._id, name: raw.name,
           brand: raw.seller?.brandName || "StyleHub",
-          price: raw.price, salePrice: raw.salePrice, description: raw.description,
+         price: raw.salePrice && raw.salePrice !== raw.price ? Math.max(raw.price, raw.salePrice) : raw.price,
+          salePrice: raw.salePrice && raw.salePrice !== raw.price ? Math.min(raw.price, raw.salePrice) : null,
+          
+         description: raw.description,
           sizes: (raw.sizes || []).map(s => typeof s === "object" ? s.name || String(s) : s),
           colors: (raw.colors || []).map(c => typeof c === "object" ? c.hex || c.value || String(c) : c),
           images: raw.images || [], rating: raw.avgRating || 0, reviewCount: raw.reviewCount || 0,
