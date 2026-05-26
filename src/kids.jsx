@@ -128,8 +128,8 @@ export default function Kids({ cart, setCart, wish, setWish }) {
         <img src="/2.jpg" alt="kids" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", opacity: .5 }}
           onError={e => e.target.style.display = "none"} />
        <div className="kids-hero-text" style={{ position: "relative", zIndex: 2, padding: "0 5%" }}>
-  <div style={{ fontSize: ".7rem", letterSpacing: ".25em", textTransform: "uppercase", color: "rgba(255,255,255,.7)", marginBottom: ".8rem", animation: "floatUp 3s ease-in-out infinite" }}>StyleHub</div>
-  <h1 style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: "clamp(2.5rem,5vw,4rem)", fontWeight: 400, color: "#fff", lineHeight: 1.1, marginBottom: "1rem", animation: "floatUpSlow 4s ease-in-out infinite" }}>Kids Collection</h1>
+<div style={{ fontSize: ".7rem", letterSpacing: ".25em", textTransform: "uppercase", color: "rgba(255,255,255,.7)", marginBottom: ".8rem" }}>StyleHub</div>
+         <h1 style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: "clamp(2.5rem,5vw,4rem)", fontWeight: 400, color: "#fff", lineHeight: 1.1, marginBottom: "1rem", animation: "floatUpSlow 4s ease-in-out infinite" }}>Kids Collection</h1>
   <p className="kids-hero-desc" style={{ fontSize: ".85rem", color: "rgba(255,255,255,.75)", maxWidth: 400, lineHeight: 1.8, animation: "floatUp 3.5s 0.5s ease-in-out infinite" }}>Curated styles for little ones from Egypt's top local brands.</p>
 </div>
       </div>
