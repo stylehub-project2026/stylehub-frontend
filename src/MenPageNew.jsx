@@ -26,7 +26,6 @@ const HERO_SLIDES = [
     
 ];
 
-// ── Category name → type tag used in products ──
 const CAT_TYPE_MAP = {
     "Pants":   "pants",
     "Hoodies": "hoodies",
@@ -39,7 +38,6 @@ const CATEGORIES = [
     { name: "Jackets", img: "/men-jacket.jpeg", count: "11 styles" },
 ];
 
-/* ══════════════════════════════════════════ HELPERS ══════════════════════════════════════════ */
 function Stars({ n }) {
     return (
         <span className="stars-row">
@@ -65,7 +63,6 @@ function useReveal() {
     }, []);
 }
 
-/* ══════════════════════════════════════════ QUICK VIEW MODAL ══════════════════════════════════════════ */
 function QuickViewModal({ p, onClose, onAddToCart }) {
     const navigate = useNavigate();
     const [selSize, setSelSize]   = useState(null);
@@ -155,7 +152,6 @@ function QuickViewModal({ p, onClose, onAddToCart }) {
     );
 }
 
-/* ══════════════════════════════════════════ PRODUCT CARD ══════════════════════════════════════════ */
 function ProdCard({ p, onQuickView, onWish, wishlisted, addRef, d = 1 }) {
     const navigate = useNavigate();
     return (
@@ -191,7 +187,6 @@ function ProdCard({ p, onQuickView, onWish, wishlisted, addRef, d = 1 }) {
     );
 }
 
-/* ══════════════════════════════════════════ HERO CAROUSEL ══════════════════════════════════════════ */
 function HeroCarousel() {
     const [cur, setCur] = useState(0);
     const [key, setKey] = useState(0);
@@ -243,12 +238,10 @@ function HeroCarousel() {
     );
 }
 
-/* ══════════════════════════════════════════ FILTER SIDEBAR CONTENT ══════════════════════════════════════════ */
 function FilterContent({ ALL_TYPES, ALL_SIZES, ALL_COLORS, ALL_BRANDS, selType, selSizes, selColors, selBrands, sortBy, setSelType, setSelSizes, setSelColors, setSelBrands, setSortBy, setFilterPage, hasFilters, onClear }) {
     const lbl = { fontSize: ".6rem", letterSpacing: ".2em", textTransform: "uppercase", fontWeight: 600, marginBottom: ".65rem", color: "var(--c-dark)" };
     return (
         <>
-            {/* Sort */}
             <div style={{ marginBottom: "1.8rem" }}>
                 <div style={lbl}>Sort By</div>
                 {[["default", "Default"], ["low", "Price: Low → High"], ["high", "Price: High → Low"], ["sale", "On Sale"]].map(([val, label]) => (
@@ -256,7 +249,6 @@ function FilterContent({ ALL_TYPES, ALL_SIZES, ALL_COLORS, ALL_BRANDS, selType, 
                 ))}
             </div>
 
-            {/* Brand */}
             {ALL_BRANDS.length > 0 && (
                 <div style={{ borderTop: "1px solid var(--c-gray-lt)", paddingTop: "1.3rem", marginBottom: "1.6rem" }}>
                     <div style={lbl}>Brand</div>
@@ -269,7 +261,6 @@ function FilterContent({ ALL_TYPES, ALL_SIZES, ALL_COLORS, ALL_BRANDS, selType, 
                 </div>
             )}
 
-            {/* Type */}
             {ALL_TYPES.length > 0 && (
                 <div style={{ borderTop: "1px solid var(--c-gray-lt)", paddingTop: "1.3rem", marginBottom: "1.6rem" }}>
                     <div style={lbl}>Type</div>
@@ -282,7 +273,6 @@ function FilterContent({ ALL_TYPES, ALL_SIZES, ALL_COLORS, ALL_BRANDS, selType, 
                 </div>
             )}
 
-            {/* Size */}
             {ALL_SIZES.length > 0 && (
                 <div style={{ borderTop: "1px solid var(--c-gray-lt)", paddingTop: "1.3rem", marginBottom: "1.6rem" }}>
                     <div style={lbl}>Size</div>
@@ -294,7 +284,6 @@ function FilterContent({ ALL_TYPES, ALL_SIZES, ALL_COLORS, ALL_BRANDS, selType, 
                 </div>
             )}
 
-            {/* Color */}
             {ALL_COLORS.length > 0 && (
                 <div style={{ borderTop: "1px solid var(--c-gray-lt)", paddingTop: "1.3rem", marginBottom: "1.6rem" }}>
                     <div style={lbl}>Color</div>
@@ -313,7 +302,6 @@ function FilterContent({ ALL_TYPES, ALL_SIZES, ALL_COLORS, ALL_BRANDS, selType, 
     );
 }
 
-/* ══════════════════════════════════════════ MAIN ══════════════════════════════════════════ */
 export default function MenPage({ cart = [], setCart, wish = [], setWish }) {
     const navigate  = useNavigate();
     const wishlist  = wish;
@@ -324,7 +312,6 @@ export default function MenPage({ cart = [], setCart, wish = [], setWish }) {
     const [menProducts, setMenProducts] = useState([]);
     const [loading,     setLoading]     = useState(true);
 
-    // ── Filter state ──
     const [selType,    setSelType]    = useState("all");
     const [selSizes,   setSelSizes]   = useState(null);
     const [selColors,  setSelColors]  = useState(null);
@@ -334,14 +321,21 @@ export default function MenPage({ cart = [], setCart, wish = [], setWish }) {
     const [drawerOpen, setDrawerOpen] = useState(false);
     const FILTER_PER_PAGE = 9;
 
-    // ── Refs ──
     const allProductsRef = useRef(null);
     const newArrRef      = useRef(null);
 
-    // ── Same as women page: set type filter + scroll to All Products ──
     const handleCategoryClick = (catName) => {
         const typeTag = CAT_TYPE_MAP[catName] || catName.toLowerCase();
         setSelType(typeTag);
+        setFilterPage(1);
+        setTimeout(() => {
+            allProductsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+        }, 50);
+    };
+
+    // ── NEW: scroll to All Products and activate sale filter ──
+    const handleShopSale = () => {
+        setSortBy("sale");
         setFilterPage(1);
         setTimeout(() => {
             allProductsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -411,7 +405,6 @@ export default function MenPage({ cart = [], setCart, wish = [], setWish }) {
         document.title = `StyleHub — Men${cartCount > 0 ? ` (${cartCount})` : ""}`;
     }, [cartCount]);
 
-    // Close drawer on Escape
     useEffect(() => {
         if (!drawerOpen) return;
         const onKey = (e) => { if (e.key === "Escape") setDrawerOpen(false); };
@@ -420,7 +413,6 @@ export default function MenPage({ cart = [], setCart, wish = [], setWish }) {
         return () => { document.removeEventListener("keydown", onKey); document.body.style.overflow = ""; };
     }, [drawerOpen]);
 
-    // ── Derived filter data ──
     const ALL_SIZES  = [...new Set(menProducts.flatMap(p => p.sizes))];
     const ALL_COLORS = [...new Set(menProducts.flatMap(p => p.colors))];
     const ALL_TYPES  = [...new Set(menProducts.map(p => p.type).filter(Boolean))];
@@ -435,9 +427,9 @@ export default function MenPage({ cart = [], setCart, wish = [], setWish }) {
     if (sortBy === "high")    filtered = [...filtered].sort((a, b) => b.price - a.price);
     if (sortBy === "sale")    filtered = filtered.filter(p => p.old);
 
-    const totalPages       = Math.ceil(filtered.length / FILTER_PER_PAGE);
-    const paginated        = filtered.slice((filterPage - 1) * FILTER_PER_PAGE, filterPage * FILTER_PER_PAGE);
-    const hasFilters       = selSizes || selColors || selType !== "all" || selBrands.length > 0;
+    const totalPages        = Math.ceil(filtered.length / FILTER_PER_PAGE);
+    const paginated         = filtered.slice((filterPage - 1) * FILTER_PER_PAGE, filterPage * FILTER_PER_PAGE);
+    const hasFilters        = selSizes || selColors || selType !== "all" || selBrands.length > 0;
     const activeFilterCount = (selSizes ? 1 : 0) + (selColors ? 1 : 0) + (selType !== "all" ? 1 : 0) + selBrands.length;
 
     const filterProps = { ALL_TYPES, ALL_SIZES, ALL_COLORS, ALL_BRANDS, selType, selSizes, selColors, selBrands, sortBy, setSelType, setSelSizes, setSelColors, setSelBrands, setSortBy, setFilterPage, hasFilters, onClear: handleClearFilters };
@@ -475,7 +467,6 @@ export default function MenPage({ cart = [], setCart, wish = [], setWish }) {
         .no-sb { scrollbar-width: none; }
         .no-sb::-webkit-scrollbar { display: none; }
 
-        /* ── HERO ── */
         .hero { min-height: 520px; position: relative; overflow: hidden; }
         .hero-slide { display: none; min-height: 520px; align-items: center; justify-content: space-between; }
         .hero-slide.full-bg { justify-content: flex-start; }
@@ -493,15 +484,12 @@ export default function MenPage({ cart = [], setCart, wish = [], setWish }) {
         .hero-dot  { width: 6px; height: 6px; border-radius: 3px; background: rgba(0,0,0,.25); border: none; cursor: pointer; transition: all .3s; padding: 0; }
         .hero-dot.on { width: 20px; background: var(--c-olive); }
 
-        /* ── BUTTONS ── */
         .btn-dk { background: var(--c-dark); color: #fff; border: none; padding: .78rem 2rem; font-family: var(--fb); font-size: .78rem; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; cursor: pointer; border-radius: 3px; transition: all .3s; }
         .btn-dk:hover { background: var(--c-olive); transform: translateY(-2px); box-shadow: var(--sh-md); }
 
-        /* ── HEADINGS ── */
         .sec-title { font-family: var(--fd); font-size: clamp(1.1rem, 2.5vw, 1.45rem); font-weight: 700; color: var(--c-dark); text-align: center; letter-spacing: -.3px; }
         .sec-line  { width: 38px; height: 2px; background: var(--c-olive); margin: .6rem auto 3rem; border-radius: 2px; }
 
-        /* ── CATEGORIES ── */
         .cat-sec  { padding: 6rem 0; background: var(--c-white); }
         .cat-card { border-radius: var(--r); overflow: hidden; position: relative; cursor: pointer; height: 350px; transition: transform .35s var(--ease), box-shadow .35s var(--ease); box-shadow: var(--sh-sm); }
         .cat-card:hover { transform: translateY(-6px); box-shadow: var(--sh-lg); }
@@ -513,7 +501,6 @@ export default function MenPage({ cart = [], setCart, wish = [], setWish }) {
         .cat-btn  { display: inline-block; background: rgba(255,255,255,.92); color: var(--c-dark); font-size: .66rem; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; padding: .3rem .7rem; border-radius: 3px; border: none; cursor: pointer; transition: all .3s; }
         .cat-btn:hover { background: var(--c-olive); color: #fff; }
 
-        /* ── PRODUCT CARD ── */
         .prod-card { background: var(--c-white); border-radius: var(--r); overflow: hidden; box-shadow: var(--sh-sm); transition: transform .35s var(--ease), box-shadow .35s var(--ease); cursor: pointer; position: relative; }
         .prod-card:hover { transform: translateY(-6px); box-shadow: var(--sh-lg); }
         .prod-card .ib { position: relative; overflow: hidden; background: var(--c-off); height: 260px; }
@@ -531,12 +518,10 @@ export default function MenPage({ cart = [], setCart, wish = [], setWish }) {
         .tag-b { position: absolute; top: .7rem; left: .7rem; background: var(--c-olive); color: #fff; font-size: .62rem; font-weight: 700; padding: .2rem .55rem; border-radius: 3px; text-transform: uppercase; letter-spacing: .5px; z-index: 2; }
         .tag-b.sale { background: var(--c-red); }
 
-        /* ── QUICK VIEW HOVER ── */
         .pc-hover-ov { position: absolute; inset: 0; background: rgba(0,0,0,.18); display: flex; align-items: flex-end; justify-content: center; padding-bottom: 1rem; opacity: 0; transition: opacity .3s; }
         .prod-card:hover .pc-hover-ov { opacity: 1; }
         .pc-qv-btn { background: rgba(255,255,255,.92); border: none; padding: .4rem 1.2rem; font-size: .72rem; font-weight: 600; border-radius: 4px; cursor: pointer; }
 
-        /* ── SCROLL CAROUSEL ── */
         .sc-wrap { position: relative; padding: 0 2px; }
         .sc-track { display: flex; gap: 1.4rem; overflow-x: auto; scroll-behavior: smooth; padding: .5rem .2rem 1.2rem; }
         .sc-track .prod-card { min-width: 200px; flex-shrink: 0; }
@@ -544,20 +529,17 @@ export default function MenPage({ cart = [], setCart, wish = [], setWish }) {
         .sc-btn:hover { background: var(--c-dark); color: #fff; border-color: var(--c-dark); }
         .sc-btn.l { left: -16px; } .sc-btn.r { right: -16px; }
 
-        /* ── SALE BANNER ── */
         .sale-ban { position: relative; overflow: hidden; }
         .sale-ban-inner { position: relative; width: 100%; overflow: hidden; }
         .sale-ban-inner img { width: 100%; height: 520px; object-fit: cover; object-position: top center; display: block; }
         .sale-ban-text { position: absolute; bottom: 0; left: 0; right: 0; padding: 2rem 3rem; background: linear-gradient(transparent, rgba(0,0,0,.45)); text-align: center; }
         .sale-ban-text h2 { font-family: var(--fh); font-size: clamp(1.8rem, 6vw, 5rem); font-weight: 900; color: #fff; letter-spacing: 4px; line-height: 1; margin: 0; text-transform: uppercase; }
         .sale-sub { color: rgba(255,255,255,.8); font-size: .8rem; letter-spacing: .15em; text-transform: uppercase; margin-bottom: .5rem; }
-        .sale-cta-btn { background: #fff; color: var(--c-dark); border: none; padding: .6rem 1.8rem; font-size: .75rem; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; cursor: pointer; border-radius: 3px; margin-top: 1rem; transition: all .3s; }
+        .sale-cta-btn { background: #fff; color: var(--c-dark); border: none; padding: .6rem 1.8rem; font-size: .75rem; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; cursor: pointer; border-radius: 3px; margin-top: 1rem; transition: all .3s; display: inline-block; }
         .sale-cta-btn:hover { background: var(--c-olive); color: #fff; }
 
-        /* ── TRENDING ── */
         .trend-g { display: grid; grid-template-columns: repeat(3,1fr); gap: 1.8rem; }
 
-        /* ── QUICK VIEW MODAL ── */
         .qv-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,.5); z-index: 9998; display: flex; align-items: center; justify-content: center; padding: 1rem; }
         .qv-modal { background: #fff; border-radius: var(--r); max-width: 820px; width: 100%; display: flex; max-height: 90vh; overflow: hidden; position: relative; }
         .qv-close { position: absolute; top: 1rem; right: 1rem; background: none; border: none; font-size: 1.1rem; cursor: pointer; z-index: 5; color: var(--c-gray); }
@@ -596,7 +578,6 @@ export default function MenPage({ cart = [], setCart, wish = [], setWish }) {
         .qv-full   { background: none; border: 1.5px solid var(--c-dark); color: var(--c-dark); padding: .75rem; font-size: .76rem; font-weight: 600; cursor: pointer; border-radius: 6px; transition: all .3s; }
         .qv-full:hover { background: var(--c-dark); color: #fff; }
 
-        /* ── ALL PRODUCTS SECTION ── */
         .m-ap-layout { display: flex; gap: 2.5rem; align-items: flex-start; }
         .m-ap-sidebar { width: 185px; flex-shrink: 0; position: sticky; top: 70px; }
         .m-ap-grid    { display: grid; grid-template-columns: repeat(3,1fr); gap: 1.4rem; }
@@ -609,7 +590,6 @@ export default function MenPage({ cart = [], setCart, wish = [], setWish }) {
         .m-active-type-badge button { background: none; border: none; color: #fff; cursor: pointer; font-size: .85rem; line-height: 1; padding: 0; margin-left: .2rem; opacity: .8; }
         .m-active-type-badge button:hover { opacity: 1; }
 
-        /* ── UTILS ── */
         .sp        { padding: 5rem 0; }
         .bg-cream  { background: var(--c-cream); }
         .bg-white  { background: var(--c-white); }
@@ -627,20 +607,15 @@ export default function MenPage({ cart = [], setCart, wish = [], setWish }) {
         .col-12   { flex: 0 0 100%; max-width: 100%; }
         .col-md-4 { flex: 0 0 33.333%; max-width: 33.333%; }
 
-        /* ── TOAST ── */
         .sh-toast { position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%) translateY(12px); background: var(--c-dark); color: #fff; padding: .65rem 1.6rem; font-size: .78rem; border-radius: 2px; opacity: 0; pointer-events: none; transition: opacity .3s, transform .3s; z-index: 9999; white-space: nowrap; }
         .sh-toast.on { opacity: 1; transform: translateX(-50%) translateY(0); }
 
-        /* ── REVEAL ── */
         .reveal   { opacity:0; transform:translateY(24px); transition:opacity .7s,transform .7s; }
         .revealed { opacity:1; transform:none; }
         .d1{transition-delay:.1s} .d2{transition-delay:.2s} .d3{transition-delay:.3s} .d4{transition-delay:.4s}
 
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        /* ════════════════════════════════════════
-           RESPONSIVE BREAKPOINTS
-        ════════════════════════════════════════ */
         @media(max-width:1024px) {
           .hero-txt { padding: 4rem 2.5rem 4rem 3.5rem; }
           .m-ap-grid { grid-template-columns: repeat(2,1fr) !important; }
@@ -660,7 +635,6 @@ export default function MenPage({ cart = [], setCart, wish = [], setWish }) {
           .sale-ban-text { padding: 1.2rem 1.5rem; }
           .sp { padding: 3.5rem 0; }
           .sec-line { margin-bottom: 2rem; }
-          /* All products layout on mobile */
           .m-ap-layout { flex-direction: column !important; }
           .m-ap-sidebar { display: none !important; }
           .m-ap-grid { grid-template-columns: repeat(2,1fr) !important; gap: .9rem !important; }
@@ -775,7 +749,10 @@ export default function MenPage({ cart = [], setCart, wish = [], setWish }) {
                     <div className="sale-ban-text">
                         <p className="sale-sub">Limited Time Only</p>
                         <h2>END OF SEASON SALE</h2>
-                        <button className="sale-cta-btn">Shop the Sale →</button>
+                        {/* onClick: apply sale filter + scroll to All Products */}
+                        <button className="sale-cta-btn" onClick={handleShopSale}>
+                            Shop the Sale →
+                        </button>
                     </div>
                 </div>
             </section>
@@ -799,15 +776,11 @@ export default function MenPage({ cart = [], setCart, wish = [], setWish }) {
                 </div>
             </section>
 
-            {/* ══════════════════════════════════════════
-                ALL PRODUCTS + FILTERS
-                (same pattern as women page)
-            ══════════════════════════════════════════ */}
+            {/* ── ALL PRODUCTS + FILTERS ── */}
             <section ref={allProductsRef} style={{ background: "var(--c-cream)", padding: "3rem 5%" }}>
                 <h2 className="sec-title reveal" ref={addRef}>All Products</h2>
                 <div className="sec-line reveal" ref={addRef} />
 
-                {/* Active type badge — shows which category was clicked */}
                 {selType !== "all" && (
                     <div style={{ display: "flex", justifyContent: "center", marginBottom: "1rem" }}>
                         <span className="m-active-type-badge">
@@ -817,7 +790,16 @@ export default function MenPage({ cart = [], setCart, wish = [], setWish }) {
                     </div>
                 )}
 
-                {/* Mobile filter bar */}
+                {/* Sale filter active badge */}
+                {sortBy === "sale" && (
+                    <div style={{ display: "flex", justifyContent: "center", marginBottom: "1rem" }}>
+                        <span className="m-active-type-badge" style={{ background: "var(--c-red)" }}>
+                            On Sale
+                            <button onClick={() => { setSortBy("default"); setFilterPage(1); }}>×</button>
+                        </span>
+                    </div>
+                )}
+
                 <div className="m-filter-bar">
                     <button className="m-filter-btn" onClick={() => setDrawerOpen(true)}>
                         <i className="bi bi-sliders" />
@@ -836,7 +818,6 @@ export default function MenPage({ cart = [], setCart, wish = [], setWish }) {
                     )}
                 </div>
 
-                {/* Mobile filter drawer */}
                 {drawerOpen && (
                     <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.45)", zIndex: 900 }} onClick={() => setDrawerOpen(false)}>
                         <div className={`m-filter-drawer ${drawerOpen ? "open" : ""}`} onClick={e => e.stopPropagation()}>
@@ -856,14 +837,11 @@ export default function MenPage({ cart = [], setCart, wish = [], setWish }) {
                     </div>
                 )}
 
-                {/* Layout: sidebar + grid */}
                 <div className="m-ap-layout">
-                    {/* Desktop sidebar */}
                     <div className="m-ap-sidebar">
                         <FilterContent {...filterProps} />
                     </div>
 
-                    {/* Products */}
                     <div style={{ flex: 1, minWidth: 0 }}>
                         <div style={{ fontSize: ".7rem", color: "var(--c-gray)", marginBottom: "1rem", letterSpacing: ".04em" }}>
                             {filtered.length} product{filtered.length !== 1 ? "s" : ""}{totalPages > 1 ? ` — page ${filterPage} of ${totalPages}` : ""}
@@ -902,7 +880,6 @@ export default function MenPage({ cart = [], setCart, wish = [], setWish }) {
                             </div>
                         )}
 
-                        {/* Pagination */}
                         {totalPages > 1 && (
                             <div style={{ display: "flex", justifyContent: "center", gap: ".45rem", padding: "2.5rem 0", flexWrap: "wrap" }}>
                                 <button onClick={() => setFilterPage(p => Math.max(1, p - 1))} disabled={filterPage === 1} style={{ width: 34, height: 34, borderRadius: "50%", border: "1px solid var(--c-gray-lt)", background: "none", cursor: filterPage === 1 ? "not-allowed" : "pointer", opacity: filterPage === 1 ? .4 : 1, fontSize: "1rem" }}>‹</button>
