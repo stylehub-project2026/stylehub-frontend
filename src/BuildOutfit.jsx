@@ -10,6 +10,13 @@ const getImageUrl = (img) => {
   return `${API.replace("/api", "")}${img}`;
 };
 
+// Fix img3d paths that are missing the leading "/"
+const normalizeImg = (img) => {
+  if (!img) return null;
+  if (img.startsWith("http") || img.startsWith("/")) return img;
+  return "/" + img;
+};
+
 const PAGE_CSS = `
 .bo-page {
   background: linear-gradient(180deg, #f7f3ec 0%, #f8f6f2 26%, #f5f2ea 100%);
@@ -239,7 +246,7 @@ function SilhouettePreview({ selectedTop, selectedBottom, body }) {
         {selectedTop ? (
           <img
             key={selectedTop.id}
-            src={selectedTop.img3d || selectedTop.img}
+            src={normalizeImg(selectedTop.img3d) || selectedTop.img}
             alt={selectedTop.name}
             style={{
               width: "100%", height: "100%",
@@ -287,7 +294,7 @@ function SilhouettePreview({ selectedTop, selectedBottom, body }) {
         {selectedBottom ? (
           <img
             key={selectedBottom.id}
-            src={selectedBottom.img3d || selectedBottom.img}
+            src={normalizeImg(selectedBottom.img3d) || selectedBottom.img}
             alt={selectedBottom.name}
             style={{
               width: "100%", height: "100%",
