@@ -9,7 +9,14 @@ const HERO_SLIDES = [
   {
     fullBanner: true,
     img: "/sec2.jpg",
+    // ── eyebrow text appears above the Discover button ──
+    eyebrow: "New Collection · 2025",
     btn: "Discover",
+    // ── action: what clicking the button does ──
+    // "scroll-all"  → smoothly scrolls to the All Products section
+    // "scroll-sale" → sets On Sale filter then scrolls
+    // "link:/path"  → navigates to a route  (e.g. "link:/sale")
+    action: "scroll-all",
   },
   {
     fullOverlay: true,
@@ -17,12 +24,13 @@ const HERO_SLIDES = [
     h1: "Style That\nSpeaks for You",
     sub: "The most coveted pieces from Egypt's boldest local designers.",
     btn: "Shop the Edit",
-    img: "/cover2.jpg",
+    action: "scroll-all",          // ← change to "link:/edit" etc. as needed
   },
   {
     fullBanner: true,
     img: "/chic.jpg",
     btn: "Shop Now",
+    action: "scroll-all",          // ← change to "link:/new-arrivals" etc. as needed
   },
 ];
 
@@ -39,7 +47,9 @@ const PAGE_CSS = `
 .w-hero { position:relative; overflow:hidden; min-height:520px; display:flex; align-items:center; }
 .w-hero-banner { position:relative; width:100%; }
 .w-hero-banner img { width:100%; height:520px; object-fit:cover; object-position:center top; display:block; }
-.w-hero-banner-overlay { position:absolute; inset:0; background:rgba(0,0,0,0.32); display:flex; align-items:center; justify-content:center; }
+.w-hero-banner-overlay { position:absolute; inset:0; background:rgba(0,0,0,0.32); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:14px; }
+/* ── eyebrow text above the Discover / fullBanner button ── */
+.w-hero-banner-eyebrow { font-size:.7rem; letter-spacing:.28em; text-transform:uppercase; color:rgba(255,255,255,.8); font-weight:500; }
 .w-hero-banner-btn { background:#fff; color:var(--dark); border:none; padding:.75rem 2.8rem; font-size:.85rem; letter-spacing:.18em; text-transform:uppercase; cursor:pointer; font-weight:600; transition:all .2s; border-radius:2px; }
 .w-hero-banner-btn:hover { background:var(--dark); color:#fff; }
 .w-hero-overlay { position:relative; width:100%; }
@@ -387,7 +397,8 @@ function PickCard({ p, d, addRef, onQuickView, onWish, wishlisted }) {
 }
 
 /* ══════════════════════════════════════════ HERO ══════════════════════════════════════════ */
-function HeroCarousel() {
+// onSlideBtn(slide) → called by WomenPage to handle action/link routing
+function HeroCarousel({ onSlideBtn }) {
   const [cur, setCur] = useState(0);
   const [key, setKey] = useState(0);
 
@@ -409,13 +420,19 @@ function HeroCarousel() {
         <div className="w-hero-banner" key={key}>
           <img src={s.img} alt="StyleHub Women" onError={e => { e.target.src = "https://placehold.co/1400x520?text=Banner"; }} />
           <div className="w-hero-banner-overlay">
-            <button className="w-hero-banner-btn">{s.btn}</button>
+            {/* ── eyebrow text above button — set via slide.eyebrow in HERO_SLIDES ── */}
+            {s.eyebrow && <div className="w-hero-banner-eyebrow">{s.eyebrow}</div>}
+            <button className="w-hero-banner-btn" onClick={() => onSlideBtn && onSlideBtn(s)}>
+              {s.btn}
+            </button>
           </div>
         </div>
       ) : s.fullSale ? (
         <div className="w-hero-sale" key={key}>
           <img src={s.img} alt="Sale" onError={e => { e.target.src = "https://placehold.co/520x520?text=Sale"; }} />
-          <button className="w-hero-sale-btn">{s.btn}</button>
+          <button className="w-hero-sale-btn" onClick={() => onSlideBtn && onSlideBtn(s)}>
+            {s.btn}
+          </button>
         </div>
       ) : s.fullOverlay ? (
         <div className="w-hero-overlay" key={key}>
@@ -426,7 +443,9 @@ function HeroCarousel() {
               {(s.h1 || '').split("\n").map((l, i) => <span key={i}>{l}<br /></span>)}
             </h1>
             {s.sub && <p className="w-hero-overlay-sub">{s.sub}</p>}
-            <button className="w-hero-overlay-btn">{s.btn}</button>
+            <button className="w-hero-overlay-btn" onClick={() => onSlideBtn && onSlideBtn(s)}>
+              {s.btn}
+            </button>
           </div>
         </div>
       ) : (
@@ -439,7 +458,7 @@ function HeroCarousel() {
               </h1>
               <p className="w-hero-sub">{s.sub}</p>
               <div className="d-flex gap-3 flex-wrap">
-                <button className="btn-dk">{s.btn}</button>
+                <button className="btn-dk" onClick={() => onSlideBtn && onSlideBtn(s)}>{s.btn}</button>
               </div>
             </div>
             <div className="w-hero-img">
@@ -548,6 +567,7 @@ function FilterContent({
 
 /* ══════════════════════════════════════════ MAIN ══════════════════════════════════════════ */
 export default function WomenPage() {
+  const navigate = useNavigate();
   const addRef = useScrollReveal();
   const [cartCount, setCartCount] = useState(0);
   const [wishlist, setWishlist] = useState([]);
@@ -609,8 +629,36 @@ export default function WomenPage() {
   const allProductsRef = useRef(null);
   const scroll = (ref, dir) => ref.current?.scrollBy({ left: dir * 250, behavior: "smooth" });
 
+  // ── Hero carousel button handler ─────────────────────────────────────────
+  // Reads slide.action:
+  //   "scroll-all"  → scroll to All Products
+  //   "scroll-sale" → set On Sale filter then scroll
+  //   "link:/path"  → navigate to a route
+  const handleSlideBtn = useCallback((slide) => {
+    const act = slide.action || "";
+    if (act === "scroll-all") {
+      allProductsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    } else if (act === "scroll-sale") {
+      setSortBy("sale");
+      setFilterPage(1);
+      setTimeout(() => allProductsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 50);
+    } else if (act.startsWith("link:")) {
+      navigate(act.replace("link:", ""));
+    }
+  }, [navigate]);
+
+  // ── Category card click → filter by type + scroll ─────────────────────
   const handleCategoryClick = (categoryName) => {
     setSelType(categoryName.toLowerCase());
+    setFilterPage(1);
+    setTimeout(() => {
+      allProductsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 50);
+  };
+
+  // ── Sale banner button → ON SALE filter + scroll ──────────────────────
+  const handleShopSale = () => {
+    setSortBy("sale");
     setFilterPage(1);
     setTimeout(() => {
       allProductsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -639,7 +687,9 @@ export default function WomenPage() {
       <style>{SHARED_CSS}</style>
       <style>{PAGE_CSS}</style>
       <SHNav cart={cartCount} wish={wishlist} />
-      <HeroCarousel />
+
+      {/* Hero — pass handler so every slide button is wired */}
+      <HeroCarousel onSlideBtn={handleSlideBtn} />
 
       {/* CATEGORIES */}
       <section className="w-sp" style={{ background: "var(--cream)" }}>
@@ -649,6 +699,7 @@ export default function WomenPage() {
           <div className="row g-3">
             {CATEGORIES.map((c, i) => (
               <div className="col-12 col-md-4" key={i}>
+                {/* Click anywhere on card → filter by that type + scroll to All Products */}
                 <div className={`w-cat-card reveal d${i + 1}`} ref={addRef} onClick={() => handleCategoryClick(c.name)}>
                   <img src={c.img} alt={c.name} onError={(e) => { e.target.src = "https://placehold.co/400x533?text=" + c.name; }} style={{ objectPosition: "top" }} />
                   <div className="w-cat-ov">
@@ -680,14 +731,14 @@ export default function WomenPage() {
         </div>
       </section>
 
-      {/* SALE BANNER */}
+      {/* SALE BANNER — "Shop the Sale →" sets sortBy="sale" and scrolls to All Products */}
       <section className="w-sale-ban reveal" ref={addRef}>
         <div className="w-sale-ban-inner">
           <img src="/sale.jpg" alt="End of Season Sale" onError={(e) => { e.target.src = "https://placehold.co/700x260?text=Sale"; }} />
           <div className="w-sale-ban-text">
             <p className="w-sale-sub">Limited Time Only</p>
             <h2>END OF SEASON SALE</h2>
-            <button className="w-sale-cta-btn">Shop the Sale →</button>
+            <button className="w-sale-cta-btn" onClick={handleShopSale}>Shop the Sale →</button>
           </div>
         </div>
       </section>
