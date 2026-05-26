@@ -7,7 +7,7 @@ import { SHNav, SHFooter, SHARED_CSS, useScrollReveal } from "./shared";
 const BRAND = {
   name: "27",
   fullName: "Twenty Seven",
-  desc: "Twenty Seven is a Cairo-born streetwear label built on the idea that clothing should tell your story. Known for bold graphics, premium cotton, and relaxed silhouettes — 27 pieces are designed for those who move through the city with confidence and intention.",
+  desc: "Twenty Seven is a Cairo-born Streetwear label built on the idea that clothing should tell your story. Known for bold graphics, premium cotton, and relaxed silhouettes — 27 pieces are designed for those who move through the city with confidence and intention.",
   logo: "/27.jpg",
   accentColor: "#92A079",
   heroOverlay: "rgba(255,255,255,.55)",
