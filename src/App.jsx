@@ -711,8 +711,7 @@ export default function App() {
               <div className="col-md-6 who-left p-5 d-flex flex-column justify-content-center">
                 <h3 className="mb-3">Who We Are?</h3>
                 <p className="mb-4">We support local Egyptian fashion brands and help them reach customers across Egypt — all in one place.</p>
-                <div><button className="sh-btn sh-btn-ol sh-btn-sm" onClick={() => navigate("/aboutus")}>Learn more ›</button></div>
-             
+<div><a href="/aboutus" className="sh-btn sh-btn-ol sh-btn-sm">Learn more ›</a></div>             
               
               </div>
               <div className="col-md-6 who-right">
