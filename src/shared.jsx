@@ -1,6 +1,6 @@
 import React, { useRef, useEffect, useCallback, useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate,useLocation } from "react-router-dom";
 
 export function useScrollReveal() {
   const refs = useRef([]);
@@ -301,6 +301,7 @@ function SearchOverlay({ open, onClose }) {
 // ─── NAV ───
 export function SHNav({ cart = [], wish = [] }) {
   const navigate = useNavigate();
+   const location = useLocation();  
   const [searchOpen, setSearchOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [navBrands, setNavBrands] = useState(BRANDS);
@@ -329,9 +330,20 @@ export function SHNav({ cart = [], wish = [] }) {
       <ul className="d-none d-lg-flex gap-4 list-unstyled mb-0">
         {NAV_LINKS.map(l => (
           <li key={l.label} className="nav-item d-flex align-items-center">
-            <a href={l.href} style={{ color: "var(--dark)", textDecoration: "none", fontSize: ".84rem", letterSpacing: ".04em" }}>
-              {l.label} {l.dropdown && <span style={{ fontSize: ".55rem", marginLeft: "3px" }}>▾</span>}
-            </a>
+            
+           <a href={l.href} style={{
+  color: "var(--dark)",
+  textDecoration: "none",
+  fontSize: ".84rem",
+  letterSpacing: ".04em",
+  borderBottom: location.pathname === l.href ? "1.6px solid var(--sage)" : "1.6px solid transparent",
+  paddingBottom: "3px",
+  transition: "all .2s",
+}}>
+  {l.label} {l.dropdown && <span style={{ fontSize: ".55rem", marginLeft: "3px" }}>▾</span>}
+</a>
+
+            
             {l.dropdown && (
               <div className="dropdown">
                 {navBrands.map(b => (
