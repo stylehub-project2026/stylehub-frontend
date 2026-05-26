@@ -85,12 +85,12 @@ function SizeGuidePopup({ onClose }) {
   return (
     <div onClick={onClose} style={{ position: "fixed", inset: 0, background: "rgba(26,26,24,.65)", zIndex: 900, display: "flex", alignItems: "center", justifyContent: "center", padding: "1rem" }}>
       <div onClick={e => e.stopPropagation()} style={{ background: "#fff", maxWidth: 580, width: "100%", padding: "2.5rem", position: "relative", borderRadius: 4, maxHeight: "90vh", overflowY: "auto" }}>
-        <button onClick={onClose} style={{ position: "absolute", top: "1rem", right: "1rem", background: "none", border: "none", cursor: "pointer", fontSize: "1.2rem", color: "var(--warm)" }}>✕</button>
+        <button onClick={onClose} style={{ position: "absolute", top: "1rem", right: "1rem", background: "none", border: "none", cursor: "pointer", fontSize: "1.2rem", color: "var(--warm)" }}>X</button>
         <div style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: "1.8rem", fontWeight: 400, marginBottom: ".4rem" }}>Size Guide</div>
         <div style={{ width: 40, height: 2, background: "var(--sage)", marginBottom: "1.8rem" }} />
 
         <div style={{ marginBottom: "1.8rem" }}>
-          <div style={{ fontSize: ".6rem", letterSpacing: ".2em", textTransform: "uppercase", fontWeight: 600, color: "var(--warm)", marginBottom: ".8rem", fontFamily: "'DM Sans',sans-serif" }}>Women & Men</div>
+          <div style={{ fontSize: ".6rem", letterSpacing: ".2em", textTransform: "uppercase", fontWeight: 600, color: "var(--warm)", marginBottom: ".8rem", fontFamily: "'DM Sans',sans-serif" }}>Women and Men</div>
           <table style={{ width: "100%", borderCollapse: "collapse", fontFamily: "'DM Sans',sans-serif", fontSize: ".75rem" }}>
             <thead>
               <tr style={{ background: "var(--cream)" }}>
@@ -100,7 +100,7 @@ function SizeGuidePopup({ onClose }) {
               </tr>
             </thead>
             <tbody>
-              {[["XS","80–84","60–64","86–90"],["S","84–88","64–68","90–94"],["M","88–92","68–72","94–98"],["L","92–96","72–76","98–102"],["XL","96–100","76–80","102–106"]].map(([size,...vals]) => (
+              {[["XS","80-84","60-64","86-90"],["S","84-88","64-68","90-94"],["M","88-92","68-72","94-98"],["L","92-96","72-76","98-102"],["XL","96-100","76-80","102-106"]].map(([size,...vals]) => (
                 <tr key={size} style={{ borderBottom: "1px solid var(--border)" }}>
                   <td style={{ padding: ".55rem .8rem", fontWeight: 600 }}>{size}</td>
                   {vals.map((v, i) => <td key={i} style={{ padding: ".55rem .8rem", color: "var(--warm)" }}>{v}</td>)}
@@ -121,7 +121,7 @@ function SizeGuidePopup({ onClose }) {
               </tr>
             </thead>
             <tbody>
-              {[["4Y","3–4","98–104","54–56"],["6Y","5–6","110–116","57–59"],["8Y","7–8","122–128","60–63"],["10Y","9–10","134–140","64–67"],["12Y","11–12","146–152","68–72"],["14Y","13–14","158–164","73–77"]].map(([size,...vals]) => (
+              {[["4Y","3-4","98-104","54-56"],["6Y","5-6","110-116","57-59"],["8Y","7-8","122-128","60-63"],["10Y","9-10","134-140","64-67"],["12Y","11-12","146-152","68-72"],["14Y","13-14","158-164","73-77"]].map(([size,...vals]) => (
                 <tr key={size} style={{ borderBottom: "1px solid var(--border)" }}>
                   <td style={{ padding: ".55rem .8rem", fontWeight: 600 }}>{size}</td>
                   {vals.map((v, i) => <td key={i} style={{ padding: ".55rem .8rem", color: "var(--warm)" }}>{v}</td>)}
@@ -156,6 +156,7 @@ export default function ProductDetail({ cart, setCart, wish, setWish }) {
   const [reviewMsg, setReviewMsg] = useState(null);
   const [submittingReview, setSubmittingReview] = useState(false);
   const [sizeGuideOpen, setSizeGuideOpen] = useState(false);
+  const [backendSimilar, setBackendSimilar] = useState([]);
 
   const getImageUrl = (img) => {
     if (!img) return null;
@@ -211,6 +212,19 @@ export default function ProductDetail({ cart, setCart, wish, setWish }) {
       .then(data => setReviews(data.data?.reviews || []))
       .catch(() => { });
   }, [id]);
+
+  useEffect(() => {
+    if (!product) return;
+    const isLocal = PRODUCTS.some(p => String(p.id) === String(id));
+    if (isLocal) return;
+    fetch(`${API}/products?brand=${encodeURIComponent(product.brand)}&limit=5`)
+      .then(r => r.json())
+      .then(data => {
+        const prods = (data.data?.products || []).filter(p => p._id !== id).slice(0, 4);
+        setBackendSimilar(prods);
+      })
+      .catch(() => {});
+  }, [product, id]);
 
   const toggleWish = () => setWish(w => w.includes(id) ? w.filter(x => x !== id) : [...w, id]);
 
@@ -284,7 +298,7 @@ export default function ProductDetail({ cart, setCart, wish, setWish }) {
 
   const BRAND_ALIAS = {
     "twenty seven": "27", "marble": "MARBLE", "antika": "Antika",
-    "ninos": "NINOS", "salty": "Salty", "blackcloset": "Salty",
+    "ninos": "NINOS", "salty": "Salty",
   };
   const normalizedBrand = BRAND_ALIAS[product.brand?.toLowerCase()] || product.brand;
   const sameBrandProducts = PRODUCTS.filter(p => p.brand === normalizedBrand && String(p.id) !== String(id)).slice(0, 4);
@@ -407,7 +421,6 @@ export default function ProductDetail({ cart, setCart, wish, setWish }) {
             <AccordionItem key={title} title={title} content={content} />
           ))}
 
-          {/* Size Guide — opens popup */}
           <div style={{ borderBottom: "1px solid var(--border)" }}>
             <div onClick={() => setSizeGuideOpen(true)}
               style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: ".9rem 0", cursor: "pointer" }}>
@@ -418,7 +431,8 @@ export default function ProductDetail({ cart, setCart, wish, setWish }) {
         </div>
       </div>
 
-      {sameBrandProducts.length > 0 && (
+      {/* YOU MAY ALSO LIKE */}
+      {(sameBrandProducts.length > 0 || backendSimilar.length > 0) && (
         <div className="pd-section" style={{ borderTop: "1px solid var(--border)", background: "var(--cream)" }}>
           <div style={{ maxWidth: 1200, margin: "0 auto" }}>
             <div style={{ marginBottom: "2rem" }}>
@@ -431,11 +445,29 @@ export default function ProductDetail({ cart, setCart, wish, setWish }) {
                   getImageUrl={(img) => { if (!img) return null; if (img.startsWith("http")) return img; return img; }}
                   onClick={() => navigate(`/product/${p.id}`)} />
               ))}
+              {backendSimilar.map(p => (
+                <ProductCard key={p._id}
+                  p={{
+                    id: p._id,
+                    name: p.name,
+                    brand: p.seller?.brandName || product.brand,
+                    price: `LE ${p.price?.toLocaleString()}`,
+                    oldPrice: p.salePrice ? `LE ${p.salePrice?.toLocaleString()}` : null,
+                    img: p.images?.[0] || null,
+                  }}
+                  getImageUrl={(img) => {
+                    if (!img) return null;
+                    if (img.startsWith("http")) return img;
+                    return `https://stylehub-backend-tau.vercel.app${img}`;
+                  }}
+                  onClick={() => navigate(`/product/${p._id}`)} />
+              ))}
             </div>
           </div>
         </div>
       )}
 
+      {/* REVIEWS */}
       <div className="pd-section" style={{ borderTop: "1px solid var(--border)", background: "#fff" }}>
         <div style={{ maxWidth: 1200, margin: "0 auto" }}>
           <div style={{ background: "var(--cream)", border: "1px solid var(--border)", borderRadius: 8, padding: "2rem", marginBottom: "2.5rem" }}>
@@ -501,7 +533,6 @@ export default function ProductDetail({ cart, setCart, wish, setWish }) {
       </div>
 
       <SHFooter />
-
       {sizeGuideOpen && <SizeGuidePopup onClose={() => setSizeGuideOpen(false)} />}
     </div>
   );
