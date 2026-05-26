@@ -8,6 +8,7 @@ import MarbleBrand from "./Marble";
 import Ninos from "./ninos";
 import BlackCloset from "./blackcloset";
 import TwentySeven from "./27";
+import Antika from "./antika";
 import SellerBrandPage from "./SellerBrandPage";
 import ProfilePage from "./Profilepage";
 import Wishlist from "./wishlist";
@@ -648,6 +649,7 @@ export default function App() {
         <Route path="/brand/ninos" element={<Ninos cart={cart} setCart={setCart} wish={wish} setWish={setWish} products={backendProducts} />} />
         <Route path="/brand/TwentySeven" element={<TwentySeven cart={cart} setCart={setCart} wish={wish} setWish={setWish} products={backendProducts} />} />
         <Route path="/brand/blackcloset" element={<BlackCloset cart={cart} setCart={setCart} wish={wish} setWish={setWish} products={backendProducts} />} />
+       <Route path="/brand/Antika" element={<Antika cart={cart} setCart={setCart} wish={wish} setWish={setWish} products={backendProducts} />} />
         <Route path="/brand/:brandSlug" element={<SellerBrandPage cart={cart} wish={wish} setWish={setWish} />} />
         <Route path="/wishlist" element={<Wishlist cart={cart} setCart={setCart} wish={wish} setWish={setWish} />} />
         <Route path="/profile" element={<ProfilePage cart={cart} wish={wish} />} />
