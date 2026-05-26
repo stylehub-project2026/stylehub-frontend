@@ -286,9 +286,20 @@ export default function ProductDetail({ cart, setCart, wish, setWish }) {
   const discountPct = product.salePrice ? Math.round((1 - product.salePrice / product.price) * 100) : null;
 
   /* ── "You May Also Like" — same brand, exclude current ── */
-  const sameBrandProducts = PRODUCTS
-    .filter(p => p.brand === product.brand && String(p.id) !== String(id))
-    .slice(0, 4);
+ const BRAND_ALIAS = {
+  "twenty seven": "27",
+  "marble": "MARBLE",
+  "antika": "Antika",
+  "ninos": "NINOS",
+  "salty": "Salty",
+  "blackcloset": "Salty",
+};
+
+const normalizedBrand = BRAND_ALIAS[product.brand?.toLowerCase()] || product.brand;
+
+const sameBrandProducts = PRODUCTS
+  .filter(p => p.brand === normalizedBrand && String(p.id) !== String(id))
+  .slice(0, 4);
 
   return (
     <div style={{ minHeight: "100vh", background: "var(--cream)" }}>
