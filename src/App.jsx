@@ -531,8 +531,8 @@ function BrandsCarousel() {
 
 // ─── HERO CAROUSEL ───
 const SLIDES = [
-  { img: "/12.jpg", title: "Discover Local Fashion,\nAll in One Place", sub: "Shop the finest Egyptian designers. Curated collections, exclusive drops.", btn: "Shop Now", href: "#" },
-  { img: "/sec.jpg", title: "Build Your\nPerfect Outfit", sub: "Mix and match pieces from Egypt's top local designers — all in one place.", btn: "Build an Outfit", href: "#" },
+  { img: "/12.jpg", title: "Discover Local Fashion,\nAll in One Place", sub: "Shop the finest Egyptian designers. Curated collections, exclusive drops.", btn: "Shop Now", href: "/MenPageNew" },
+  { img: "/zoo.png", title: "Build Your\nPerfect Outfit", sub: "Mix and match pieces from Egypt's top local designers — all in one place.", btn: "Build an Outfit", href: "/BuildOutfit" },
 ];
 function HeroCarousel() {
   const [cur, setCur] = useState(0);
