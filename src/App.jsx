@@ -675,7 +675,7 @@ export default function App() {
             <BrandsCarousel />
 
             {/* PRODUCTS — fixed: homeProducts is an object, use homeProducts[tab] */}
-            <section className="products-section py-3 my-1">
+            <section id="new"  className="products-section py-3 my-1">
               <div className="sh-tabs reveal" ref={addRef}>
                 {[["best", "Best Sellers"], ["new", "New Arrivals"], ["sale", "Sale"]].map(([key, label]) => (
                   <div key={key} className={`sh-tab${tab === key ? " on" : ""}`} onClick={() => setTab(key)}>{label}</div>
@@ -736,7 +736,7 @@ export default function App() {
             </section>
 
             {/* TRENDING — fixed: homeProducts is an object, use homeProducts.trend */}
-            <section className="px-4 py-4 mobile-mt-sm" style={{ marginTop: "6rem" }}>
+            <section  id="trend" className="px-4 py-4 mobile-mt-sm" style={{ marginTop: "6rem" }}>
               <div className="sec-title reveal" ref={addRef}>Trending Now</div>
               <TrendingCarousel
                 products={homeProducts.trend || []}
