@@ -312,7 +312,7 @@ export function SHNav({ cart = [], wish = [] }) {
         if (d.success && d.data.length > 0) {
           setNavBrands(d.data.map(s => ({
             name: s.brandName,
-            href: `/brand/${s.brandName}`,
+            href: `/brand/${s.brandName.replace(/\s+/g,"")}`,
           })));
         }
       })
