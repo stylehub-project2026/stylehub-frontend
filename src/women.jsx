@@ -31,7 +31,7 @@ const HERO_SLIDES = [
   },
   {
     fullBanner: true,
-    img: "/chic.jpg",
+    img: "/image.png",
     btn: "Shop Now",
     action: "scroll-all",          // ← change to "link:/new-arrivals" etc. as needed
   },
