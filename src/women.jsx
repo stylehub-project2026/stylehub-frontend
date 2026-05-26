@@ -53,6 +53,17 @@ const PAGE_CSS = `
 .w-hero-banner-overlay { position:absolute; inset:0; background:rgba(0,0,0,0.32); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:14px; }
 /* ── eyebrow text above the Discover / fullBanner button ── */
 .w-hero-banner-eyebrow { font-size:.7rem; letter-spacing:.28em; text-transform:uppercase; color:rgba(255,255,255,.8); font-weight:500; }
+.w-hero-banner-h1{
+  font-family:'Cormorant Garamond',serif;
+  font-size:clamp(2.2rem,5vw,4rem);
+  font-weight:600;
+  color:#fff;
+  text-align:center;
+  line-height:1.1;
+  margin:0;
+  max-width:700px;
+  padding:0 20px;
+}
 .w-hero-banner-btn { background:#fff; color:var(--dark); border:none; padding:.75rem 2.8rem; font-size:.85rem; letter-spacing:.18em; text-transform:uppercase; cursor:pointer; font-weight:600; transition:all .2s; border-radius:2px; }
 .w-hero-banner-btn:hover { background:var(--dark); color:#fff; }
 .w-hero-overlay { position:relative; width:100%; }
@@ -425,6 +436,11 @@ function HeroCarousel({ onSlideBtn }) {
           <div className="w-hero-banner-overlay">
             {/* ── eyebrow text above button — set via slide.eyebrow in HERO_SLIDES ── */}
             {s.eyebrow && <div className="w-hero-banner-eyebrow">{s.eyebrow}</div>}
+            {s.h1 && (
+    <h1 className="w-hero-banner-h1">
+      {s.h1}
+    </h1>
+  )}
             <button className="w-hero-banner-btn" onClick={() => onSlideBtn && onSlideBtn(s)}>
               {s.btn}
             </button>
