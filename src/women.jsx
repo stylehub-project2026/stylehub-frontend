@@ -8,7 +8,7 @@ import { SHNav, SHFooter, useScrollReveal, SHARED_CSS, PRODUCTS, shuffle } from 
 const HERO_SLIDES = [
   {
     fullBanner: true,
-    img: "/cover1.jpg",
+    img: "/sec2.jpg",
     btn: "Discover",
   },
   {
@@ -20,16 +20,16 @@ const HERO_SLIDES = [
     img: "/cover2.jpg",
   },
   {
-    fullSale: true,
+    fullBanner: true,
     img: "/chic.jpg",
     btn: "Shop Now",
   },
 ];
 
 const CATEGORIES = [
-  { name: "Tops", img: "/tops.jpg", count: "28 styles" },
-  { name: "Dresses", img: "/.jpg", count: "21 styles" },
-  { name: "Pants", img: "/pants.jpg", count: "18 styles" },
+  { name: "Jackets", img: "/1.jpeg", count: "10 styles" },
+  { name: "Tops", img: "/4.png", count: "21 styles" },
+  { name: "Pants", img: "/2.jpeg", count: "12 styles" },
 ];
 
 
