@@ -55,7 +55,7 @@ const PAGE_CSS = `
 .w-hero-banner-eyebrow { font-size:.7rem; letter-spacing:.28em; text-transform:uppercase; color:rgba(255,255,255,.8); font-weight:500; }
 .w-hero-banner-h1{
   font-family:'Cormorant Garamond',serif;
-  font-size:clamp(2.2rem,5vw,4rem);
+  font-size:clamp(1.2rem,5vw,4rem);
   font-weight:600;
   color:#fff;
   text-align:center;
