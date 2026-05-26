@@ -36,7 +36,7 @@ const CAT_TYPE_MAP = {
 const CATEGORIES = [
     { name: "Pants",   img: "https://twentysevenegy.myshopify.com/cdn/shop/files/022A2473.jpg?v=1768003189&width=980", count: "10 styles" },
     { name: "Hoodies", img: "https://m.media-amazon.com/images/I/61pyF5Fn+qL._AC_SY445_SX342_QL70_ML2_.jpg",          count: "12 styles" },
-    { name: "Jackets", img: "/men-jacket,jpeg", count: "11 styles" },
+    { name: "Jackets", img: "/men-jacket.jpeg", count: "11 styles" },
 ];
 
 /* ══════════════════════════════════════════ HELPERS ══════════════════════════════════════════ */
