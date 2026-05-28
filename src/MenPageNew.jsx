@@ -213,7 +213,6 @@ function HeroCarousel() {
         } : { backgroundColor: s.bg }}>
             <div className={`hero-slide active${s.fullBg ? " full-bg" : ""}`} key={key}>
                 <div className="hero-txt">
-                    <div className="hero-ey">{s.ey}</div>
                     <h1 className="hero-h1">
                         {s.h1.split("\n").map((l, i) => <span key={i}>{l}<br /></span>)}
                     </h1>
