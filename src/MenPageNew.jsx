@@ -218,9 +218,7 @@ function HeroCarousel() {
                         {s.h1.split("\n").map((l, i) => <span key={i}>{l}<br /></span>)}
                     </h1>
                     <p className="hero-sub">{s.sub}</p>
-                    <div className="d-flex gap-3 flex-wrap">
-                        <button className="btn-dk">{s.btn}</button>
-                    </div>
+
                 </div>
                 {!s.fullBg && (
                     <div className="hero-img"><img src={s.img} alt={s.h1} /></div>
