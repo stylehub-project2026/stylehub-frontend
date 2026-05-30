@@ -662,7 +662,7 @@ function SellerSignUpForm({ onSwitchSignIn, onDone }) {
         localStorage.setItem("sellerToken", token);
         localStorage.setItem("seller", JSON.stringify(user));
         setOk(true);
-        setTimeout(() => { window.location.href = '/seller/payment'; }, 1100);
+        setTimeout(() => { window.location.href = 'https://stylehub-frontend-ten.vercel.app/seller/payment'; }, 1100);
       } catch (error) {
         setErr(error.response?.data?.message || "Something went wrong. Please try again.");
       } finally {
