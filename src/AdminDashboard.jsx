@@ -69,6 +69,15 @@ export default function AdminDashboard() {
         fetchCustomers();
     };
 
+    const getDiscountStatus = (seller) => {
+        if (!seller.discountEndsAt) return null;
+        const now = new Date();
+        const end = new Date(seller.discountEndsAt);
+        const daysLeft = Math.ceil((end - now) / (1000 * 60 * 60 * 24));
+        if (daysLeft > 0) return { active: true, daysLeft };
+        return { active: false, daysLeft: 0 };
+    };
+
     const th = { padding: '12px 16px', background: '#f8f6f2', textAlign: 'left', fontSize: '.75rem', letterSpacing: '.08em', color: '#8c8880', fontWeight: 600 };
     const td = { padding: '12px 16px', borderBottom: '1px solid #e4e0da', fontSize: '.85rem' };
 
@@ -119,34 +128,56 @@ export default function AdminDashboard() {
                     <div style={{ background: '#fff', borderRadius: 12, border: '1px solid #e4e0da', overflow: 'hidden' }}>
                         <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                             <thead>
-                                <tr>{['Brand', 'Email', 'Category', 'Status', 'Actions'].map(h => <th key={h} style={th}>{h}</th>)}</tr>
+                                <tr>{['Brand', 'Email', 'Plan', 'Discount Status', 'Status', 'Actions'].map(h => <th key={h} style={th}>{h}</th>)}</tr>
                             </thead>
                             <tbody>
-                                {sellers.length === 0 && <tr><td colSpan={5} style={{ ...td, textAlign: 'center', color: '#8c8880' }}>No sellers found</td></tr>}
-                                {sellers.map(s => (
-                                    <tr key={s._id}>
-                                        <td style={td}><strong>{s.brandName}</strong></td>
-                                        <td style={td}>{s.email}</td>
-                                        <td style={td}>{s.category}</td>
-                                        <td style={td}>
-                                            <span style={{ padding: '3px 10px', borderRadius: 20, fontSize: '.75rem', fontWeight: 600, background: s.isApproved ? '#e8f5e9' : '#fff3e0', color: s.isApproved ? '#2e7d32' : '#e65100' }}>
-                                                {s.isApproved ? 'Approved' : 'Pending Payment'}
-                                            </span>
-                                        </td>
-                                        <td style={td}>
-                                            {!s.isApproved && (
-                                                <button onClick={() => approveSeller(s._id)}
-                                                    style={{ marginRight: 8, padding: '5px 12px', background: '#92A079', color: '#fff', border: 'none', borderRadius: 6, cursor: 'pointer', fontSize: '.8rem' }}>
-                                                    Approve
+                                {sellers.length === 0 && <tr><td colSpan={6} style={{ ...td, textAlign: 'center', color: '#8c8880' }}>No sellers found</td></tr>}
+                                {sellers.map(s => {
+                                    const disc = getDiscountStatus(s);
+                                    return (
+                                        <tr key={s._id}>
+                                            <td style={td}><strong>{s.brandName}</strong></td>
+                                            <td style={td}>{s.email}</td>
+                                            <td style={td}>
+                                                <span style={{ padding: '3px 10px', borderRadius: 20, fontSize: '.75rem', fontWeight: 600, background: '#f8f6f2', color: '#1a1a18' }}>
+                                                    {s.subscriptionPlan || 'standard'}
+                                                </span>
+                                            </td>
+                                            <td style={td}>
+                                                {disc ? (
+                                                    disc.active ? (
+                                                        <span style={{ padding: '3px 10px', borderRadius: 20, fontSize: '.75rem', fontWeight: 600, background: '#fff3cd', color: '#856404' }}>
+                                                            50% OFF — {disc.daysLeft}d left
+                                                        </span>
+                                                    ) : (
+                                                        <span style={{ padding: '3px 10px', borderRadius: 20, fontSize: '.75rem', fontWeight: 600, background: '#fde8e8', color: '#c0392b' }}>
+                                                            Discount Expired
+                                                        </span>
+                                                    )
+                                                ) : (
+                                                    <span style={{ color: '#ccc', fontSize: '.75rem' }}>—</span>
+                                                )}
+                                            </td>
+                                            <td style={td}>
+                                                <span style={{ padding: '3px 10px', borderRadius: 20, fontSize: '.75rem', fontWeight: 600, background: s.isApproved ? '#e8f5e9' : '#fff3e0', color: s.isApproved ? '#2e7d32' : '#e65100' }}>
+                                                    {s.isApproved ? 'Approved' : 'Pending Payment'}
+                                                </span>
+                                            </td>
+                                            <td style={td}>
+                                                {!s.isApproved && (
+                                                    <button onClick={() => approveSeller(s._id)}
+                                                        style={{ marginRight: 8, padding: '5px 12px', background: '#92A079', color: '#fff', border: 'none', borderRadius: 6, cursor: 'pointer', fontSize: '.8rem' }}>
+                                                        Approve
+                                                    </button>
+                                                )}
+                                                <button onClick={() => deleteSeller(s._id)}
+                                                    style={{ padding: '5px 12px', background: '#fff', color: '#e63946', border: '1px solid #e63946', borderRadius: 6, cursor: 'pointer', fontSize: '.8rem' }}>
+                                                    Delete
                                                 </button>
-                                            )}
-                                            <button onClick={() => deleteSeller(s._id)}
-                                                style={{ padding: '5px 12px', background: '#fff', color: '#e63946', border: '1px solid #e63946', borderRadius: 6, cursor: 'pointer', fontSize: '.8rem' }}>
-                                                Delete
-                                            </button>
-                                        </td>
-                                    </tr>
-                                ))}
+                                            </td>
+                                        </tr>
+                                    );
+                                })}
                             </tbody>
                         </table>
                     </div>
@@ -183,7 +214,6 @@ export default function AdminDashboard() {
                 {/* Revenue Tab */}
                 {tab === 'revenue' && (
                     <div>
-                        {/* Summary */}
                         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1rem', marginBottom: '1.5rem' }}>
                             {[
                                 { label: 'Total Orders', value: commissions.orders?.length || 0 },
@@ -197,7 +227,6 @@ export default function AdminDashboard() {
                             ))}
                         </div>
 
-                        {/* Orders Table */}
                         <div style={{ background: '#fff', borderRadius: 12, border: '1px solid #e4e0da', overflow: 'hidden' }}>
                             <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                                 <thead>
