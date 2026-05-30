@@ -1,6 +1,6 @@
 import React, { useRef, useEffect, useCallback, useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
-import { Link, useNavigate,useLocation } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 
 export function useScrollReveal() {
   const refs = useRef([]);
@@ -122,21 +122,21 @@ export const PRODUCTS = [
 
 
 
-  { id: 100, gender: "men", name: "Gray shorts", brand: "27", type: "Pants",img3d: "pant1.jpg", price: "LE 750", oldPrice: "LE 950", img: "/pant1.jpg", colors: ["#6d6668ff"], sizes: ["XS", "S", "M", "L", "XL"], rating: 4.6, reviews: 203, desc: "100% cotton short" },
-  { id: 101, gender: "women", name: "Dark Blue oversized T-shirt", type:"Tops",brand: "MARBLE", img3d: "182.jpg", price: "LE 600", oldPrice: "LE 950", img: "/181.jpg", colors: ["#26305aff"], sizes: ["XS", "S", "M", "L", "XL"], rating: 4.6, reviews: 203, desc: "Printed Dark Blue oversized t-shirt 100% cotton" },
-  { id: 102, gender: "women", name: "Printed oversized hoodie", type:"Tops",brand: "MARBLE", img3d: "blackhood2.jpg", price: "LE 600", oldPrice: "LE 950", img: "/bb9.jpg", colors: ["#161717ff"], sizes: ["XS", "S", "M", "L", "XL"], rating: 4.6, reviews: 203, desc: "Printed Black printed oversized hoodie" },
+  { id: 100, gender: "men", name: "Gray shorts", brand: "27", type: "Pants", img3d: "pant1.jpg", price: "LE 750", oldPrice: "LE 950", img: "/pant1.jpg", colors: ["#6d6668ff"], sizes: ["XS", "S", "M", "L", "XL"], rating: 4.6, reviews: 203, desc: "100% cotton short" },
+  { id: 101, gender: "women", name: "Dark Blue oversized T-shirt", type: "Tops", brand: "MARBLE", img3d: "182.jpg", price: "LE 600", oldPrice: "LE 950", img: "/181.jpg", colors: ["#26305aff"], sizes: ["XS", "S", "M", "L", "XL"], rating: 4.6, reviews: 203, desc: "Printed Dark Blue oversized t-shirt 100% cotton" },
+  { id: 102, gender: "women", name: "Printed oversized hoodie", type: "Tops", brand: "MARBLE", img3d: "blackhood2.jpg", price: "LE 600", oldPrice: "LE 950", img: "/bb9.jpg", colors: ["#161717ff"], sizes: ["XS", "S", "M", "L", "XL"], rating: 4.6, reviews: 203, desc: "Printed Black printed oversized hoodie" },
   { id: 103, gender: "unisex", name: "Blue jeans", brand: "27", img3d: "nojean.jpg", price: "LE 600", oldPrice: "LE 950", img: "/jean1.jpg", colors: ["#365a99ff"], sizes: ["XS", "S", "M", "L", "XL"], rating: 4.6, reviews: 203 },
   { id: 104, gender: "men", name: "Black bagy jeans", brand: "Salty", img3d: "bagyjean2.jpg", price: "LE 600", oldPrice: "LE 950", img: "/bagyjean1.jpg", colors: ["#2b2d31ff"], sizes: ["XS", "S", "M", "L", "XL"], rating: 4.6, reviews: 203 },
   { id: 105, gender: "men", name: "Grey bagy jeans", brand: "Salty", img3d: "grayjean1.jpg", price: "LE 600", oldPrice: "LE 950", img: "/grayjean.jpg", colors: ["#2b2d31ff"], sizes: ["XS", "S", "M", "L", "XL"], rating: 4.6, reviews: 203 },
-  { id: 106, gender: "unisex", name: " Straight leg jeans",type:"Pants", brand: "MARBLE", img3d: "bluy2.jpg", price: "LE 690", oldPrice: "LE 950", img: "/bluy.jpg", colors: ["#2b2d31ff"], sizes: ["XS", "S", "M", "L", "XL"], rating: 4.6, reviews: 203 },
-  { id: 107, gender: "women", name: " Pink Peanuts hockey T-shirt",type:"Tops", brand: "27", img3d: "pea1.jpg", price: "LE 560", oldPrice: "LE 650", img: "/pea.jpg", colors: ["#d4b5deff"], sizes: ["XS", "S", "M", "L", "XL"], rating: 4.6, reviews: 203 },
-  { id: 108, gender: "women", name: " Long sleeve boxy-fit T-shirt", type:"Tops",brand: "27", img3d: "strips2.jpg", price: "LE 460", oldPrice: "LE 650", img: "/strips.jpg", colors: ["#d8d8d8ff"], sizes: ["XS", "S", "M", "L", "XL"], rating: 4.6, reviews: 203 },
+  { id: 106, gender: "unisex", name: " Straight leg jeans", type: "Pants", brand: "MARBLE", img3d: "bluy2.jpg", price: "LE 690", oldPrice: "LE 950", img: "/bluy.jpg", colors: ["#2b2d31ff"], sizes: ["XS", "S", "M", "L", "XL"], rating: 4.6, reviews: 203 },
+  { id: 107, gender: "women", name: " Pink Peanuts hockey T-shirt", type: "Tops", brand: "27", img3d: "pea1.jpg", price: "LE 560", oldPrice: "LE 650", img: "/pea.jpg", colors: ["#d4b5deff"], sizes: ["XS", "S", "M", "L", "XL"], rating: 4.6, reviews: 203 },
+  { id: 108, gender: "women", name: " Long sleeve boxy-fit T-shirt", type: "Tops", brand: "27", img3d: "strips2.jpg", price: "LE 460", oldPrice: "LE 650", img: "/strips.jpg", colors: ["#d8d8d8ff"], sizes: ["XS", "S", "M", "L", "XL"], rating: 4.6, reviews: 203 },
   { id: 109, gender: "men", name: "  Graffiti T-shirt", brand: "Salty", img3d: "stay2.jpg", price: "LE 550", oldPrice: "LE 650", img: "/stay.jpg", colors: ["#060505ff"], sizes: ["XS", "S", "M", "L", "XL"], rating: 4.6, reviews: 203 },
-  { id: 110, gender: "women", name: "  Chenille hooded jumper", type:"Tops",brand: "Salty", img3d: "jump1.jpg", price: "LE 850", oldPrice: "LE 950", img: "/jump.jpg", colors: ["#eff3dfff"], sizes: ["XS", "S", "M", "L", "XL"], rating: 4.6, reviews: 203 },
+  { id: 110, gender: "women", name: "  Chenille hooded jumper", type: "Tops", brand: "Salty", img3d: "jump1.jpg", price: "LE 850", oldPrice: "LE 950", img: "/jump.jpg", colors: ["#eff3dfff"], sizes: ["XS", "S", "M", "L", "XL"], rating: 4.6, reviews: 203 },
   { id: 111, gender: "men", name: "  Ford zip-up hoodie", brand: "MARBLE", img3d: "ford1.jpg", price: "LE 950", oldPrice: "LE 1,050", img: "/ford.jpg", colors: ["#9d9d9dff"], sizes: ["XS", "S", "M", "L", "XL"], rating: 4.6, reviews: 203 },
   { id: 112, gender: "men", name: "  Star knit T-shirt", brand: "Salty", img3d: "star1.jpg", price: "LE 850", oldPrice: "LE 1,050", img: "/star.jpg", colors: ["#473232ff"], sizes: ["XS", "S", "M", "L", "XL"], rating: 4.6, reviews: 203 },
-  { id: 113, gender: "unisex", name: " Ripped blue jeans ",type:"Pants", brand: "27", img3d: "ripped1.jpg", price: "LE 750", oldPrice: "LE 850", img: "/ripped.jpg", colors: ["#357a97ff"], sizes: ["XS", "S", "M", "L", "XL"], rating: 4.6, reviews: 203 },
-  { id: 114, gender: "unisex", name: " PIVOT SWEATPANTS",type:"Pants", brand: "27", img3d: "oh.jpg", price: "LE 550", oldPrice: "LE 650", img: "/oh2.jpg", colors: ["#95999aff"], sizes: ["XS", "S", "M", "L", "XL"], rating: 4.6, reviews: 203 },
+  { id: 113, gender: "unisex", name: " Ripped blue jeans ", type: "Pants", brand: "27", img3d: "ripped1.jpg", price: "LE 750", oldPrice: "LE 850", img: "/ripped.jpg", colors: ["#357a97ff"], sizes: ["XS", "S", "M", "L", "XL"], rating: 4.6, reviews: 203 },
+  { id: 114, gender: "unisex", name: " PIVOT SWEATPANTS", type: "Pants", brand: "27", img3d: "oh.jpg", price: "LE 550", oldPrice: "LE 650", img: "/oh2.jpg", colors: ["#95999aff"], sizes: ["XS", "S", "M", "L", "XL"], rating: 4.6, reviews: 203 },
   { id: 115, gender: "men", name: " STWD graphic T-shirt", brand: "MARBLE", img3d: "st1.jpg", price: "LE 850", oldPrice: "LE 950", img: "/st.jpg", colors: ["#1d5562ff"], sizes: ["XS", "S", "M", "L", "XL"], rating: 4.6, reviews: 203 },
   { id: 116, name: " Sheer blouse with ruffle", brand: "antika", img3d: "sheer.jpg", price: "LE 850", oldPrice: "LE 950", img: "/sheer2.jpg", colors: ["#1d5562ff"], sizes: ["XS", "S", "M", "L", "XL"], rating: 4.6, reviews: 203 },
 
@@ -301,7 +301,7 @@ function SearchOverlay({ open, onClose }) {
 // ─── NAV ───
 export function SHNav({ cart = [], wish = [] }) {
   const navigate = useNavigate();
-   const location = useLocation();  
+  const location = useLocation();
   const [searchOpen, setSearchOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [navBrands, setNavBrands] = useState(BRANDS);
@@ -313,7 +313,7 @@ export function SHNav({ cart = [], wish = [] }) {
         if (d.success && d.data.length > 0) {
           setNavBrands(d.data.map(s => ({
             name: s.brandName,
-            href: `/brand/${s.brandName.replace(/\s+/g,"")}`,
+            href: `/brand/${s.brandName.replace(/\s+/g, "")}`,
           })));
         }
       })
@@ -330,20 +330,20 @@ export function SHNav({ cart = [], wish = [] }) {
       <ul className="d-none d-lg-flex gap-4 list-unstyled mb-0">
         {NAV_LINKS.map(l => (
           <li key={l.label} className="nav-item d-flex align-items-center">
-            
-           <a href={l.href} style={{
-  color: "var(--dark)",
-  textDecoration: "none",
-  fontSize: ".84rem",
-  letterSpacing: ".04em",
-  borderBottom: location.pathname === l.href ? "1.6px solid var(--sage)" : "1.6px solid transparent",
-  paddingBottom: "3px",
-  transition: "all .2s",
-}}>
-  {l.label} {l.dropdown && <span style={{ fontSize: ".55rem", marginLeft: "3px" }}>▾</span>}
-</a>
 
-            
+            <a href={l.href} style={{
+              color: "var(--dark)",
+              textDecoration: "none",
+              fontSize: ".84rem",
+              letterSpacing: ".04em",
+              borderBottom: location.pathname === l.href ? "1.6px solid var(--sage)" : "1.6px solid transparent",
+              paddingBottom: "3px",
+              transition: "all .2s",
+            }}>
+              {l.label} {l.dropdown && <span style={{ fontSize: ".55rem", marginLeft: "3px" }}>▾</span>}
+            </a>
+
+
             {l.dropdown && (
               <div className="dropdown">
                 {navBrands.map(b => (
@@ -415,11 +415,11 @@ export function SHFooter() {
           <p className="f-about mb-3">Your destination for Egypt's finest local fashion brands.</p>
           <div className="d-flex gap-2">
             <div className="d-flex gap-2">
-  <a href="https://www.facebook.com/share/18ztJYRk3q/?mibextid=wwXIfr" className="f-soc" target="_blank" rel="noopener noreferrer">F</a>
-  <a href="https://www.instagram.com/stylehub7500?igsh=MTE2bm1uYXoyZmFndw%3D%3D&utm_source=qr" className="f-soc" target="_blank" rel="noopener noreferrer">IG</a>
-</div>
-         
-          
+              <a href="https://www.facebook.com/share/18ztJYRk3q/?mibextid=wwXIfr" className="f-soc" target="_blank" rel="noopener noreferrer">F</a>
+              <a href="https://www.instagram.com/stylehub7500?igsh=MTE2bm1uYXoyZmFndw%3D%3D&utm_source=qr" className="f-soc" target="_blank" rel="noopener noreferrer">IG</a>
+            </div>
+
+
           </div>
         </div>
         {FOOTER_COLS.map((col, i) => (
@@ -432,7 +432,7 @@ export function SHFooter() {
         ))}
       </div>
       <div className="d-flex justify-content-between align-items-center pt-3 flex-wrap gap-2" style={{ borderTop: "1px solid rgba(255,255,255,.15)" }}>
-        <span className="f-copy">© 2026 StyleHub. All rights reserved.</span>
+        <span className="f-copy">© 2026 StyleHub. All rights reserved. <a href="/admin/login" style={{ fontSize: '.65rem', color: 'rgba(255,255,255,.2)', textDecoration: 'none' }}>·</a></span>
         <div className="d-flex gap-1">{["VISA", "FAWRY", "CASH"].map(p => <span className="fpb" key={p}>{p}</span>)}</div>
       </div>
     </footer>
