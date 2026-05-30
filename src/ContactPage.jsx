@@ -91,10 +91,10 @@ const INITIAL_FORM = { firstName: "", lastName: "", email: "", phone: "", messag
 export default function ContactPage({ cart, wish }) {
   const addRef = useScrollReveal();
 
-  const [form,       setForm]       = useState(INITIAL_FORM);
+  const [form, setForm] = useState(INITIAL_FORM);
   const [submitting, setSubmitting] = useState(false);
-  const [sent,       setSent]       = useState(false);
-  const [error,      setError]      = useState(null);
+  const [sent, setSent] = useState(false);
+  const [error, setError] = useState(null);
 
   const handleChange = e =>
     setForm(f => ({ ...f, [e.target.name]: e.target.value }));
@@ -183,7 +183,7 @@ export default function ContactPage({ cart, wish }) {
                 <div className="cp-info-icon"><i className="bi bi-envelope-fill" /></div>
                 <div className="cp-info-text">
                   <strong>Email</strong>
-                  hello@stylehub.com.eg
+                  style.hub7031@gmail.com
                 </div>
               </div>
 
