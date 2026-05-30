@@ -28,6 +28,8 @@ import AboutUs from "./AboutUs";
 import ContactPage from "./ContactPage";
 import ChatWidget from "./ChatWidget";
 import AdminChat from "./AdminChat";
+import AdminLogin from './AdminLogin';
+import AdminDashboard from './AdminDashboard';
 
 import { saveCart, saveWishlist, sellerSignOut } from "./api";
 
@@ -650,7 +652,7 @@ export default function App() {
         <Route path="/brand/ninos" element={<Ninos cart={cart} setCart={setCart} wish={wish} setWish={setWish} products={backendProducts} />} />
         <Route path="/brand/TwentySeven" element={<TwentySeven cart={cart} setCart={setCart} wish={wish} setWish={setWish} products={backendProducts} />} />
         <Route path="/brand/BlackCloset" element={<BlackCloset cart={cart} setCart={setCart} wish={wish} setWish={setWish} products={backendProducts} />} />
-       <Route path="/brand/Antika" element={<Antika cart={cart} setCart={setCart} wish={wish} setWish={setWish} products={backendProducts} />} />
+        <Route path="/brand/Antika" element={<Antika cart={cart} setCart={setCart} wish={wish} setWish={setWish} products={backendProducts} />} />
         <Route path="/sellersupport" element={<SellerSupport cart={cart} wish={wish} />} />
         <Route path="/brand/:brandSlug" element={<SellerBrandPage cart={cart} wish={wish} setWish={setWish} />} />
         <Route path="/wishlist" element={<Wishlist cart={cart} setCart={setCart} wish={wish} setWish={setWish} />} />
@@ -664,6 +666,8 @@ export default function App() {
         <Route path="/aboutus" element={<AboutUs cart={cart} wish={wish} />} />
         <Route path="/ContactPage" element={<ContactPage cart={cart} wish={wish} />} />
         <Route path="/admin/chat" element={<AdminChat />} />
+        <Route path="/admin/login" element={<AdminLogin />} />
+        <Route path="/admin/dashboard" element={<AdminDashboard />} />
 
         <Route path="/" element={
           <div key={location.key}>
@@ -679,7 +683,7 @@ export default function App() {
             <BrandsCarousel />
 
             {/* PRODUCTS — fixed: homeProducts is an object, use homeProducts[tab] */}
-            <section id="new"  className="products-section py-3 my-1">
+            <section id="new" className="products-section py-3 my-1">
               <div className="sh-tabs reveal" ref={addRef}>
                 {[["best", "Best Sellers"], ["new", "New Arrivals"], ["sale", "Sale"]].map(([key, label]) => (
                   <div key={key} className={`sh-tab${tab === key ? " on" : ""}`} onClick={() => setTab(key)}>{label}</div>
@@ -713,8 +717,8 @@ export default function App() {
               <div className="col-md-6 who-left p-5 d-flex flex-column justify-content-center">
                 <h3 className="mb-3">Who We Are?</h3>
                 <p className="mb-4">We support local Egyptian fashion brands and help them reach customers across Egypt — all in one place.</p>
-<div><a href="/aboutus" className="sh-btn sh-btn-ol sh-btn-sm">Learn more ›</a></div>             
-              
+                <div><a href="/aboutus" className="sh-btn sh-btn-ol sh-btn-sm">Learn more ›</a></div>
+
               </div>
               <div className="col-md-6 who-right">
                 <img src="/who.jpg" alt="support local" />
@@ -741,7 +745,7 @@ export default function App() {
             </section>
 
             {/* TRENDING — fixed: homeProducts is an object, use homeProducts.trend */}
-            <section  id="trend" className="px-4 py-4 mobile-mt-sm" style={{ marginTop: "6rem" }}>
+            <section id="trend" className="px-4 py-4 mobile-mt-sm" style={{ marginTop: "6rem" }}>
               <div className="sec-title reveal" ref={addRef}>Trending Now</div>
               <TrendingCarousel
                 products={homeProducts.trend || []}
