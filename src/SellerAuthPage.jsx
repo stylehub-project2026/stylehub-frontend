@@ -662,7 +662,7 @@ function SellerSignUpForm({ onSwitchSignIn, onDone }) {
         localStorage.setItem("sellerToken", token);
         localStorage.setItem("seller", JSON.stringify(user));
         setOk(true);
-        setTimeout(onDone, 1100);
+        setTimeout(() => { window.location.href = '/seller/payment'; }, 1100);
       } catch (error) {
         setErr(error.response?.data?.message || "Something went wrong. Please try again.");
       } finally {
@@ -695,7 +695,7 @@ function SellerSignUpForm({ onSwitchSignIn, onDone }) {
       {ok && (
         <div className="sh-alert sh-alert-success">
           <i className="fas fa-check-circle" style={{ marginRight: 8 }} />
-          Store created! Redirecting to dashboard…
+          Store created! Redirecting to payment…
         </div>
       )}
       {err && (
