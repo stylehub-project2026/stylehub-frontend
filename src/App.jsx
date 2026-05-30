@@ -30,6 +30,7 @@ import ChatWidget from "./ChatWidget";
 import AdminChat from "./AdminChat";
 import AdminLogin from './AdminLogin';
 import AdminDashboard from './AdminDashboard';
+import SellerPayment from './SellerPayment';
 
 import { saveCart, saveWishlist, sellerSignOut } from "./api";
 
@@ -668,6 +669,7 @@ export default function App() {
         <Route path="/admin/chat" element={<AdminChat />} />
         <Route path="/admin/login" element={<AdminLogin />} />
         <Route path="/admin/dashboard" element={<AdminDashboard />} />
+        <Route path="/seller/payment" element={<SellerPayment />} />
 
         <Route path="/" element={
           <div key={location.key}>
