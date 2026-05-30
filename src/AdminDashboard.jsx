@@ -7,6 +7,7 @@ const BACKEND_URL = 'https://stylehub-backend-tau.vercel.app';
 export default function AdminDashboard() {
     const [sellers, setSellers] = useState([]);
     const [customers, setCustomers] = useState([]);
+    const [commissions, setCommissions] = useState({ orders: [], totalCommission: 0, totalSales: 0, totalSellerEarnings: 0 });
     const [tab, setTab] = useState('sellers');
     const navigate = useNavigate();
     const token = getAdminToken();
@@ -15,6 +16,7 @@ export default function AdminDashboard() {
         if (!token) return navigate('/admin/login');
         fetchSellers();
         fetchCustomers();
+        fetchCommissions();
     }, []);
 
     const fetchSellers = async () => {
@@ -31,6 +33,14 @@ export default function AdminDashboard() {
         });
         const data = await res.json();
         setCustomers(Array.isArray(data) ? data : []);
+    };
+
+    const fetchCommissions = async () => {
+        const res = await fetch(`${BACKEND_URL}/api/admin/commissions`, {
+            headers: { Authorization: `Bearer ${token}` },
+        });
+        const data = await res.json();
+        setCommissions(data);
     };
 
     const approveSeller = async (id) => {
@@ -74,9 +84,29 @@ export default function AdminDashboard() {
             </div>
 
             <div style={{ padding: '2rem' }}>
+
+                {/* Stats Cards */}
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1rem', marginBottom: '2rem' }}>
+                    {[
+                        { label: 'Total Sellers', value: sellers.length, color: '#92A079' },
+                        { label: 'Total Customers', value: customers.length, color: '#c8a96e' },
+                        { label: 'Total Sales', value: `EGP ${(commissions.totalSales || 0).toLocaleString()}`, color: '#728060' },
+                        { label: 'StyleHub Revenue (10%)', value: `EGP ${(commissions.totalCommission || 0).toLocaleString()}`, color: '#1a1a18' },
+                    ].map(s => (
+                        <div key={s.label} style={{ background: '#fff', borderRadius: 12, padding: '1.2rem 1.5rem', border: '1px solid #e4e0da' }}>
+                            <div style={{ fontSize: '.75rem', color: '#8c8880', marginBottom: '.4rem', letterSpacing: '.05em' }}>{s.label}</div>
+                            <div style={{ fontSize: '1.5rem', fontWeight: 700, color: s.color }}>{s.value}</div>
+                        </div>
+                    ))}
+                </div>
+
                 {/* Tabs */}
                 <div style={{ display: 'flex', gap: 12, marginBottom: 24 }}>
-                    {[['sellers', `Sellers (${sellers.length})`], ['customers', `Customers (${customers.length})`]].map(([key, label]) => (
+                    {[
+                        ['sellers', `Sellers (${sellers.length})`],
+                        ['customers', `Customers (${customers.length})`],
+                        ['revenue', 'Revenue'],
+                    ].map(([key, label]) => (
                         <button key={key} onClick={() => setTab(key)}
                             style={{ padding: '8px 20px', background: tab === key ? '#1a1a18' : '#fff', color: tab === key ? '#fff' : '#1a1a18', border: '1px solid #e4e0da', borderRadius: 8, cursor: 'pointer', fontSize: '.85rem' }}>
                             {label}
@@ -89,9 +119,7 @@ export default function AdminDashboard() {
                     <div style={{ background: '#fff', borderRadius: 12, border: '1px solid #e4e0da', overflow: 'hidden' }}>
                         <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                             <thead>
-                                <tr>
-                                    {['Brand', 'Email', 'Category', 'Status', 'Actions'].map(h => <th key={h} style={th}>{h}</th>)}
-                                </tr>
+                                <tr>{['Brand', 'Email', 'Category', 'Status', 'Actions'].map(h => <th key={h} style={th}>{h}</th>)}</tr>
                             </thead>
                             <tbody>
                                 {sellers.length === 0 && <tr><td colSpan={5} style={{ ...td, textAlign: 'center', color: '#8c8880' }}>No sellers found</td></tr>}
@@ -102,7 +130,7 @@ export default function AdminDashboard() {
                                         <td style={td}>{s.category}</td>
                                         <td style={td}>
                                             <span style={{ padding: '3px 10px', borderRadius: 20, fontSize: '.75rem', fontWeight: 600, background: s.isApproved ? '#e8f5e9' : '#fff3e0', color: s.isApproved ? '#2e7d32' : '#e65100' }}>
-                                                {s.isApproved ? 'Approved' : 'Pending'}
+                                                {s.isApproved ? 'Approved' : 'Pending Payment'}
                                             </span>
                                         </td>
                                         <td style={td}>
@@ -129,9 +157,7 @@ export default function AdminDashboard() {
                     <div style={{ background: '#fff', borderRadius: 12, border: '1px solid #e4e0da', overflow: 'hidden' }}>
                         <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                             <thead>
-                                <tr>
-                                    {['Name', 'Email', 'Phone', 'Points', 'Actions'].map(h => <th key={h} style={th}>{h}</th>)}
-                                </tr>
+                                <tr>{['Name', 'Email', 'Phone', 'Points', 'Actions'].map(h => <th key={h} style={th}>{h}</th>)}</tr>
                             </thead>
                             <tbody>
                                 {customers.length === 0 && <tr><td colSpan={5} style={{ ...td, textAlign: 'center', color: '#8c8880' }}>No customers found</td></tr>}
@@ -151,6 +177,52 @@ export default function AdminDashboard() {
                                 ))}
                             </tbody>
                         </table>
+                    </div>
+                )}
+
+                {/* Revenue Tab */}
+                {tab === 'revenue' && (
+                    <div>
+                        {/* Summary */}
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1rem', marginBottom: '1.5rem' }}>
+                            {[
+                                { label: 'Total Orders', value: commissions.orders?.length || 0 },
+                                { label: 'Total Sales Volume', value: `EGP ${(commissions.totalSales || 0).toLocaleString()}` },
+                                { label: 'StyleHub Commission (10%)', value: `EGP ${(commissions.totalCommission || 0).toLocaleString()}` },
+                            ].map(s => (
+                                <div key={s.label} style={{ background: '#fff', borderRadius: 12, padding: '1.2rem 1.5rem', border: '1px solid #e4e0da', textAlign: 'center' }}>
+                                    <div style={{ fontSize: '.75rem', color: '#8c8880', marginBottom: '.4rem' }}>{s.label}</div>
+                                    <div style={{ fontSize: '1.4rem', fontWeight: 700, color: '#1a1a18' }}>{s.value}</div>
+                                </div>
+                            ))}
+                        </div>
+
+                        {/* Orders Table */}
+                        <div style={{ background: '#fff', borderRadius: 12, border: '1px solid #e4e0da', overflow: 'hidden' }}>
+                            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                                <thead>
+                                    <tr>{['Date', 'Order Subtotal', 'Commission (10%)', 'Seller Earnings', 'Status'].map(h => <th key={h} style={th}>{h}</th>)}</tr>
+                                </thead>
+                                <tbody>
+                                    {(!commissions.orders || commissions.orders.length === 0) && (
+                                        <tr><td colSpan={5} style={{ ...td, textAlign: 'center', color: '#8c8880' }}>No orders yet</td></tr>
+                                    )}
+                                    {(commissions.orders || []).map(o => (
+                                        <tr key={o._id}>
+                                            <td style={td}>{new Date(o.createdAt).toLocaleDateString('en-EG')}</td>
+                                            <td style={td}>EGP {o.subtotal?.toLocaleString()}</td>
+                                            <td style={{ ...td, color: '#92A079', fontWeight: 600 }}>EGP {o.commissionAmount?.toLocaleString()}</td>
+                                            <td style={td}>EGP {o.sellerEarnings?.toLocaleString()}</td>
+                                            <td style={td}>
+                                                <span style={{ padding: '3px 10px', borderRadius: 20, fontSize: '.75rem', fontWeight: 600, background: '#e8f5e9', color: '#2e7d32' }}>
+                                                    {o.status}
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 )}
             </div>
