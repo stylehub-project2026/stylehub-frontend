@@ -7,6 +7,7 @@ const PLANS = [
         id: 'basic',
         name: 'Basic',
         price: 199,
+        firstMonth: 100,
         color: '#8c8880',
         features: [
             'Dedicated brand page',
@@ -20,6 +21,7 @@ const PLANS = [
         id: 'standard',
         name: 'Standard',
         price: 399,
+        firstMonth: 200,
         color: '#92A079',
         popular: true,
         features: [
@@ -35,6 +37,7 @@ const PLANS = [
         id: 'premium',
         name: 'Premium',
         price: 699,
+        firstMonth: 350,
         color: '#c8a96e',
         features: [
             'Dedicated brand page',
@@ -70,6 +73,10 @@ export default function SellerPayment() {
                         <h2 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '2rem', color: '#1a1a18', marginBottom: '.5rem' }}>
                             Choose Your Plan
                         </h2>
+                        {/* First month discount banner */}
+                        <div style={{ display: 'inline-block', background: '#c8a96e', color: '#fff', padding: '6px 20px', borderRadius: 20, fontSize: '.82rem', fontWeight: 700, letterSpacing: '.05em', marginBottom: '.8rem' }}>
+                            🎁 50% OFF YOUR FIRST MONTH
+                        </div>
                         <p style={{ color: '#8c8880', fontSize: '.9rem' }}>
                             Select the plan that fits your brand. You can upgrade anytime.
                         </p>
@@ -94,9 +101,20 @@ export default function SellerPayment() {
 
                                 <div style={{ marginBottom: '1rem' }}>
                                     <div style={{ fontSize: '.75rem', fontWeight: 700, color: p.color, letterSpacing: '.1em', textTransform: 'uppercase', marginBottom: '.4rem' }}>{p.name}</div>
-                                    <div style={{ fontSize: '1.8rem', fontWeight: 800, color: '#1a1a18' }}>
-                                        EGP {p.price}
-                                        <span style={{ fontSize: '.85rem', fontWeight: 400, color: '#8c8880' }}>/mo</span>
+
+                                    {/* Pricing with discount */}
+                                    <div style={{ display: 'flex', alignItems: 'baseline', gap: '.5rem', flexWrap: 'wrap' }}>
+                                        <div style={{ fontSize: '1.8rem', fontWeight: 800, color: '#1a1a18' }}>
+                                            EGP {p.firstMonth}
+                                            <span style={{ fontSize: '.85rem', fontWeight: 400, color: '#8c8880' }}>/1st mo</span>
+                                        </div>
+                                    </div>
+                                    <div style={{ fontSize: '.8rem', color: '#8c8880', marginTop: '.2rem' }}>
+                                        then <span style={{ textDecoration: 'line-through', color: '#ccc' }}>EGP {p.price}</span>
+                                        {' '}→ <strong style={{ color: p.color }}>EGP {p.price}/mo</strong>
+                                    </div>
+                                    <div style={{ display: 'inline-block', background: '#fff3cd', color: '#856404', fontSize: '.7rem', fontWeight: 700, padding: '2px 8px', borderRadius: 10, marginTop: '.4rem' }}>
+                                        50% OFF first month
                                     </div>
                                 </div>
 
@@ -127,8 +145,21 @@ export default function SellerPayment() {
 
                     {/* Payment Box */}
                     <div style={{ maxWidth: 520, margin: '0 auto', background: '#fff', borderRadius: 18, padding: '2rem', boxShadow: '0 8px 32px rgba(0,0,0,0.08)' }}>
+
+                        {/* Summary */}
+                        <div style={{ background: '#f5f7f0', borderRadius: 12, padding: '1rem 1.2rem', marginBottom: '1.2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                            <div>
+                                <div style={{ fontSize: '.8rem', color: '#8c8880' }}>{plan.name} Plan — First Month</div>
+                                <div style={{ fontSize: '.75rem', color: '#8c8880', textDecoration: 'line-through' }}>EGP {plan.price}</div>
+                            </div>
+                            <div style={{ textAlign: 'right' }}>
+                                <div style={{ fontSize: '1.4rem', fontWeight: 800, color: plan.color }}>EGP {plan.firstMonth}</div>
+                                <div style={{ fontSize: '.7rem', color: '#92A079', fontWeight: 700 }}>50% OFF ✓</div>
+                            </div>
+                        </div>
+
                         <div style={{ fontSize: '.8rem', fontWeight: 700, color: '#555', marginBottom: '1rem', letterSpacing: '.05em', textTransform: 'uppercase' }}>
-                            Pay for {plan.name} Plan — EGP {plan.price}/month
+                            Pay via
                         </div>
 
                         {/* Vodafone Cash */}
@@ -138,7 +169,7 @@ export default function SellerPayment() {
                                 <span style={{ fontWeight: 700, color: '#c0392b', fontSize: '.95rem' }}>Vodafone Cash</span>
                             </div>
                             <div style={{ fontSize: '.85rem', color: '#555', lineHeight: 1.6 }}>
-                                Send <strong>EGP {plan.price}</strong> to: <strong style={{ color: '#c0392b' }}>01XXXXXXXXX</strong>
+                                Send <strong>EGP {plan.firstMonth}</strong> to: <strong style={{ color: '#c0392b' }}>01XXXXXXXXX</strong>
                                 <br />
                                 <span style={{ fontSize: '.8rem', color: '#8c8880' }}>Use your brand name as reference</span>
                             </div>
@@ -151,7 +182,7 @@ export default function SellerPayment() {
                                 <span style={{ fontWeight: 700, color: '#2471a3', fontSize: '.95rem' }}>Instapay</span>
                             </div>
                             <div style={{ fontSize: '.85rem', color: '#555', lineHeight: 1.6 }}>
-                                Send <strong>EGP {plan.price}</strong> to: <strong style={{ color: '#2471a3' }}>stylehub@instapay</strong>
+                                Send <strong>EGP {plan.firstMonth}</strong> to: <strong style={{ color: '#2471a3' }}>stylehub@instapay</strong>
                                 <br />
                                 <span style={{ fontSize: '.8rem', color: '#8c8880' }}>Use your brand name as reference</span>
                             </div>
@@ -159,12 +190,12 @@ export default function SellerPayment() {
 
                         {/* Note */}
                         <div style={{ background: '#fffbeb', border: '1px solid #f6d860', borderRadius: 12, padding: '1rem 1.2rem', marginBottom: '1.5rem', fontSize: '.83rem', color: '#7d6608', lineHeight: 1.6 }}>
-                            ⏳ After sending payment, our team will verify and activate your store within <strong>24 hours</strong>.
+                            ⏳ After sending payment, our team will verify and activate your store within <strong>24 hours</strong>. Then EGP {plan.price}/month from the second month.
                         </div>
 
                         <button onClick={() => { setPaid(true); setTimeout(() => navigate('/seller/dashboard'), 1200); }}
                             style={{ width: '100%', padding: '13px', background: plan.color, color: '#fff', border: 'none', borderRadius: 25, fontSize: '.88rem', fontWeight: 700, letterSpacing: '1px', cursor: 'pointer' }}>
-                            {paid ? '✓ Done! Redirecting…' : "I'VE SENT THE PAYMENT →"}
+                            {paid ? '✓ Done! Redirecting…' : `PAY EGP ${plan.firstMonth} & START →`}
                         </button>
                         <p style={{ textAlign: 'center', fontSize: '.78rem', color: '#8c8880', marginTop: '.8rem' }}>
                             Your store will be reviewed and activated within 24 hours.
