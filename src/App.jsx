@@ -760,7 +760,7 @@ export default function App() {
             >
               {[
                 { tag: "Editorial", title: "Discover Latest in Fashion", gradient: "145deg,#8a9a7a,#4a5c40", img: "/beni.png", href: "/women" },
-                { tag: "Explore", title: "Explore Fashion New Era", gradient: "145deg,#c4a882,#8a7060", img: "/bano.png", href: "/brand/27" },
+                { tag: "Explore", title: "Explore Fashion New Era", gradient: "145deg,#c4a882,#8a7060", img: "/bano.png", href: "/brand/salty" },
               ].map((e, i) => (
                 <div className="col-md-6" key={i}>
                   <a href={e.href} className="sh-ed">
