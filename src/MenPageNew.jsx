@@ -23,7 +23,6 @@ const HERO_SLIDES = [
         bg: "#ede9e0",
         fullBg: true,
     },
-    
 ];
 
 const CAT_TYPE_MAP = {
@@ -208,16 +207,16 @@ function HeroCarousel() {
             backgroundColor: s.bg,
             backgroundImage: `url(${s.img})`,
             backgroundSize: "cover",
-            backgroundPosition: "center",
+            backgroundPosition: "center top",
             backgroundRepeat: "no-repeat",
         } : { backgroundColor: s.bg }}>
             <div className={`hero-slide active${s.fullBg ? " full-bg" : ""}`} key={key}>
                 <div className="hero-txt">
+                    {s.ey && <div className="hero-ey">{s.ey}</div>}
                     <h1 className="hero-h1">
                         {s.h1.split("\n").map((l, i) => <span key={i}>{l}<br /></span>)}
                     </h1>
                     <p className="hero-sub">{s.sub}</p>
-
                 </div>
                 {!s.fullBg && (
                     <div className="hero-img"><img src={s.img} alt={s.h1} /></div>
@@ -330,7 +329,6 @@ export default function MenPage({ cart = [], setCart, wish = [], setWish }) {
         }, 50);
     };
 
-    // ── NEW: scroll to All Products and activate sale filter ──
     const handleShopSale = () => {
         setSortBy("sale");
         setFilterPage(1);
@@ -464,22 +462,184 @@ export default function MenPage({ cart = [], setCart, wish = [], setWish }) {
         .no-sb { scrollbar-width: none; }
         .no-sb::-webkit-scrollbar { display: none; }
 
-        .hero { min-height: 520px; position: relative; overflow: hidden; }
-        .hero-slide { display: none; min-height: 520px; align-items: center; justify-content: space-between; }
-        .hero-slide.full-bg { justify-content: flex-start; }
-        .hero-slide.active  { display: flex; animation: fadeIn .55s var(--ease); }
-        .hero-txt { padding: 5rem 3rem 5rem 5.5rem; flex: 1; z-index: 1; }
-        .hero-ey  { font-size: .7rem; font-weight: 600; text-transform: uppercase; letter-spacing: 2.5px; color: var(--c-olive); margin-bottom: .85rem; }
+        /* ─────────────────────────────────────────
+           HERO  –  fully responsive
+        ───────────────────────────────────────── */
+        .hero {
+          position: relative;
+          overflow: hidden;
+          width: 100%;
+        }
+
+        /* base slide */
+        .hero-slide {
+          display: none;
+          position: relative;
+          width: 100%;
+          min-height: 560px;
+          align-items: flex-end;
+          justify-content: flex-start;
+        }
+
+        /* full-background variant */
+        .hero-slide.full-bg {
+          background-attachment: scroll;
+          justify-content: flex-start;
+          align-items: flex-end;
+        }
+
+        .hero-slide.active {
+          display: flex;
+          animation: fadeIn .55s var(--ease);
+        }
+
+        /* dark gradient overlay so text is always legible */
+        .hero-slide.full-bg::after {
+          content: "";
+          position: absolute;
+          inset: 0;
+          background: linear-gradient(
+            to bottom,
+            rgba(0,0,0,0)   25%,
+            rgba(0,0,0,.60) 100%
+          );
+          pointer-events: none;
+          z-index: 0;
+        }
+
+        /* text block */
+        .hero-txt {
+          position: relative;
+          z-index: 1;
+          padding: 2.5rem 3rem 4.5rem 5.5rem;
+          max-width: 560px;
+        }
+        .hero-slide.full-bg .hero-txt {
+          padding: 2rem 2rem 4rem 4rem;
+        }
+        .hero-slide.full-bg .hero-h1  { color: #fff; }
+        .hero-slide.full-bg .hero-sub { color: rgba(255,255,255,.82); }
+
+        /* eyebrow */
+        .hero-ey {
+          font-size: .7rem;
+          font-weight: 600;
+          text-transform: uppercase;
+          letter-spacing: 2.5px;
+          color: var(--c-olive);
+          margin-bottom: .85rem;
+        }
+        .hero-slide.full-bg .hero-ey { color: rgba(255,255,255,.7); }
+
+        /* headings */
+        .hero-h1 {
+          font-family: var(--fd);
+          font-size: clamp(1.6rem, 3.5vw, 3rem);
+          font-weight: 700;
+          line-height: 1.15;
+          color: var(--c-dark);
+          margin-bottom: .9rem;
+        }
+        .hero-sub {
+          font-size: .99rem;
+          color: var(--c-gray);
+          line-height: 1.65;
+          max-width: 320px;
+          margin-bottom: 1.8rem;
+        }
+
+        /* split-layout image column (non-full-bg slides) */
         .hero-img { width: 50%; height: 480px; overflow: hidden; }
         .hero-img img { width: 100%; height: 100%; object-fit: cover; object-position: center; }
-        .hero-h1  { font-family: var(--fd); font-size: clamp(1.6rem, 3.5vw, 3rem); font-weight: 700; line-height: 1.15; color: var(--c-dark); margin-bottom: .9rem; }
-        .hero-sub { font-size: .99rem; color: var(--c-gray); line-height: 1.65; max-width: 300px; margin-bottom: 1.8rem; }
-        .hero-arrow { position: absolute; top: 50%; transform: translateY(-50%); width: 38px; height: 38px; border-radius: 50%; background: #fff; border: 1px solid var(--c-gray-lt); display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: var(--sh-sm); z-index: 5; transition: all .3s; font-size: .85rem; }
-        .hero-arrow:hover { background: var(--c-dark); color: #fff; }
-        .hero-arrow.p { left: 1rem; } .hero-arrow.n { right: 1rem; }
-        .hero-dots { position: absolute; bottom: 1rem; left: 50%; transform: translateX(-50%); display: flex; gap: .4rem; }
-        .hero-dot  { width: 6px; height: 6px; border-radius: 3px; background: rgba(0,0,0,.25); border: none; cursor: pointer; transition: all .3s; padding: 0; }
-        .hero-dot.on { width: 20px; background: var(--c-olive); }
+
+        /* arrows */
+        .hero-arrow {
+          position: absolute;
+          top: 50%;
+          transform: translateY(-50%);
+          width: 38px; height: 38px;
+          border-radius: 50%;
+          background: rgba(255,255,255,.88);
+          border: 1px solid var(--c-gray-lt);
+          display: flex; align-items: center; justify-content: center;
+          cursor: pointer;
+          box-shadow: var(--sh-sm);
+          z-index: 5;
+          transition: all .3s;
+          font-size: .85rem;
+        }
+        .hero-arrow:hover { background: var(--c-dark); color: #fff; border-color: var(--c-dark); }
+        .hero-arrow.p { left: 1rem; }
+        .hero-arrow.n { right: 1rem; }
+
+        /* dots */
+        .hero-dots {
+          position: absolute;
+          bottom: 1.1rem;
+          left: 50%;
+          transform: translateX(-50%);
+          display: flex;
+          gap: .4rem;
+          z-index: 5;
+        }
+        .hero-dot {
+          width: 6px; height: 6px;
+          border-radius: 3px;
+          background: rgba(255,255,255,.45);
+          border: none;
+          cursor: pointer;
+          transition: all .3s;
+          padding: 0;
+        }
+        .hero-dot.on { width: 20px; background: #fff; }
+
+        /* ── tablet ── */
+        @media (max-width: 1024px) {
+          .hero-txt { padding: 2.5rem 2rem 4rem 3rem; }
+          .hero-slide.full-bg .hero-txt { padding: 2rem 2rem 4rem 3rem; }
+        }
+
+        /* ── mobile ── */
+        @media (max-width: 768px) {
+          .hero-slide,
+          .hero-slide.full-bg {
+            min-height: 420px;
+          }
+          /* non-full-bg: stack image above, text below */
+          .hero-slide:not(.full-bg) {
+            flex-direction: column-reverse;
+            min-height: auto;
+          }
+          .hero-txt,
+          .hero-slide.full-bg .hero-txt {
+            padding: 1.4rem 1.2rem 3.2rem 1.2rem;
+            max-width: 100%;
+          }
+          .hero-img { height: 240px; width: 100%; }
+          .hero-arrow { width: 32px; height: 32px; font-size: .78rem; }
+          .hero-arrow.p { left: .6rem; }
+          .hero-arrow.n { right: .6rem; }
+        }
+
+        @media (max-width: 600px) {
+          .hero-slide,
+          .hero-slide.full-bg { min-height: 360px; }
+          .hero-h1 { font-size: clamp(1.4rem, 6vw, 2rem); }
+          .hero-sub { font-size: .82rem; max-width: 100%; margin-bottom: 1.2rem; }
+          .hero-dots { bottom: .65rem; }
+          .hero-arrow { width: 28px; height: 28px; font-size: .72rem; }
+        }
+
+        @media (max-width: 400px) {
+          .hero-slide,
+          .hero-slide.full-bg { min-height: 300px; }
+          .hero-h1 { font-size: 1.3rem; }
+          .hero-txt,
+          .hero-slide.full-bg .hero-txt { padding: 1rem 1rem 2.8rem 1rem; }
+        }
+        /* ─────────────────────────────────────────
+           END HERO
+        ───────────────────────────────────────── */
 
         .btn-dk { background: var(--c-dark); color: #fff; border: none; padding: .78rem 2rem; font-family: var(--fb); font-size: .78rem; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; cursor: pointer; border-radius: 3px; transition: all .3s; }
         .btn-dk:hover { background: var(--c-olive); transform: translateY(-2px); box-shadow: var(--sh-md); }
@@ -614,16 +774,10 @@ export default function MenPage({ cart = [], setCart, wish = [], setWish }) {
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
         @media(max-width:1024px) {
-          .hero-txt { padding: 4rem 2.5rem 4rem 3.5rem; }
           .m-ap-grid { grid-template-columns: repeat(2,1fr) !important; }
         }
         @media(max-width:768px) {
           .col-md-4 { flex: 0 0 100%; max-width: 100%; }
-          .hero { min-height: auto; }
-          .hero-slide { flex-direction: column-reverse; min-height: auto; }
-          .hero-slide.full-bg { flex-direction: column; justify-content: flex-end; min-height: 420px; }
-          .hero-txt { padding: 2rem 1.5rem; }
-          .hero-img { height: 240px; width: 100%; }
           .cat-sec { padding: 4rem 0; }
           .cat-card { height: 280px; }
           .trend-g  { grid-template-columns: repeat(2,1fr); gap: 1.2rem; }
@@ -645,12 +799,6 @@ export default function MenPage({ cart = [], setCart, wish = [], setWish }) {
           .qv-backdrop { align-items: flex-end; padding: 0; }
         }
         @media(max-width:600px) {
-          .hero-slide.full-bg { min-height: 360px; }
-          .hero-txt { padding: 1.5rem 1rem; }
-          .hero-h1  { font-size: clamp(1.4rem, 5vw, 2rem); }
-          .hero-sub { font-size: .8rem; max-width: 100%; }
-          .btn-dk   { padding: .65rem 1.4rem; font-size: .74rem; }
-          .hero-arrow { width: 30px; height: 30px; font-size: .75rem; }
           .cat-card { height: 240px; }
           .sc-btn { display: none; }
           .sc-track { gap: 1rem; padding: .4rem .1rem 1rem; }
@@ -662,12 +810,11 @@ export default function MenPage({ cart = [], setCart, wish = [], setWish }) {
           .container { padding: 0 1rem; }
           .sp { padding: 2.5rem 0; }
           .sh-toast { width: 88%; white-space: normal; text-align: center; font-size: .74rem; }
+          .btn-dk { padding: .65rem 1.4rem; font-size: .74rem; }
         }
         @media(max-width:400px) {
           .trend-g { grid-template-columns: 1fr; }
           .cat-card { height: 220px; }
-          .hero-slide.full-bg { min-height: 300px; }
-          .hero-h1  { font-size: 1.3rem; }
           .sc-track .prod-card { min-width: 150px; }
           .prod-card .ib { height: 180px; }
           .sale-ban-inner img { height: 220px; }
@@ -746,7 +893,6 @@ export default function MenPage({ cart = [], setCart, wish = [], setWish }) {
                     <div className="sale-ban-text">
                         <p className="sale-sub">Limited Time Only</p>
                         <h2>END OF SEASON SALE</h2>
-                        {/* onClick: apply sale filter + scroll to All Products */}
                         <button className="sale-cta-btn" onClick={handleShopSale}>
                             Shop the Sale →
                         </button>
@@ -787,7 +933,6 @@ export default function MenPage({ cart = [], setCart, wish = [], setWish }) {
                     </div>
                 )}
 
-                {/* Sale filter active badge */}
                 {sortBy === "sale" && (
                     <div style={{ display: "flex", justifyContent: "center", marginBottom: "1rem" }}>
                         <span className="m-active-type-badge" style={{ background: "var(--c-red)" }}>
