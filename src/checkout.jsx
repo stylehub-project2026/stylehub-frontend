@@ -648,30 +648,31 @@ export default function Checkout({ cart = [], setCart, wish = [], setWish }) {
       .catch(console.error);
   }, [token]);
 
-  // Use backend items if logged in, merged with any local items not yet in backend
+  // Merge backend items + local cart items (static products not in backend)
   const items = useMemo(() => {
-    if (token && backendItems !== null) {
-      // Also include local cart items that have a full product object but aren't in backend
-      const localItems = (cart || [])
-        .map(item => {
-          // Skip if already in backend cart
-          const inBackend = backendItems.some(
-            bi => String(bi.product?._id) === String(item.id) || String(bi.product?.id) === String(item.id)
-          );
-          if (inBackend) return null;
-          // Use existing product object if available
-          if (item.product && item.product.name) return { ...item, _isLocal: true };
-          // Try resolving from static products
-          const product = resolveProduct(item);
-          return product ? { ...item, product, _isLocal: true } : null;
-        })
-        .filter(Boolean);
-      return [...backendItems, ...localItems];
-    }
-    return (cart || []).map(item => {
-      const product = resolveProduct(item);
-      return product ? { ...item, product } : null;
-    }).filter(Boolean);
+    // Always resolve local cart items
+    const localResolved = (cart || [])
+      .map(item => {
+        const product = resolveProduct(item);
+        return product ? { ...item, product, _isLocal: true } : null;
+      })
+      .filter(Boolean);
+
+    // If not logged in, use local only
+    if (!token) return localResolved;
+
+    // If logged in but backend not loaded yet, use local
+    if (backendItems === null) return localResolved;
+
+    // Merge: backend items + local items not already in backend
+    const localOnly = localResolved.filter(item => {
+      const inBackend = backendItems.some(
+        bi => String(bi.product?._id) === String(item.id) || String(bi.product?.id) === String(item.id)
+      );
+      return !inBackend;
+    });
+
+    return [...backendItems, ...localOnly];
   }, [cart, backendItems, token]);
 
   // Group by brand
