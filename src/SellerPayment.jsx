@@ -55,8 +55,26 @@ export default function SellerPayment() {
     const navigate = useNavigate();
     const [selected, setSelected] = useState('standard');
     const [paid, setPaid] = useState(false);
+    const [submitted, setSubmitted] = useState(false);
 
     const plan = PLANS.find(p => p.id === selected);
+
+    const handleSubmit = async () => {
+        setPaid(true);
+        try {
+            await fetch(`${import.meta.env.VITE_API_URL}/api/seller/payment-submitted`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${localStorage.getItem('sellerToken')}`,
+                },
+                body: JSON.stringify({ plan: selected, amount: plan.firstMonth }),
+            });
+        } catch (e) {
+            console.error(e);
+        }
+        setSubmitted(true);
+    };
 
     return (
         <>
@@ -193,13 +211,37 @@ export default function SellerPayment() {
                             ⏳ After sending payment, our team will verify and activate your store within <strong>24 hours</strong>. Then EGP {plan.price}/month from the second month.
                         </div>
 
-                        <button onClick={() => { setPaid(true); setTimeout(() => navigate('/seller/dashboard'), 1200); }}
-                            style={{ width: '100%', padding: '13px', background: plan.color, color: '#fff', border: 'none', borderRadius: 25, fontSize: '.88rem', fontWeight: 700, letterSpacing: '1px', cursor: 'pointer' }}>
-                            {paid ? '✓ Done! Redirecting…' : `PAY EGP ${plan.firstMonth} & START →`}
-                        </button>
-                        <p style={{ textAlign: 'center', fontSize: '.78rem', color: '#8c8880', marginTop: '.8rem' }}>
-                            Your store will be reviewed and activated within 24 hours.
-                        </p>
+                        {submitted ? (
+                            <div style={{
+                                textAlign: 'center', padding: '2rem',
+                                background: '#f0f7e8', borderRadius: 16,
+                                border: '2px solid #92A079'
+                            }}>
+                                <div style={{ fontSize: '2.5rem', marginBottom: '1rem' }}>✅</div>
+                                <h3 style={{ fontFamily: 'Cormorant Garamond, serif', color: '#1a1a18', marginBottom: '.5rem', fontSize: '1.3rem' }}>
+                                    Payment Submitted!
+                                </h3>
+                                <p style={{ color: '#555', fontSize: '.88rem', lineHeight: 1.6 }}>
+                                    Our team will verify your payment and activate your store within <strong>24 hours</strong>.
+                                    You'll receive a confirmation email once you're live.
+                                </p>
+                                <button
+                                    onClick={() => navigate('/seller/dashboard')}
+                                    style={{ marginTop: '1.2rem', padding: '10px 28px', background: '#92A079', color: '#fff', border: 'none', borderRadius: 25, fontWeight: 700, cursor: 'pointer', fontSize: '.85rem', letterSpacing: '1px' }}>
+                                    Go to Dashboard →
+                                </button>
+                            </div>
+                        ) : (
+                            <>
+                                <button onClick={handleSubmit} disabled={paid}
+                                    style={{ width: '100%', padding: '13px', background: plan.color, color: '#fff', border: 'none', borderRadius: 25, fontSize: '.88rem', fontWeight: 700, letterSpacing: '1px', cursor: paid ? 'not-allowed' : 'pointer', opacity: paid ? 0.8 : 1 }}>
+                                    {paid ? '⏳ Submitting…' : `I've Sent EGP ${plan.firstMonth} →`}
+                                </button>
+                                <p style={{ textAlign: 'center', fontSize: '.78rem', color: '#8c8880', marginTop: '.8rem' }}>
+                                    Your store will be reviewed and activated within 24 hours.
+                                </p>
+                            </>
+                        )}
                     </div>
                 </div>
             </div>
