@@ -17,11 +17,14 @@ export default function Wishlist({ cart, setCart, wish, setWish }) {
   const [sizePicker, setSizePicker] = useState(null);
   const [selectedSizes, setSelectedSizes] = useState({});
 
+  // Normalize wish entries — can be a string ID or a full object { id, name, ... }
+  const normalizeId = (entry) => (typeof entry === "object" && entry !== null) ? String(entry.id || entry._id || "") : String(entry);
+
   useEffect(() => {
     if (!wish || wish.length === 0) { setBackendProducts([]); return; }
 
     // Only fetch from backend for MongoDB-style IDs (24 hex chars)
-    const mongoIds = wish.filter(id => /^[a-f\d]{24}$/i.test(id));
+    const mongoIds = wish.map(normalizeId).filter(id => /^[a-f\d]{24}$/i.test(id));
 
     if (mongoIds.length === 0) { setBackendProducts([]); return; }
 
@@ -48,14 +51,23 @@ export default function Wishlist({ cart, setCart, wish, setWish }) {
   }, [wish]);
 
   // Merge: backend results + static fallback for any non-backend IDs
-  const fetchedIds = new Set(backendProducts.map(p => p.id));
+  const fetchedIds = new Set(backendProducts.map(p => String(p.id)));
   const staticItems = (wish || [])
-    .filter(id => !fetchedIds.has(id))
-    .map(id => PRODUCTS.find(p => p.id === id))
+    .filter(entry => {
+      const id = normalizeId(entry);
+      return !fetchedIds.has(id);
+    })
+    .map(entry => {
+      // If entry is already a full object (from BuildOutfit), use it directly
+      if (typeof entry === "object" && entry !== null && entry.name) return entry;
+      // Otherwise look up in PRODUCTS by numeric or string id
+      const id = normalizeId(entry);
+      return PRODUCTS.find(p => String(p.id) === id) || null;
+    })
     .filter(Boolean);
   const items = [...backendProducts, ...staticItems];
 
-  const removeWish = id => setWish(w => w.filter(x => x !== id));
+  const removeWish = id => setWish(w => w.filter(x => normalizeId(x) !== String(id)));
 
   const addProductToCart = async (p, size) => {
     const token = localStorage.getItem("token");
