@@ -11,6 +11,29 @@ const toNum = s => {
   return parseInt(String(s || "").replace(/\D/g, "")) || 0;
 };
 
+// Resolve a cart item to always have a product object with consistent shape
+// Works for: static PRODUCTS, items added from home/BuildOutfit, and backend items
+const resolveProduct = (item) => {
+  // Already has a fully resolved product
+  if (item.product && item.product.name) return item.product;
+
+  // Try to find in static PRODUCTS by id
+  const staticMatch = PRODUCTS.find(p => p.id === item.id || p.id === item.productId);
+  if (staticMatch) return staticMatch;
+
+  // Fallback: build a minimal product shape from whatever is on the item
+  return {
+    id: item.id || item.productId,
+    name: item.name || "Unknown Product",
+    brand: item.brand || "StyleHub",
+    price: item.price || "LE 0",
+    oldPrice: item.oldPrice || null,
+    img: item.img || null,
+    sizes: item.sizes || [],
+    colors: item.colors || [],
+  };
+};
+
 // Format customization details into a readable string
 const FONT_LABEL = { "serif-italic": "Italic", "serif": "Serif", "block": "Block" };
 const COLOR_LABEL = { "#c8a96e": "Gold", "#ffffff": "White", "#c84a3d": "Red", "#9eaa8a": "Sage", "#1a1a18": "Black" };
@@ -76,16 +99,13 @@ const CART_CSS = `
 .cart-wrap { max-width: 1000px; margin: 0 auto; padding: 3rem 2rem; }
 .cart-page { min-height: 100vh; background: var(--cream); }
 
-/* tablet + iPad (up to 1024px) → single column */
 @media (max-width: 1024px) {
   .cart-grid { grid-template-columns: 1fr; gap: 2rem; }
   .cart-aside { position: static; }
 }
-
 @media (max-width: 768px) {
   .cart-wrap { padding: 2rem 1.2rem; }
 }
-
 @media (max-width: 480px) {
   .cart-wrap { padding: 1.5rem .75rem; }
   .cart-item { gap: .8rem; }
@@ -102,7 +122,6 @@ function BackendCart({ cart, setCart, wish }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Sync local cart count with backend
   const syncLocalCart = (backendItems) => {
     if (!setCart) return;
     const localCart = backendItems.map(i => ({
@@ -120,9 +139,7 @@ function BackendCart({ cart, setCart, wish }) {
     fetch(`${API}/cart`, { headers: { Authorization: `Bearer ${token}` } })
       .then(async r => {
         const data = await r.json();
-        if (!r.ok) {
-          throw new Error(data.message || `Server error ${r.status}`);
-        }
+        if (!r.ok) throw new Error(data.message || `Server error ${r.status}`);
         return data;
       })
       .then(data => {
@@ -141,10 +158,7 @@ function BackendCart({ cart, setCart, wish }) {
       .finally(() => setLoading(false));
   };
 
-  useEffect(() => {
-    fetchCart();
-    // eslint-disable-next-line
-  }, []);
+  useEffect(() => { fetchCart(); }, []);
 
   const updateQty = async (itemId, quantity) => {
     if (quantity < 1) return removeItem(itemId);
@@ -182,7 +196,6 @@ function BackendCart({ cart, setCart, wish }) {
     }
   };
 
-  // ✅ Subtotal includes customization fees
   const subtotal = items.reduce((sum, i) => {
     const base = i.product?.salePrice || i.product?.price || 0;
     const fee = i.customization?.fee || 0;
@@ -208,19 +221,11 @@ function BackendCart({ cart, setCart, wish }) {
       <SHNav cart={cart} wish={wish} />
       <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: "60vh", padding: "2rem" }}>
         <div style={{ fontSize: "2.5rem", marginBottom: "1rem" }}>⚠️</div>
-        <div style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: "1.5rem", marginBottom: ".8rem", textAlign: "center" }}>
-          Couldn't load your cart
-        </div>
-        <p style={{ color: "var(--warm)", fontSize: ".85rem", marginBottom: "2rem", textAlign: "center", maxWidth: 420 }}>
-          {error}
-        </p>
+        <div style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: "1.5rem", marginBottom: ".8rem", textAlign: "center" }}>Couldn't load your cart</div>
+        <p style={{ color: "var(--warm)", fontSize: ".85rem", marginBottom: "2rem", textAlign: "center", maxWidth: 420 }}>{error}</p>
         <div style={{ display: "flex", gap: "1rem", flexWrap: "wrap", justifyContent: "center" }}>
-          <button onClick={fetchCart} style={{ background: "var(--dark)", color: "#fff", border: "none", padding: ".8rem 2rem", fontSize: ".72rem", letterSpacing: ".12em", textTransform: "uppercase", cursor: "pointer", fontFamily: "'DM Sans',sans-serif" }}>
-            Retry
-          </button>
-          <button onClick={() => { localStorage.removeItem("token"); window.location.reload(); }} style={{ background: "transparent", color: "var(--dark)", border: "1.5px solid var(--dark)", padding: ".8rem 2rem", fontSize: ".72rem", letterSpacing: ".12em", textTransform: "uppercase", cursor: "pointer", fontFamily: "'DM Sans',sans-serif" }}>
-            Logout
-          </button>
+          <button onClick={fetchCart} style={{ background: "var(--dark)", color: "#fff", border: "none", padding: ".8rem 2rem", fontSize: ".72rem", letterSpacing: ".12em", textTransform: "uppercase", cursor: "pointer", fontFamily: "'DM Sans',sans-serif" }}>Retry</button>
+          <button onClick={() => { localStorage.removeItem("token"); window.location.reload(); }} style={{ background: "transparent", color: "var(--dark)", border: "1.5px solid var(--dark)", padding: ".8rem 2rem", fontSize: ".72rem", letterSpacing: ".12em", textTransform: "uppercase", cursor: "pointer", fontFamily: "'DM Sans',sans-serif" }}>Logout</button>
         </div>
       </div>
     </div>
@@ -240,25 +245,23 @@ function BackendCart({ cart, setCart, wish }) {
             <div style={{ fontSize: "3rem", marginBottom: "1rem" }}>🛍</div>
             <div style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: "1.8rem", marginBottom: ".8rem" }}>Your Cart is empty</div>
             <p style={{ color: "var(--warm)", fontSize: ".85rem", marginBottom: "2rem" }}>Add items to get started</p>
-            <button onClick={() => navigate("/")} style={{ background: "var(--dark)", color: "#fff", border: "none", padding: ".8rem 2.5rem", fontSize: ".72rem", letterSpacing: ".12em", textTransform: "uppercase", cursor: "pointer", fontFamily: "'DM Sans',sans-serif" }}>
-              Continue Shopping
-            </button>
+            <button onClick={() => navigate("/")} style={{ background: "var(--dark)", color: "#fff", border: "none", padding: ".8rem 2.5rem", fontSize: ".72rem", letterSpacing: ".12em", textTransform: "uppercase", cursor: "pointer", fontFamily: "'DM Sans',sans-serif" }}>Continue Shopping</button>
           </div>
         ) : (
           <div className="cart-grid">
-            {/* ITEMS */}
             <div>
               {items.map(item => {
                 const p = item.product;
                 if (!p) return null;
-                const img = p.images?.[0] ? (p.images[0].startsWith('http') ? p.images[0] : `https://stylehub-backend-tau.vercel.app${p.images[0]}`) : null;
+                const img = p.images?.[0]
+                  ? (p.images[0].startsWith('http') ? p.images[0] : `https://stylehub-backend-tau.vercel.app${p.images[0]}`)
+                  : null;
                 const basePrice = p.salePrice || p.price;
                 const fee = item.customization?.fee || 0;
                 const unitPrice = basePrice + fee;
 
                 return (
                   <div key={item._id} className="cart-item">
-                    {/* Image */}
                     <div className="cart-item-img" onClick={() => navigate(`/product/${p._id}`)}>
                       {img
                         ? <img src={img} alt={p.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
@@ -267,27 +270,19 @@ function BackendCart({ cart, setCart, wish }) {
                         </div>
                       }
                     </div>
-
-                    {/* Info */}
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <div onClick={() => navigate(`/product/${p._id}`)} style={{ fontSize: ".95rem", fontWeight: 500, marginBottom: ".5rem", cursor: "pointer" }}>{p.name}</div>
                       {item.size && <div style={{ fontSize: ".75rem", color: "var(--warm)", marginBottom: ".5rem" }}>Size: <strong style={{ color: "var(--dark)" }}>{item.size}</strong></div>}
-
                       <CustomizationLine customization={item.customization} />
-
                       <div style={{ display: "flex", alignItems: "center", gap: "1rem", flexWrap: "wrap", marginTop: ".8rem" }}>
                         <div style={{ display: "flex", alignItems: "center", border: "1px solid var(--border)" }}>
                           <button onClick={() => updateQty(item._id, item.quantity - 1)} style={{ width: 32, height: 32, border: "none", background: "none", cursor: "pointer", fontSize: "1rem" }}>−</button>
                           <span style={{ width: 32, textAlign: "center", fontSize: ".85rem" }}>{item.quantity}</span>
                           <button onClick={() => updateQty(item._id, item.quantity + 1)} style={{ width: 32, height: 32, border: "none", background: "none", cursor: "pointer", fontSize: "1rem" }}>+</button>
                         </div>
-                        <button onClick={() => removeItem(item._id)} style={{ fontSize: ".68rem", letterSpacing: ".08em", color: "var(--warm)", background: "none", border: "none", cursor: "pointer", textDecoration: "underline", fontFamily: "'DM Sans',sans-serif" }}>
-                          Remove
-                        </button>
+                        <button onClick={() => removeItem(item._id)} style={{ fontSize: ".68rem", letterSpacing: ".08em", color: "var(--warm)", background: "none", border: "none", cursor: "pointer", textDecoration: "underline", fontFamily: "'DM Sans',sans-serif" }}>Remove</button>
                       </div>
                     </div>
-
-                    {/* Price */}
                     <div style={{ textAlign: "right", flexShrink: 0 }}>
                       {p.salePrice && <div style={{ fontSize: ".75rem", color: "var(--warm)", textDecoration: "line-through", marginBottom: ".2rem" }}>LE {(p.price + fee).toLocaleString()}</div>}
                       <div style={{ fontSize: "1rem", fontWeight: 600 }}>LE {unitPrice.toLocaleString()}</div>
@@ -298,7 +293,6 @@ function BackendCart({ cart, setCart, wish }) {
               })}
             </div>
 
-            {/* ORDER SUMMARY */}
             <div className="cart-aside">
               <div style={{ fontSize: ".65rem", letterSpacing: ".2em", textTransform: "uppercase", fontWeight: 600, marginBottom: "1.5rem" }}>Order Summary</div>
               <div style={{ display: "flex", justifyContent: "space-between", fontSize: ".82rem", marginBottom: ".8rem" }}>
@@ -320,9 +314,7 @@ function BackendCart({ cart, setCart, wish }) {
                 onClick={() => navigate("/checkout")}>
                 Checkout
               </button>
-              <button onClick={() => navigate("/")} style={{ width: "100%", background: "transparent", color: "var(--dark)", border: "1.5px solid var(--dark)", padding: ".9rem", fontSize: ".72rem", letterSpacing: ".12em", textTransform: "uppercase", cursor: "pointer", fontFamily: "'DM Sans',sans-serif" }}>
-                Continue Shopping
-              </button>
+              <button onClick={() => navigate("/")} style={{ width: "100%", background: "transparent", color: "var(--dark)", border: "1.5px solid var(--dark)", padding: ".9rem", fontSize: ".72rem", letterSpacing: ".12em", textTransform: "uppercase", cursor: "pointer", fontFamily: "'DM Sans',sans-serif" }}>Continue Shopping</button>
               <div style={{ display: "flex", gap: ".4rem", justifyContent: "center", marginTop: "1.2rem" }}>
                 {["VISA", "FAWRY", "CASH"].map(m => (
                   <span key={m} style={{ background: "rgba(0,0,0,.06)", borderRadius: 3, padding: ".2rem .5rem", fontSize: ".55rem", color: "var(--warm)", fontWeight: 600 }}>{m}</span>
@@ -341,13 +333,13 @@ function BackendCart({ cart, setCart, wish }) {
 function LocalCart({ cart, setCart, wish }) {
   const navigate = useNavigate();
 
+  // Resolve every cart item to have a consistent product shape
+  // Handles: static PRODUCTS, home page items, BuildOutfit items
   const items = (cart || []).map(item => {
-    if (item.product) return item;
-    const p = PRODUCTS.find(x => x.id === item.id);
-    return p ? { ...item, product: p } : null;
+    const product = resolveProduct(item);
+    return product ? { ...item, product } : null;
   }).filter(Boolean);
 
-  // ✅ Subtotal includes customization fees
   const subtotal = items.reduce((sum, item) => {
     const base = toNum(item.product.price);
     const fee = item.customization?.fee || 0;
@@ -363,11 +355,23 @@ function LocalCart({ cart, setCart, wish }) {
         : item
     ));
   };
+
   const removeItem = (id, size, customization) => {
     const customKey = JSON.stringify(customization || null);
     setCart(prev => prev.filter(item =>
       !(item.id === id && item.size === size && JSON.stringify(item.customization || null) === customKey)
     ));
+  };
+
+  // Resolve image: backend items use images[] array, static use .img
+  const resolveImg = (product) => {
+    if (product.img) return product.img;
+    if (product.images?.[0]) {
+      return product.images[0].startsWith('http')
+        ? product.images[0]
+        : `https://stylehub-backend-tau.vercel.app${product.images[0]}`;
+    }
+    return null;
   };
 
   return (
@@ -384,9 +388,7 @@ function LocalCart({ cart, setCart, wish }) {
             <div style={{ fontSize: "3rem", marginBottom: "1rem" }}>🛍</div>
             <div style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: "1.8rem", marginBottom: ".8rem" }}>Your Cart is empty</div>
             <p style={{ color: "var(--warm)", fontSize: ".85rem", marginBottom: "2rem" }}>Add items to get started</p>
-            <button onClick={() => navigate("/")} style={{ background: "var(--dark)", color: "#fff", border: "none", padding: ".8rem 2.5rem", fontSize: ".72rem", letterSpacing: ".12em", textTransform: "uppercase", cursor: "pointer", fontFamily: "'DM Sans',sans-serif" }}>
-              Continue Shopping
-            </button>
+            <button onClick={() => navigate("/")} style={{ background: "var(--dark)", color: "#fff", border: "none", padding: ".8rem 2.5rem", fontSize: ".72rem", letterSpacing: ".12em", textTransform: "uppercase", cursor: "pointer", fontFamily: "'DM Sans',sans-serif" }}>Continue Shopping</button>
           </div>
         ) : (
           <div className="cart-grid">
@@ -397,33 +399,30 @@ function LocalCart({ cart, setCart, wish }) {
                 const unitPrice = base + fee;
                 const oldBase = item.product.oldPrice ? toNum(item.product.oldPrice) : null;
                 const oldUnit = oldBase ? oldBase + fee : null;
+                const img = resolveImg(item.product);
 
                 return (
                   <div key={`${item.id}-${item.size}-${idx}`} className="cart-item">
-                    <div className="cart-item-img" onClick={() => navigate(`/product/${item.product.id}`)}>
-                      {item.product.img
-                        ? <img src={item.product.img} alt={item.product.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-                        : <div style={{ width: "100%", height: "100%", background: `linear-gradient(${item.product.gradient})`, display: "flex", alignItems: "center", justifyContent: "center" }}>
-                          <span style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: "1.5rem", color: "rgba(255,255,255,.2)" }}>{item.product.brand[0]}</span>
+                    <div className="cart-item-img" onClick={() => navigate(`/product/${item.product.id || item.product._id}`)}>
+                      {img
+                        ? <img src={img} alt={item.product.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                        : <div style={{ width: "100%", height: "100%", background: item.product.gradient ? `linear-gradient(${item.product.gradient})` : "#f0ece6", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                          <span style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: "1.5rem", color: "rgba(26,26,24,.15)" }}>{item.product.brand?.[0]}</span>
                         </div>
                       }
                     </div>
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <div style={{ fontSize: ".58rem", letterSpacing: ".15em", textTransform: "uppercase", color: "var(--warm)", marginBottom: ".3rem" }}>{item.product.brand}</div>
-                      <div onClick={() => navigate(`/product/${item.product.id}`)} style={{ fontSize: ".95rem", fontWeight: 500, marginBottom: ".5rem", cursor: "pointer" }}>{item.product.name}</div>
-                      <div style={{ fontSize: ".75rem", color: "var(--warm)", marginBottom: ".5rem" }}>Size: <strong style={{ color: "var(--dark)" }}>{item.size}</strong></div>
-
+                      <div onClick={() => navigate(`/product/${item.product.id || item.product._id}`)} style={{ fontSize: ".95rem", fontWeight: 500, marginBottom: ".5rem", cursor: "pointer" }}>{item.product.name}</div>
+                      {item.size && <div style={{ fontSize: ".75rem", color: "var(--warm)", marginBottom: ".5rem" }}>Size: <strong style={{ color: "var(--dark)" }}>{item.size}</strong></div>}
                       <CustomizationLine customization={item.customization} />
-
                       <div style={{ display: "flex", alignItems: "center", gap: "1rem", flexWrap: "wrap", marginTop: ".8rem" }}>
                         <div style={{ display: "flex", alignItems: "center", border: "1px solid var(--border)" }}>
                           <button onClick={() => updateQty(item.id, item.size, item.customization, -1)} style={{ width: 32, height: 32, border: "none", background: "none", cursor: "pointer", fontSize: "1rem" }}>−</button>
                           <span style={{ width: 32, textAlign: "center", fontSize: ".85rem" }}>{item.qty}</span>
                           <button onClick={() => updateQty(item.id, item.size, item.customization, +1)} style={{ width: 32, height: 32, border: "none", background: "none", cursor: "pointer", fontSize: "1rem" }}>+</button>
                         </div>
-                        <button onClick={() => removeItem(item.id, item.size, item.customization)} style={{ fontSize: ".68rem", letterSpacing: ".08em", color: "var(--warm)", background: "none", border: "none", cursor: "pointer", textDecoration: "underline", fontFamily: "'DM Sans',sans-serif" }}>
-                          Remove
-                        </button>
+                        <button onClick={() => removeItem(item.id, item.size, item.customization)} style={{ fontSize: ".68rem", letterSpacing: ".08em", color: "var(--warm)", background: "none", border: "none", cursor: "pointer", textDecoration: "underline", fontFamily: "'DM Sans',sans-serif" }}>Remove</button>
                       </div>
                     </div>
                     <div style={{ textAlign: "right", flexShrink: 0 }}>
@@ -457,9 +456,7 @@ function LocalCart({ cart, setCart, wish }) {
                 onClick={() => navigate("/checkout")}>
                 Checkout
               </button>
-              <button onClick={() => navigate("/")} style={{ width: "100%", background: "transparent", color: "var(--dark)", border: "1.5px solid var(--dark)", padding: ".9rem", fontSize: ".72rem", letterSpacing: ".12em", textTransform: "uppercase", cursor: "pointer", fontFamily: "'DM Sans',sans-serif" }}>
-                Continue Shopping
-              </button>
+              <button onClick={() => navigate("/")} style={{ width: "100%", background: "transparent", color: "var(--dark)", border: "1.5px solid var(--dark)", padding: ".9rem", fontSize: ".72rem", letterSpacing: ".12em", textTransform: "uppercase", cursor: "pointer", fontFamily: "'DM Sans',sans-serif" }}>Continue Shopping</button>
               <div style={{ display: "flex", gap: ".4rem", justifyContent: "center", marginTop: "1.2rem" }}>
                 {["VISA", "FAWRY", "CASH"].map(m => (
                   <span key={m} style={{ background: "rgba(0,0,0,.06)", borderRadius: 3, padding: ".2rem .5rem", fontSize: ".55rem", color: "var(--warm)", fontWeight: 600 }}>{m}</span>
