@@ -616,63 +616,71 @@ export default function ProductDetail({ cart, setCart, wish, setWish }) {
       {/* REVIEWS */}
       <div className="pd-section" style={{ borderTop: "1px solid var(--border)", background: "#fff" }}>
         <div style={{ maxWidth: 1200, margin: "0 auto" }}>
-          <div style={{ background: "var(--cream)", border: "1px solid var(--border)", borderRadius: 8, padding: "2rem", marginBottom: "2.5rem" }}>
-            {isLoggedIn ? (
-              <>
-                <div style={{ marginBottom: "1.2rem" }}>
-                  <div style={{ fontSize: ".62rem", letterSpacing: ".18em", textTransform: "uppercase", fontWeight: 700, color: "var(--dark)", marginBottom: ".6rem", fontFamily: "'DM Sans',sans-serif" }}>Your Rating</div>
-                  <div style={{ display: "flex", gap: ".3rem" }}>
-                    {[1, 2, 3, 4, 5].map(i => (
-                      <button key={i} type="button" onClick={() => setReviewRating(i)} onMouseEnter={() => setReviewHover(i)} onMouseLeave={() => setReviewHover(0)} style={{ background: "none", border: "none", cursor: "pointer", padding: 0 }}>
-                        <svg width="26" height="26" viewBox="0 0 24 24" fill={(reviewHover || reviewRating) >= i ? "#c8a96e" : "none"} stroke="#c8a96e" strokeWidth="1.5">
-                          <polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26" />
-                        </svg>
-                      </button>
-                    ))}
-                  </div>
-                </div>
-                <div style={{ marginBottom: "1rem" }}>
-                  <div style={{ fontSize: ".62rem", letterSpacing: ".18em", textTransform: "uppercase", fontWeight: 700, color: "var(--dark)", marginBottom: ".6rem", fontFamily: "'DM Sans',sans-serif" }}>Your Comment</div>
-                  <textarea value={reviewComment} onChange={e => setReviewComment(e.target.value)} placeholder="Share your thoughts..." rows={4}
-                    style={{ width: "100%", padding: ".8rem", border: "1px solid var(--border)", fontFamily: "'DM Sans',sans-serif", fontSize: ".85rem", resize: "vertical", outline: "none", background: "#fff", borderRadius: 4, lineHeight: 1.6, boxSizing: "border-box" }} />
-                </div>
-                {reviewMsg && (
-                  <div style={{ padding: ".6rem 1rem", borderRadius: 4, marginBottom: "1rem", fontSize: ".8rem", fontFamily: "'DM Sans',sans-serif", background: reviewMsg.type === "success" ? "#edf7ee" : "#fdf0ee", color: reviewMsg.type === "success" ? "#2d7a35" : "#c0392b" }}>
-                    {reviewMsg.text}
+          {PRODUCTS.some(p => String(p.id) === String(id)) ? (
+            <div style={{ background: "var(--cream)", border: "1px solid var(--border)", borderRadius: 8, padding: "2rem", marginBottom: "2.5rem", textAlign: "center" }}>
+              <p style={{ color: "var(--warm)", fontSize: ".85rem", fontFamily: "'DM Sans',sans-serif" }}>Reviews are available for products sold through our platform.</p>
+            </div>
+          ) : (
+            <>
+              <div style={{ background: "var(--cream)", border: "1px solid var(--border)", borderRadius: 8, padding: "2rem", marginBottom: "2.5rem" }}>
+                {isLoggedIn ? (
+                  <>
+                    <div style={{ marginBottom: "1.2rem" }}>
+                      <div style={{ fontSize: ".62rem", letterSpacing: ".18em", textTransform: "uppercase", fontWeight: 700, color: "var(--dark)", marginBottom: ".6rem", fontFamily: "'DM Sans',sans-serif" }}>Your Rating</div>
+                      <div style={{ display: "flex", gap: ".3rem" }}>
+                        {[1, 2, 3, 4, 5].map(i => (
+                          <button key={i} type="button" onClick={() => setReviewRating(i)} onMouseEnter={() => setReviewHover(i)} onMouseLeave={() => setReviewHover(0)} style={{ background: "none", border: "none", cursor: "pointer", padding: 0 }}>
+                            <svg width="26" height="26" viewBox="0 0 24 24" fill={(reviewHover || reviewRating) >= i ? "#c8a96e" : "none"} stroke="#c8a96e" strokeWidth="1.5">
+                              <polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26" />
+                            </svg>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                    <div style={{ marginBottom: "1rem" }}>
+                      <div style={{ fontSize: ".62rem", letterSpacing: ".18em", textTransform: "uppercase", fontWeight: 700, color: "var(--dark)", marginBottom: ".6rem", fontFamily: "'DM Sans',sans-serif" }}>Your Comment</div>
+                      <textarea value={reviewComment} onChange={e => setReviewComment(e.target.value)} placeholder="Share your thoughts..." rows={4}
+                        style={{ width: "100%", padding: ".8rem", border: "1px solid var(--border)", fontFamily: "'DM Sans',sans-serif", fontSize: ".85rem", resize: "vertical", outline: "none", background: "#fff", borderRadius: 4, lineHeight: 1.6, boxSizing: "border-box" }} />
+                    </div>
+                    {reviewMsg && (
+                      <div style={{ padding: ".6rem 1rem", borderRadius: 4, marginBottom: "1rem", fontSize: ".8rem", fontFamily: "'DM Sans',sans-serif", background: reviewMsg.type === "success" ? "#edf7ee" : "#fdf0ee", color: reviewMsg.type === "success" ? "#2d7a35" : "#c0392b" }}>
+                        {reviewMsg.text}
+                      </div>
+                    )}
+                    <button onClick={submitReview} disabled={submittingReview}
+                      style={{ background: "var(--dark)", color: "#fff", border: "none", padding: ".7rem 2rem", fontSize: ".68rem", letterSpacing: ".14em", textTransform: "uppercase", cursor: submittingReview ? "not-allowed" : "pointer", fontFamily: "'DM Sans',sans-serif", opacity: submittingReview ? .6 : 1, borderRadius: 3 }}>
+                      {submittingReview ? "Submitting..." : "Submit Review"}
+                    </button>
+                  </>
+                ) : (
+                  <div style={{ textAlign: "center", padding: "1.5rem 0" }}>
+                    <p style={{ fontSize: ".85rem", color: "var(--warm)", fontFamily: "'DM Sans',sans-serif", marginBottom: "1rem" }}>Sign in to leave a review</p>
+                    <button onClick={() => navigate("/signin")}
+                      style={{ background: "var(--dark)", color: "#fff", border: "none", padding: ".7rem 2rem", fontSize: ".68rem", letterSpacing: ".14em", textTransform: "uppercase", cursor: "pointer", fontFamily: "'DM Sans',sans-serif", borderRadius: 3 }}>
+                      Sign In
+                    </button>
                   </div>
                 )}
-                <button onClick={submitReview} disabled={submittingReview}
-                  style={{ background: "var(--dark)", color: "#fff", border: "none", padding: ".7rem 2rem", fontSize: ".68rem", letterSpacing: ".14em", textTransform: "uppercase", cursor: submittingReview ? "not-allowed" : "pointer", fontFamily: "'DM Sans',sans-serif", opacity: submittingReview ? .6 : 1, borderRadius: 3 }}>
-                  {submittingReview ? "Submitting..." : "Submit Review"}
-                </button>
-              </>
-            ) : (
-              <div style={{ textAlign: "center", padding: "1.5rem 0" }}>
-                <p style={{ fontSize: ".85rem", color: "var(--warm)", fontFamily: "'DM Sans',sans-serif", marginBottom: "1rem" }}>Sign in to leave a review</p>
-                <button onClick={() => navigate("/signin")}
-                  style={{ background: "var(--dark)", color: "#fff", border: "none", padding: ".7rem 2rem", fontSize: ".68rem", letterSpacing: ".14em", textTransform: "uppercase", cursor: "pointer", fontFamily: "'DM Sans',sans-serif", borderRadius: 3 }}>
-                  Sign In
-                </button>
               </div>
-            )}
-          </div>
 
-          {reviews.length > 0 && (
-            <>
-              <h2 style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: "1.6rem", fontWeight: 400, marginBottom: "1.5rem" }}>Customer Reviews</h2>
-              <div className="pd-reviews-grid">
-                {reviews.map(r => (
-                  <div key={r._id} style={{ padding: "1.2rem", border: "1px solid var(--border)", background: "var(--cream)", borderRadius: 4 }}>
-                    <div style={{ display: "flex", gap: ".1rem", marginBottom: ".5rem" }}>
-                      {[1, 2, 3, 4, 5].map(i => <StarIcon key={i} filled={i <= r.rating} />)}
-                    </div>
-                    {r.comment && <p style={{ fontSize: ".8rem", color: "#555", lineHeight: 1.6, marginBottom: ".5rem" }}>{r.comment}</p>}
-                    <div style={{ fontSize: ".65rem", color: "var(--warm)", fontFamily: "'DM Sans',sans-serif" }}>
-                      — {r.customer?.firstName} {r.customer?.lastName}
-                    </div>
+              {reviews.length > 0 && (
+                <>
+                  <h2 style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: "1.6rem", fontWeight: 400, marginBottom: "1.5rem" }}>Customer Reviews</h2>
+                  <div className="pd-reviews-grid">
+                    {reviews.map(r => (
+                      <div key={r._id} style={{ padding: "1.2rem", border: "1px solid var(--border)", background: "var(--cream)", borderRadius: 4 }}>
+                        <div style={{ display: "flex", gap: ".1rem", marginBottom: ".5rem" }}>
+                          {[1, 2, 3, 4, 5].map(i => <StarIcon key={i} filled={i <= r.rating} />)}
+                        </div>
+                        {r.comment && <p style={{ fontSize: ".8rem", color: "#555", lineHeight: 1.6, marginBottom: ".5rem" }}>{r.comment}</p>}
+                        <div style={{ fontSize: ".65rem", color: "var(--warm)", fontFamily: "'DM Sans',sans-serif" }}>
+                          — {r.customer?.firstName} {r.customer?.lastName}
+                        </div>
+                      </div>
+                    ))}
                   </div>
-                ))}
-              </div>
+                </>
+              )}
             </>
           )}
         </div>
