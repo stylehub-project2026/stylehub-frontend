@@ -4,6 +4,8 @@ import { SHNav, SHFooter, SHARED_CSS, PRODUCTS } from "./shared";
 
 const API = "https://stylehub-backend-tau.vercel.app/api";
 
+const CUSTOM_FEE = 100; // LE — embroidery surcharge
+
 const PRODUCT_CSS = `
 .pd-grid { display:grid; grid-template-columns:52% 48%; gap:0; }
 .pd-left { display:flex; gap:.75rem; padding:1rem 2rem 4rem 4%; }
@@ -158,6 +160,14 @@ export default function ProductDetail({ cart, setCart, wish, setWish }) {
   const [sizeGuideOpen, setSizeGuideOpen] = useState(false);
   const [backendSimilar, setBackendSimilar] = useState([]);
 
+  // ----- Personalization state -----
+  const [customEnabled, setCustomEnabled] = useState(false);
+  const [customText, setCustomText] = useState("");
+  const [customFont, setCustomFont] = useState("serif-italic");
+  const [customColor, setCustomColor] = useState("#c8a96e");
+  const [customPosition, setCustomPosition] = useState("chest");
+  const [customError, setCustomError] = useState(false);
+
   const getImageUrl = (img) => {
     if (!img) return null;
     if (img.startsWith("http")) return img;
@@ -167,7 +177,7 @@ export default function ProductDetail({ cart, setCart, wish, setWish }) {
   };
 
   useEffect(() => {
-     window.scrollTo(0, 0); 
+    window.scrollTo(0, 0);
     setLoading(true);
     const local = PRODUCTS.find(p => String(p.id) === String(id));
     if (local) {
@@ -191,10 +201,9 @@ export default function ProductDetail({ cart, setCart, wish, setWish }) {
         setProduct({
           id: raw._id, _id: raw._id, name: raw.name,
           brand: raw.seller?.brandName || "StyleHub",
-         price: raw.salePrice && raw.salePrice !== raw.price ? Math.max(raw.price, raw.salePrice) : raw.price,
+          price: raw.salePrice && raw.salePrice !== raw.price ? Math.max(raw.price, raw.salePrice) : raw.price,
           salePrice: raw.salePrice && raw.salePrice !== raw.price ? Math.min(raw.price, raw.salePrice) : null,
-          
-         description: raw.description,
+          description: raw.description,
           sizes: (raw.sizes || []).map(s => typeof s === "object" ? s.name || String(s) : s),
           colors: (raw.colors || []).map(c => typeof c === "object" ? c.hex || c.value || String(c) : c),
           images: raw.images || [], rating: raw.avgRating || 0, reviewCount: raw.reviewCount || 0,
@@ -232,23 +241,55 @@ export default function ProductDetail({ cart, setCart, wish, setWish }) {
 
   const toggleWish = () => setWish(w => w.includes(id) ? w.filter(x => x !== id) : [...w, id]);
 
+  // Personalization only enabled for Marble and Salty brands
+  const isCustomizable = product && ["marble", "salty"].includes((product.brand || "").toLowerCase());
+
   const handleAddToCart = async () => {
     if (product.sizes.length > 0 && !selectedSize) { setSizeError(true); return; }
+    if (customEnabled && !customText.trim()) { setCustomError(true); return; }
     setSizeError(false);
+    setCustomError(false);
+
+    const customization = customEnabled ? {
+      text: customText.trim(),
+      font: customFont,
+      color: customColor,
+      position: customPosition,
+      fee: CUSTOM_FEE,
+    } : null;
+
     const token = localStorage.getItem("token");
     if (token && product._id) {
       await fetch(`${API}/cart`, {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ productId: product._id, quantity: 1, size: selectedSize }),
+        body: JSON.stringify({ productId: product._id, quantity: 1, size: selectedSize, customization }),
       }).catch(console.error);
     }
+
     setCart(prev => {
-      const existing = prev.find(x => x.id === product.id && x.size === selectedSize);
-      if (existing) return prev.map(x => x.id === product.id && x.size === selectedSize ? { ...x, qty: x.qty + 1 } : x);
+      // Dedupe by id+size+customization so different customizations stay as separate lines
+      const customKey = JSON.stringify(customization);
+      const existing = prev.find(x =>
+        x.id === product.id &&
+        x.size === selectedSize &&
+        JSON.stringify(x.customization || null) === customKey
+      );
+      if (existing) return prev.map(x => x === existing ? { ...x, qty: x.qty + 1 } : x);
       return [...prev, {
-        id: product.id, size: selectedSize, qty: 1,
-        product: { id: product.id, _id: product._id, name: product.name, price: `LE ${product.price?.toLocaleString()}`, salePrice: product.salePrice ? `LE ${product.salePrice?.toLocaleString()}` : null, img: getImageUrl(product.images[0]), brand: product.brand }
+        id: product.id,
+        size: selectedSize,
+        qty: 1,
+        customization, // null if not personalized
+        product: {
+          id: product.id,
+          _id: product._id,
+          name: product.name,
+          price: `LE ${product.price?.toLocaleString()}`,                                   // ORIGINAL price
+          salePrice: product.salePrice ? `LE ${product.salePrice?.toLocaleString()}` : null, // ORIGINAL salePrice
+          img: getImageUrl(product.images[0]),
+          brand: product.brand,
+        }
       }];
     });
     setAddedToCart(true);
@@ -307,6 +348,9 @@ export default function ProductDetail({ cart, setCart, wish, setWish }) {
   const normalizedBrand = BRAND_ALIAS[product.brand?.toLowerCase()] || product.brand;
   const sameBrandProducts = PRODUCTS.filter(p => p.brand === normalizedBrand && String(p.id) !== String(id)).slice(0, 4);
 
+  // Live total shown on the Add-to-Bag button
+  const displayPrice = (product.salePrice || product.price) + (customEnabled ? CUSTOM_FEE : 0);
+
   return (
     <div style={{ minHeight: "100vh", background: "var(--cream)" }}>
       <style>{SHARED_CSS}</style>
@@ -345,7 +389,7 @@ export default function ProductDetail({ cart, setCart, wish, setWish }) {
                 <span style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: "3rem", color: "rgba(26,26,24,.1)" }}>{product.brand[0]}</span>
               </div>
             )}
-            {discountPct && <div style={{ position: "absolute", top: "1rem", left: "1rem", background: "var(--red)", color: "#fff", fontSize: ".6rem", letterSpacing: ".1em", padding: ".3rem .7rem", fontWeight: 700 }}>SALE</div>}
+            {discountPct && <div style={{ position: "absolute", top: "1rem", left: "1rem", background: "var(--red)", color: "#fff", fontSize: ".6rem", letterSpacing: ".1em", padding: ".3rem .7rem", fontWeight: 700, zIndex: 6 }}>SALE</div>}
           </div>
         </div>
 
@@ -362,10 +406,15 @@ export default function ProductDetail({ cart, setCart, wish, setWish }) {
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: "1rem", marginBottom: "1.5rem", flexWrap: "wrap" }}>
             <span style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: "1.8rem", fontWeight: 600, color: product.salePrice ? "var(--red)" : "var(--dark)" }}>
-              LE {(product.salePrice || product.price)?.toLocaleString()}
+              LE {displayPrice.toLocaleString()}
             </span>
-            {product.salePrice && <span style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: "1.3rem", color: "var(--warm)", textDecoration: "line-through" }}>LE {product.price?.toLocaleString()}</span>}
+            {product.salePrice && <span style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: "1.3rem", color: "var(--warm)", textDecoration: "line-through" }}>LE {(product.price + (customEnabled ? CUSTOM_FEE : 0)).toLocaleString()}</span>}
             {discountPct && <span style={{ background: "var(--red)", color: "#fff", fontSize: ".6rem", padding: ".2rem .5rem", fontWeight: 700, fontFamily: "'DM Sans',sans-serif" }}>-{discountPct}%</span>}
+            {customEnabled && (
+              <span style={{ fontSize: ".68rem", color: "var(--warm)", fontFamily: "'DM Sans',sans-serif", fontStyle: "italic" }}>
+                includes +LE {CUSTOM_FEE} personalization
+              </span>
+            )}
           </div>
           <div style={{ height: 1, background: "var(--border)", marginBottom: "1.5rem" }} />
 
@@ -398,9 +447,100 @@ export default function ProductDetail({ cart, setCart, wish, setWish }) {
             </div>
           )}
 
+          {/* ===================== PERSONALIZATION ===================== */}
+          {isCustomizable && (
+            <div style={{ marginBottom: "1.5rem", padding: "1rem", background: "#fbf6ea", border: "1px solid #ede4d3", borderRadius: 6 }}>
+              <label style={{ display: "flex", alignItems: "center", gap: ".7rem", cursor: "pointer", marginBottom: customEnabled ? "1rem" : 0 }}>
+                <input type="checkbox" checked={customEnabled} onChange={e => { setCustomEnabled(e.target.checked); setCustomError(false); }}
+                  style={{ width: 18, height: 18, accentColor: "#1a1a18", cursor: "pointer", flexShrink: 0 }} />
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontSize: ".72rem", letterSpacing: ".12em", textTransform: "uppercase", fontWeight: 700, color: "var(--dark)", fontFamily: "'DM Sans',sans-serif", display: "flex", alignItems: "center", gap: ".35rem" }}>
+                    ✨ Personalize it
+                  </div>
+                  <div style={{ fontSize: ".68rem", color: "var(--warm)", fontFamily: "'DM Sans',sans-serif", marginTop: ".2rem" }}>
+                    Add embroidered text · +LE {CUSTOM_FEE}
+                  </div>
+                </div>
+              </label>
+
+              {customEnabled && (
+                <div style={{ paddingTop: ".9rem", borderTop: "1px solid #ede4d3" }}>
+                  {/* Text input */}
+                  <div style={{ marginBottom: ".9rem" }}>
+                    <div style={{ fontSize: ".6rem", letterSpacing: ".15em", textTransform: "uppercase", fontWeight: 600, color: "var(--dark)", marginBottom: ".4rem", fontFamily: "'DM Sans',sans-serif", display: "flex", gap: ".5rem", alignItems: "center" }}>
+                      Your Text
+                      {customError && <span style={{ color: "var(--red)", fontWeight: 400, letterSpacing: 0, textTransform: "none", fontSize: ".7rem" }}>— required</span>}
+                    </div>
+                    <input type="text" value={customText} onChange={e => { setCustomText(e.target.value); setCustomError(false); }} maxLength={15}
+                      placeholder="Type a name or short word"
+                      style={{ width: "100%", padding: ".6rem .8rem", border: `1.5px solid ${customError ? "var(--red)" : "var(--border)"}`, background: "#fff", fontFamily: "'DM Sans',sans-serif", fontSize: ".82rem", outline: "none", borderRadius: 3, boxSizing: "border-box" }} />
+                    <div style={{ fontSize: ".62rem", color: "var(--warm)", textAlign: "right", marginTop: ".25rem", fontFamily: "'DM Sans',sans-serif" }}>{customText.length}/15</div>
+                  </div>
+
+                  {/* Font picker */}
+                  <div style={{ marginBottom: ".9rem" }}>
+                    <div style={{ fontSize: ".6rem", letterSpacing: ".15em", textTransform: "uppercase", fontWeight: 600, color: "var(--dark)", marginBottom: ".4rem", fontFamily: "'DM Sans',sans-serif" }}>Font Style</div>
+                    <div style={{ display: "flex", gap: ".4rem", flexWrap: "wrap" }}>
+                      {[
+                        { id: "serif-italic", label: customText || "Text", style: { fontFamily: "'Cormorant Garamond',serif", fontStyle: "italic" } },
+                        { id: "serif",        label: customText || "Text", style: { fontFamily: "'Cormorant Garamond',serif" } },
+                        { id: "block",        label: (customText || "Text").toUpperCase(), style: { fontFamily: "'DM Sans',sans-serif", fontWeight: 700, letterSpacing: ".1em" } },
+                      ].map(f => (
+                        <button key={f.id} onClick={() => setCustomFont(f.id)}
+                          style={{ padding: ".5rem .85rem", border: `1.5px solid ${customFont === f.id ? "var(--dark)" : "var(--border)"}`, background: customFont === f.id ? "var(--dark)" : "#fff", color: customFont === f.id ? "#fff" : "var(--dark)", cursor: "pointer", fontSize: ".78rem", borderRadius: 3, transition: "all .2s", ...f.style }}>
+                          {f.label.slice(0, 8)}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Thread color */}
+                  <div style={{ marginBottom: ".9rem" }}>
+                    <div style={{ fontSize: ".6rem", letterSpacing: ".15em", textTransform: "uppercase", fontWeight: 600, color: "var(--dark)", marginBottom: ".4rem", fontFamily: "'DM Sans',sans-serif" }}>Thread Color</div>
+                    <div style={{ display: "flex", gap: ".5rem", flexWrap: "wrap" }}>
+                      {[
+                        { hex: "#c8a96e", name: "Gold" },
+                        { hex: "#ffffff", name: "White" },
+                        { hex: "#c84a3d", name: "Red" },
+                        { hex: "#9eaa8a", name: "Sage" },
+                        { hex: "#1a1a18", name: "Black" },
+                      ].map(c => (
+                        <div key={c.hex} onClick={() => setCustomColor(c.hex)} title={c.name}
+                          style={{ width: 26, height: 26, borderRadius: "50%", background: c.hex, border: customColor === c.hex ? "2px solid var(--dark)" : "2px solid var(--border)", cursor: "pointer", boxShadow: customColor === c.hex ? "0 0 0 2px var(--dark)" : "none", transform: customColor === c.hex ? "scale(1.15)" : "none", transition: "all .2s" }} />
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Placement */}
+                  <div style={{ marginBottom: ".8rem" }}>
+                    <div style={{ fontSize: ".6rem", letterSpacing: ".15em", textTransform: "uppercase", fontWeight: 600, color: "var(--dark)", marginBottom: ".4rem", fontFamily: "'DM Sans',sans-serif" }}>Placement</div>
+                    <div style={{ display: "flex", gap: ".4rem", flexWrap: "wrap" }}>
+                      {[
+                        { id: "chest", label: "Chest" },
+                        { id: "sleeve", label: "Sleeve" },
+                        { id: "back", label: "Back" },
+                      ].map(pos => (
+                        <button key={pos.id} onClick={() => setCustomPosition(pos.id)}
+                          style={{ padding: ".45rem .8rem", border: `1.5px solid ${customPosition === pos.id ? "var(--dark)" : "var(--border)"}`, background: customPosition === pos.id ? "var(--dark)" : "#fff", color: customPosition === pos.id ? "#fff" : "var(--dark)", cursor: "pointer", fontSize: ".68rem", letterSpacing: ".08em", textTransform: "uppercase", fontWeight: 600, fontFamily: "'DM Sans',sans-serif", borderRadius: 3, transition: "all .2s" }}>
+                          {pos.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div style={{ fontSize: ".65rem", color: "var(--warm)", fontFamily: "'DM Sans',sans-serif", lineHeight: 1.5, marginTop: ".8rem", display: "flex", gap: ".4rem", alignItems: "flex-start" }}>
+                    <span style={{ marginTop: 1 }}>ⓘ</span>
+                    <span>Customized items are final sale and ship in 5–7 business days.</span>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+          {/* =================== END PERSONALIZATION =================== */}
+
           <button onClick={handleAddToCart}
             style={{ width: "100%", background: addedToCart ? "var(--sage)" : "var(--dark)", color: "#fff", border: "none", padding: "1rem", fontSize: ".72rem", letterSpacing: ".15em", textTransform: "uppercase", cursor: "pointer", fontFamily: "'DM Sans',sans-serif", marginBottom: ".8rem", transition: "background .3s" }}>
-            {addedToCart ? "ADDED TO BAG" : "ADD TO BAG"}
+            {addedToCart ? "ADDED TO BAG" : `ADD TO BAG · LE ${displayPrice.toLocaleString()}`}
           </button>
 
           <button onClick={toggleWish}
@@ -419,7 +559,7 @@ export default function ProductDetail({ cart, setCart, wish, setWish }) {
 
           {[
             { title: "Product Details", content: product.description || "No description available." },
-            { title: "Shipping & Returns", content: "Free shipping on orders above LE 500. Returns accepted within 14 days." },
+            { title: "Shipping & Returns", content: "Free shipping on orders above LE 500. Returns accepted within 14 days. Customized items are final sale." },
             { title: "Brand Info", content: `${product.brand} — available exclusively on StyleHub.` },
           ].map(({ title, content }) => (
             <AccordionItem key={title} title={title} content={content} />
@@ -436,45 +576,43 @@ export default function ProductDetail({ cart, setCart, wish, setWish }) {
       </div>
 
       {/* YOU MAY ALSO LIKE */}
-{(() => {
-  const allSimilar = [...sameBrandProducts, ...backendSimilar].slice(0, 4);
-  return allSimilar.length > 0 && (
-    <div className="pd-section" style={{ borderTop: "1px solid var(--border)", background: "var(--cream)" }}>
-      <div style={{ maxWidth: 1200, margin: "0 auto" }}>
-        <div style={{ marginBottom: "2rem" }}>
-          <h2 style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: "2rem", fontWeight: 400, color: "var(--dark)", marginBottom: ".4rem" }}>You May Also Like</h2>
-          <div style={{ width: 40, height: 2, background: "var(--warm)" }} />
-        </div>
-        <div className="pd-also-grid">
-          {allSimilar.map(p => {
-            const isBackend = !p.img && !!p.images;
-            return (
-              <ProductCard
-                key={p.id || p._id}
-                p={isBackend ? {
-                  id: p._id, name: p.name,
-                  brand: p.seller?.brandName || product.brand,
-                  price: `LE ${p.price?.toLocaleString()}`,
-                  oldPrice: p.salePrice ? `LE ${p.salePrice?.toLocaleString()}` : null,
-                  img: p.images?.[0] || null,
-                } : p}
-                getImageUrl={(img) => {
-                  if (!img) return null;
-                  if (img.startsWith("http")) return img;
-                  return isBackend ? `https://stylehub-backend-tau.vercel.app${img}` : img;
-                }}
-                onClick={() => navigate(`/product/${p._id || p.id}`)}
-              />
-            );
-          })}
-        </div>
-      </div>
-    </div>
-  );
-})()}
+      {(() => {
+        const allSimilar = [...sameBrandProducts, ...backendSimilar].slice(0, 4);
+        return allSimilar.length > 0 && (
+          <div className="pd-section" style={{ borderTop: "1px solid var(--border)", background: "var(--cream)" }}>
+            <div style={{ maxWidth: 1200, margin: "0 auto" }}>
+              <div style={{ marginBottom: "2rem" }}>
+                <h2 style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: "2rem", fontWeight: 400, color: "var(--dark)", marginBottom: ".4rem" }}>You May Also Like</h2>
+                <div style={{ width: 40, height: 2, background: "var(--warm)" }} />
+              </div>
+              <div className="pd-also-grid">
+                {allSimilar.map(p => {
+                  const isBackend = !p.img && !!p.images;
+                  return (
+                    <ProductCard
+                      key={p.id || p._id}
+                      p={isBackend ? {
+                        id: p._id, name: p.name,
+                        brand: p.seller?.brandName || product.brand,
+                        price: `LE ${p.price?.toLocaleString()}`,
+                        oldPrice: p.salePrice ? `LE ${p.salePrice?.toLocaleString()}` : null,
+                        img: p.images?.[0] || null,
+                      } : p}
+                      getImageUrl={(img) => {
+                        if (!img) return null;
+                        if (img.startsWith("http")) return img;
+                        return isBackend ? `https://stylehub-backend-tau.vercel.app${img}` : img;
+                      }}
+                      onClick={() => navigate(`/product/${p._id || p.id}`)}
+                    />
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        );
+      })()}
 
-
-      
       {/* REVIEWS */}
       <div className="pd-section" style={{ borderTop: "1px solid var(--border)", background: "#fff" }}>
         <div style={{ maxWidth: 1200, margin: "0 auto" }}>
