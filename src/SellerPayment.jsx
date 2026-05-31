@@ -57,6 +57,14 @@ export default function SellerPayment() {
     const [paid, setPaid] = useState(false);
     const [submitted, setSubmitted] = useState(false);
 
+    // ── Guard: redirect to seller auth if not logged in ──
+    const sellerToken = localStorage.getItem('sellerToken');
+    const sellerData = localStorage.getItem('seller');
+    if (!sellerToken || !sellerData) {
+        navigate('/seller', { replace: true });
+        return null;
+    }
+
     const plan = PLANS.find(p => p.id === selected);
 
     const handleSubmit = async () => {
