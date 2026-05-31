@@ -48,15 +48,58 @@ export default function AdminDashboard() {
     };
 
     const approveSeller = async () => {
-        await fetch(`${BACKEND_URL}/api/admin/sellers/${approveModal._id}/approve`, {
-            method: 'PUT',
-            headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
-            body: JSON.stringify({ paidAmount: Number(paidAmount) }),
-        });
-        setApproveModal(null);
-        setPaidAmount('');
-        fetchSellers();
-        fetchSubRevenue();
+        if (!approveModal) return;
+
+        try {
+            const res = await fetch(`${BACKEND_URL}/api/seller/admin/approve-subscription/${approveModal._id}`, {
+                method: 'PATCH',
+                headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+                body: JSON.stringify({ paidAmount: Number(paidAmount) || approveModal.subscriptionPaidAmount || 0 }),
+            });
+
+            const data = await res.json().catch(() => ({}));
+
+            if (!res.ok || data.success === false) {
+                alert(data.message || 'Failed to approve seller.');
+                return;
+            }
+
+            alert('Seller approved and approval email sent.');
+            setApproveModal(null);
+            setPaidAmount('');
+            fetchSellers();
+            fetchSubRevenue();
+        } catch (err) {
+            console.error(err);
+            alert('Server error while approving seller.');
+        }
+    };
+
+    const rejectSeller = async (seller) => {
+        const reason = window.prompt('Reason for rejection:', 'Your payment or application could not be verified.');
+        if (reason === null) return;
+
+        try {
+            const res = await fetch(`${BACKEND_URL}/api/seller/admin/reject-subscription/${seller._id}`, {
+                method: 'PATCH',
+                headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+                body: JSON.stringify({ reason }),
+            });
+
+            const data = await res.json().catch(() => ({}));
+
+            if (!res.ok || data.success === false) {
+                alert(data.message || 'Failed to reject seller.');
+                return;
+            }
+
+            alert('Seller rejected and rejection email sent.');
+            fetchSellers();
+            fetchSubRevenue();
+        } catch (err) {
+            console.error(err);
+            alert('Server error while rejecting seller.');
+        }
     };
 
     const deleteSeller = async (id) => {
@@ -173,8 +216,15 @@ export default function AdminDashboard() {
                                                 ) : <span style={{ color: '#ccc', fontSize: '.75rem' }}>—</span>}
                                             </td>
                                             <td style={td}>
-                                                <span style={{ padding: '3px 10px', borderRadius: 20, fontSize: '.75rem', fontWeight: 600, background: s.isApproved ? '#e8f5e9' : '#fff3e0', color: s.isApproved ? '#2e7d32' : '#e65100' }}>
-                                                    {s.isApproved ? 'Approved' : 'Pending'}
+                                                <span style={{
+                                                    padding: '3px 10px',
+                                                    borderRadius: 20,
+                                                    fontSize: '.75rem',
+                                                    fontWeight: 600,
+                                                    background: s.isApproved ? '#e8f5e9' : s.subscriptionStatus === 'rejected' ? '#fde8e8' : '#fff3e0',
+                                                    color: s.isApproved ? '#2e7d32' : s.subscriptionStatus === 'rejected' ? '#c0392b' : '#e65100'
+                                                }}>
+                                                    {s.isApproved ? 'Approved' : s.subscriptionStatus === 'rejected' ? 'Rejected' : 'Pending'}
                                                 </span>
                                             </td>
                                             <td style={td}>
@@ -182,6 +232,12 @@ export default function AdminDashboard() {
                                                     <button onClick={() => setApproveModal(s)}
                                                         style={{ marginRight: 8, padding: '5px 12px', background: '#92A079', color: '#fff', border: 'none', borderRadius: 6, cursor: 'pointer', fontSize: '.8rem' }}>
                                                         Approve
+                                                    </button>
+                                                )}
+                                                {!s.isApproved && s.subscriptionStatus !== 'rejected' && (
+                                                    <button onClick={() => rejectSeller(s)}
+                                                        style={{ marginRight: 8, padding: '5px 12px', background: '#fff', color: '#c0392b', border: '1px solid #c0392b', borderRadius: 6, cursor: 'pointer', fontSize: '.8rem' }}>
+                                                        Reject
                                                     </button>
                                                 )}
                                                 <button onClick={() => deleteSeller(s._id)}
