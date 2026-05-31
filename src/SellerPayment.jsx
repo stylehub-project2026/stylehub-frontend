@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { SHNav, SHFooter, SHARED_CSS } from './shared';
 
@@ -56,14 +56,17 @@ export default function SellerPayment() {
     const [selected, setSelected] = useState('standard');
     const [paid, setPaid] = useState(false);
     const [submitted, setSubmitted] = useState(false);
+    const [authorized, setAuthorized] = useState(false);
 
-    // ── Guard: redirect to seller auth if not logged in ──
-    const sellerToken = localStorage.getItem('sellerToken');
-    const sellerData = localStorage.getItem('seller');
-    if (!sellerToken || !sellerData) {
-        navigate('/seller', { replace: true });
-        return null;
-    }
+    useEffect(() => {
+        const sellerToken = localStorage.getItem('sellerToken');
+        const sellerData = localStorage.getItem('seller');
+        if (!sellerToken || !sellerData) {
+            navigate('/seller', { replace: true });
+        } else {
+            setAuthorized(true);
+        }
+    }, [navigate]);
 
     const plan = PLANS.find(p => p.id === selected);
 
@@ -84,6 +87,8 @@ export default function SellerPayment() {
         setSubmitted(true);
     };
 
+    if (!authorized) return null;
+
     return (
         <>
             <style>{SHARED_CSS}</style>
@@ -99,7 +104,6 @@ export default function SellerPayment() {
                         <h2 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '2rem', color: '#1a1a18', marginBottom: '.5rem' }}>
                             Choose Your Plan
                         </h2>
-                        {/* First month discount banner */}
                         <div style={{ display: 'inline-block', background: '#c8a96e', color: '#fff', padding: '6px 20px', borderRadius: 20, fontSize: '.82rem', fontWeight: 700, letterSpacing: '.05em', marginBottom: '.8rem' }}>
                             🎁 50% OFF YOUR FIRST MONTH
                         </div>
@@ -127,8 +131,6 @@ export default function SellerPayment() {
 
                                 <div style={{ marginBottom: '1rem' }}>
                                     <div style={{ fontSize: '.75rem', fontWeight: 700, color: p.color, letterSpacing: '.1em', textTransform: 'uppercase', marginBottom: '.4rem' }}>{p.name}</div>
-
-                                    {/* Pricing with discount */}
                                     <div style={{ display: 'flex', alignItems: 'baseline', gap: '.5rem', flexWrap: 'wrap' }}>
                                         <div style={{ fontSize: '1.8rem', fontWeight: 800, color: '#1a1a18' }}>
                                             EGP {p.firstMonth}
@@ -172,7 +174,6 @@ export default function SellerPayment() {
                     {/* Payment Box */}
                     <div style={{ maxWidth: 520, margin: '0 auto', background: '#fff', borderRadius: 18, padding: '2rem', boxShadow: '0 8px 32px rgba(0,0,0,0.08)' }}>
 
-                        {/* Summary */}
                         <div style={{ background: '#f5f7f0', borderRadius: 12, padding: '1rem 1.2rem', marginBottom: '1.2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                             <div>
                                 <div style={{ fontSize: '.8rem', color: '#8c8880' }}>{plan.name} Plan — First Month</div>
@@ -188,7 +189,6 @@ export default function SellerPayment() {
                             Pay via
                         </div>
 
-                        {/* Vodafone Cash */}
                         <div style={{ background: '#fff5f5', border: '1px solid #fdd', borderRadius: 12, padding: '1rem 1.2rem', marginBottom: '.8rem' }}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '.8rem', marginBottom: '.5rem' }}>
                                 <span style={{ fontSize: '1.3rem' }}>📱</span>
@@ -201,7 +201,6 @@ export default function SellerPayment() {
                             </div>
                         </div>
 
-                        {/* Instapay */}
                         <div style={{ background: '#f0f7ff', border: '1px solid #cde', borderRadius: 12, padding: '1rem 1.2rem', marginBottom: '1.2rem' }}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '.8rem', marginBottom: '.5rem' }}>
                                 <span style={{ fontSize: '1.3rem' }}>🏦</span>
@@ -214,17 +213,12 @@ export default function SellerPayment() {
                             </div>
                         </div>
 
-                        {/* Note */}
                         <div style={{ background: '#fffbeb', border: '1px solid #f6d860', borderRadius: 12, padding: '1rem 1.2rem', marginBottom: '1.5rem', fontSize: '.83rem', color: '#7d6608', lineHeight: 1.6 }}>
                             ⏳ After sending payment, our team will verify and activate your store within <strong>24 hours</strong>. Then EGP {plan.price}/month from the second month.
                         </div>
 
                         {submitted ? (
-                            <div style={{
-                                textAlign: 'center', padding: '2rem',
-                                background: '#f0f7e8', borderRadius: 16,
-                                border: '2px solid #92A079'
-                            }}>
+                            <div style={{ textAlign: 'center', padding: '2rem', background: '#f0f7e8', borderRadius: 16, border: '2px solid #92A079' }}>
                                 <div style={{ fontSize: '2.5rem', marginBottom: '1rem' }}>⏳</div>
                                 <h3 style={{ fontFamily: 'Cormorant Garamond, serif', color: '#1a1a18', marginBottom: '.5rem', fontSize: '1.3rem' }}>
                                     Request Sent!
