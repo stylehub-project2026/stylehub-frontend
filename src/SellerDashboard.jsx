@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { SHFooter, SHARED_CSS } from "./shared";
 import {
   BarChart, Bar, LineChart, Line, PieChart, Pie, Cell,
@@ -1625,6 +1626,7 @@ function SettingsView() {
 
 export default function SellerDashboard({ onLogout }) {
   const [activeNav, setActiveNav] = useState("dashboard");
+  const navigate = useNavigate();
   const [subscriptionStatus, setSubscriptionStatus] = useState(null); // null = loading
   const seller = (() => { try { return JSON.parse(localStorage.getItem("seller") || "{}"); } catch { return {}; } })();
   const brandName = seller.brandName || seller.storeName || seller.name || "Seller";
@@ -1718,7 +1720,7 @@ export default function SellerDashboard({ onLogout }) {
 
   // No subscription — redirect to payment
   if (subscriptionStatus === "none") {
-    window.location.href = "/seller/payment";
+    navigate("/seller/payment");
     return null;
   }
 

@@ -670,6 +670,7 @@ export default function App() {
         <Route path="/admin/login" element={<AdminLogin />} />
         <Route path="/admin/dashboard" element={<AdminDashboard />} />
         <Route path="/seller/payment" element={<SellerPayment />} />
+        <Route path="/seller/login" element={sellerLoggedIn ? <SellerDashboard onLogout={handleSellerLogout} /> : <Seller onSellerLoggedIn={handleSellerLogin} cart={cart} wish={wish} />} />
 
         <Route path="/" element={
           <div key={location.key}>
