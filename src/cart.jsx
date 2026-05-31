@@ -5,6 +5,45 @@ import { PRODUCTS, SHNav, SHFooter, SHARED_CSS } from "./shared";
 const SHIPPING = 80;
 const API = "https://stylehub-backend-tau.vercel.app/api";
 
+// ─── helpers ───
+const toNum = s => {
+  if (typeof s === "number") return s;
+  return parseInt(String(s || "").replace(/\D/g, "")) || 0;
+};
+
+// Format customization details into a readable string
+const FONT_LABEL = { "serif-italic": "Italic", "serif": "Serif", "block": "Block" };
+const COLOR_LABEL = { "#c8a96e": "Gold", "#ffffff": "White", "#c84a3d": "Red", "#9eaa8a": "Sage", "#1a1a18": "Black" };
+const POS_LABEL = { chest: "Chest", sleeve: "Sleeve", back: "Back" };
+
+function CustomizationLine({ customization }) {
+  if (!customization) return null;
+  const { text, font, color, position, fee } = customization;
+  const fontLabel = FONT_LABEL[font] || font;
+  const colorLabel = COLOR_LABEL[color] || color;
+  const posLabel = POS_LABEL[position] || position;
+  return (
+    <div style={{
+      marginTop: ".5rem",
+      padding: ".5rem .7rem",
+      background: "#fbf6ea",
+      border: "1px solid #ede4d3",
+      borderRadius: 4,
+      fontSize: ".7rem",
+      color: "#7a6a3f",
+      fontFamily: "'DM Sans',sans-serif",
+      lineHeight: 1.5,
+    }}>
+      <div style={{ fontWeight: 600, marginBottom: ".15rem" }}>
+        ✨ Personalized <span style={{ color: "var(--warm)", fontWeight: 400 }}>· +LE {fee?.toLocaleString()}</span>
+      </div>
+      <div style={{ color: "#5a4f30" }}>
+        "{text}" · {fontLabel} · {colorLabel} thread · {posLabel}
+      </div>
+    </div>
+  );
+}
+
 // ─── RESPONSIVE CSS ───
 const CART_CSS = `
 .cart-grid {
@@ -70,6 +109,7 @@ function BackendCart({ cart, setCart, wish }) {
       id: i.product?._id,
       size: i.size,
       qty: i.quantity,
+      customization: i.customization || null,
     }));
     setCart(localCart);
   };
@@ -142,7 +182,12 @@ function BackendCart({ cart, setCart, wish }) {
     }
   };
 
-  const subtotal = items.reduce((sum, i) => sum + (i.product?.salePrice || i.product?.price || 0) * i.quantity, 0);
+  // ✅ Subtotal includes customization fees
+  const subtotal = items.reduce((sum, i) => {
+    const base = i.product?.salePrice || i.product?.price || 0;
+    const fee = i.customization?.fee || 0;
+    return sum + (base + fee) * i.quantity;
+  }, 0);
   const total = subtotal + SHIPPING;
 
   if (loading) return (
@@ -207,7 +252,9 @@ function BackendCart({ cart, setCart, wish }) {
                 const p = item.product;
                 if (!p) return null;
                 const img = p.images?.[0] ? (p.images[0].startsWith('http') ? p.images[0] : `https://stylehub-backend-tau.vercel.app${p.images[0]}`) : null;
-                const price = p.salePrice || p.price;
+                const basePrice = p.salePrice || p.price;
+                const fee = item.customization?.fee || 0;
+                const unitPrice = basePrice + fee;
 
                 return (
                   <div key={item._id} className="cart-item">
@@ -224,8 +271,11 @@ function BackendCart({ cart, setCart, wish }) {
                     {/* Info */}
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <div onClick={() => navigate(`/product/${p._id}`)} style={{ fontSize: ".95rem", fontWeight: 500, marginBottom: ".5rem", cursor: "pointer" }}>{p.name}</div>
-                      {item.size && <div style={{ fontSize: ".75rem", color: "var(--warm)", marginBottom: ".8rem" }}>Size: <strong style={{ color: "var(--dark)" }}>{item.size}</strong></div>}
-                      <div style={{ display: "flex", alignItems: "center", gap: "1rem", flexWrap: "wrap" }}>
+                      {item.size && <div style={{ fontSize: ".75rem", color: "var(--warm)", marginBottom: ".5rem" }}>Size: <strong style={{ color: "var(--dark)" }}>{item.size}</strong></div>}
+
+                      <CustomizationLine customization={item.customization} />
+
+                      <div style={{ display: "flex", alignItems: "center", gap: "1rem", flexWrap: "wrap", marginTop: ".8rem" }}>
                         <div style={{ display: "flex", alignItems: "center", border: "1px solid var(--border)" }}>
                           <button onClick={() => updateQty(item._id, item.quantity - 1)} style={{ width: 32, height: 32, border: "none", background: "none", cursor: "pointer", fontSize: "1rem" }}>−</button>
                           <span style={{ width: 32, textAlign: "center", fontSize: ".85rem" }}>{item.quantity}</span>
@@ -239,9 +289,9 @@ function BackendCart({ cart, setCart, wish }) {
 
                     {/* Price */}
                     <div style={{ textAlign: "right", flexShrink: 0 }}>
-                      {p.salePrice && <div style={{ fontSize: ".75rem", color: "var(--warm)", textDecoration: "line-through", marginBottom: ".2rem" }}>LE {p.price?.toLocaleString()}</div>}
-                      <div style={{ fontSize: "1rem", fontWeight: 600 }}>LE {price?.toLocaleString()}</div>
-                      {item.quantity > 1 && <div style={{ fontSize: ".72rem", color: "var(--warm)" }}>× {item.quantity}</div>}
+                      {p.salePrice && <div style={{ fontSize: ".75rem", color: "var(--warm)", textDecoration: "line-through", marginBottom: ".2rem" }}>LE {(p.price + fee).toLocaleString()}</div>}
+                      <div style={{ fontSize: "1rem", fontWeight: 600 }}>LE {unitPrice.toLocaleString()}</div>
+                      {item.quantity > 1 && <div style={{ fontSize: ".72rem", color: "var(--warm)" }}>× {item.quantity} = LE {(unitPrice * item.quantity).toLocaleString()}</div>}
                     </div>
                   </div>
                 );
@@ -297,23 +347,27 @@ function LocalCart({ cart, setCart, wish }) {
     return p ? { ...item, product: p } : null;
   }).filter(Boolean);
 
+  // ✅ Subtotal includes customization fees
   const subtotal = items.reduce((sum, item) => {
-    const price = typeof item.product.price === 'number'
-      ? item.product.price
-      : parseInt(String(item.product.price || "").replace(/\D/g, "")) || 0;
-    return sum + price * item.qty;
+    const base = toNum(item.product.price);
+    const fee = item.customization?.fee || 0;
+    return sum + (base + fee) * item.qty;
   }, 0);
   const total = subtotal + SHIPPING;
 
-  const updateQty = (id, size, delta) => {
+  const updateQty = (id, size, customization, delta) => {
+    const customKey = JSON.stringify(customization || null);
     setCart(prev => prev.map(item =>
-      item.id === id && item.size === size
+      item.id === id && item.size === size && JSON.stringify(item.customization || null) === customKey
         ? { ...item, qty: Math.max(1, item.qty + delta) }
         : item
     ));
   };
-  const removeItem = (id, size) => {
-    setCart(prev => prev.filter(item => !(item.id === id && item.size === size)));
+  const removeItem = (id, size, customization) => {
+    const customKey = JSON.stringify(customization || null);
+    setCart(prev => prev.filter(item =>
+      !(item.id === id && item.size === size && JSON.stringify(item.customization || null) === customKey)
+    ));
   };
 
   return (
@@ -337,37 +391,49 @@ function LocalCart({ cart, setCart, wish }) {
         ) : (
           <div className="cart-grid">
             <div>
-              {items.map((item) => (
-                <div key={`${item.id}-${item.size}`} className="cart-item">
-                  <div className="cart-item-img" onClick={() => navigate(`/product/${item.product.id}`)}>
-                    {item.product.img
-                      ? <img src={item.product.img} alt={item.product.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-                      : <div style={{ width: "100%", height: "100%", background: `linear-gradient(${item.product.gradient})`, display: "flex", alignItems: "center", justifyContent: "center" }}>
-                        <span style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: "1.5rem", color: "rgba(255,255,255,.2)" }}>{item.product.brand[0]}</span>
+              {items.map((item, idx) => {
+                const base = toNum(item.product.price);
+                const fee = item.customization?.fee || 0;
+                const unitPrice = base + fee;
+                const oldBase = item.product.oldPrice ? toNum(item.product.oldPrice) : null;
+                const oldUnit = oldBase ? oldBase + fee : null;
+
+                return (
+                  <div key={`${item.id}-${item.size}-${idx}`} className="cart-item">
+                    <div className="cart-item-img" onClick={() => navigate(`/product/${item.product.id}`)}>
+                      {item.product.img
+                        ? <img src={item.product.img} alt={item.product.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                        : <div style={{ width: "100%", height: "100%", background: `linear-gradient(${item.product.gradient})`, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                          <span style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: "1.5rem", color: "rgba(255,255,255,.2)" }}>{item.product.brand[0]}</span>
+                        </div>
+                      }
+                    </div>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ fontSize: ".58rem", letterSpacing: ".15em", textTransform: "uppercase", color: "var(--warm)", marginBottom: ".3rem" }}>{item.product.brand}</div>
+                      <div onClick={() => navigate(`/product/${item.product.id}`)} style={{ fontSize: ".95rem", fontWeight: 500, marginBottom: ".5rem", cursor: "pointer" }}>{item.product.name}</div>
+                      <div style={{ fontSize: ".75rem", color: "var(--warm)", marginBottom: ".5rem" }}>Size: <strong style={{ color: "var(--dark)" }}>{item.size}</strong></div>
+
+                      <CustomizationLine customization={item.customization} />
+
+                      <div style={{ display: "flex", alignItems: "center", gap: "1rem", flexWrap: "wrap", marginTop: ".8rem" }}>
+                        <div style={{ display: "flex", alignItems: "center", border: "1px solid var(--border)" }}>
+                          <button onClick={() => updateQty(item.id, item.size, item.customization, -1)} style={{ width: 32, height: 32, border: "none", background: "none", cursor: "pointer", fontSize: "1rem" }}>−</button>
+                          <span style={{ width: 32, textAlign: "center", fontSize: ".85rem" }}>{item.qty}</span>
+                          <button onClick={() => updateQty(item.id, item.size, item.customization, +1)} style={{ width: 32, height: 32, border: "none", background: "none", cursor: "pointer", fontSize: "1rem" }}>+</button>
+                        </div>
+                        <button onClick={() => removeItem(item.id, item.size, item.customization)} style={{ fontSize: ".68rem", letterSpacing: ".08em", color: "var(--warm)", background: "none", border: "none", cursor: "pointer", textDecoration: "underline", fontFamily: "'DM Sans',sans-serif" }}>
+                          Remove
+                        </button>
                       </div>
-                    }
-                  </div>
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontSize: ".58rem", letterSpacing: ".15em", textTransform: "uppercase", color: "var(--warm)", marginBottom: ".3rem" }}>{item.product.brand}</div>
-                    <div onClick={() => navigate(`/product/${item.product.id}`)} style={{ fontSize: ".95rem", fontWeight: 500, marginBottom: ".5rem", cursor: "pointer" }}>{item.product.name}</div>
-                    <div style={{ fontSize: ".75rem", color: "var(--warm)", marginBottom: ".8rem" }}>Size: <strong style={{ color: "var(--dark)" }}>{item.size}</strong></div>
-                    <div style={{ display: "flex", alignItems: "center", gap: "1rem", flexWrap: "wrap" }}>
-                      <div style={{ display: "flex", alignItems: "center", border: "1px solid var(--border)" }}>
-                        <button onClick={() => updateQty(item.id, item.size, -1)} style={{ width: 32, height: 32, border: "none", background: "none", cursor: "pointer", fontSize: "1rem" }}>−</button>
-                        <span style={{ width: 32, textAlign: "center", fontSize: ".85rem" }}>{item.qty}</span>
-                        <button onClick={() => updateQty(item.id, item.size, +1)} style={{ width: 32, height: 32, border: "none", background: "none", cursor: "pointer", fontSize: "1rem" }}>+</button>
-                      </div>
-                      <button onClick={() => removeItem(item.id, item.size)} style={{ fontSize: ".68rem", letterSpacing: ".08em", color: "var(--warm)", background: "none", border: "none", cursor: "pointer", textDecoration: "underline", fontFamily: "'DM Sans',sans-serif" }}>
-                        Remove
-                      </button>
+                    </div>
+                    <div style={{ textAlign: "right", flexShrink: 0 }}>
+                      {oldUnit && <div style={{ fontSize: ".75rem", color: "var(--warm)", textDecoration: "line-through", marginBottom: ".2rem" }}>LE {oldUnit.toLocaleString()}</div>}
+                      <div style={{ fontSize: "1rem", fontWeight: 600 }}>LE {unitPrice.toLocaleString()}</div>
+                      {item.qty > 1 && <div style={{ fontSize: ".72rem", color: "var(--warm)" }}>× {item.qty} = LE {(unitPrice * item.qty).toLocaleString()}</div>}
                     </div>
                   </div>
-                  <div style={{ textAlign: "right", flexShrink: 0 }}>
-                    {item.product.oldPrice && <div style={{ fontSize: ".75rem", color: "var(--warm)", textDecoration: "line-through", marginBottom: ".2rem" }}>{item.product.oldPrice}</div>}
-                    <div style={{ fontSize: "1rem", fontWeight: 600 }}>{item.product.price}</div>
-                  </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
 
             <div className="cart-aside">
