@@ -1,5 +1,6 @@
 import React from "react";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { sellerAuthAPI, authAPI } from "./api.jsx";
 import { signInWithGoogle } from "./firebase";
 import { SHNav, SHFooter, SHARED_CSS } from "./shared";
@@ -1077,10 +1078,12 @@ function SellerForgotForm({ onBack }) {
 /* ─────── ROOT ─────── */
 export default function SellerAuthPage({ onSellerLoggedIn }) {
   const [mode, setMode] = useState("signin"); // "signin" | "signup" | "forgot"
+  const navigate = useNavigate();
 
   const go = (m) => setMode(m);
   const handleDone = () => {
     if (onSellerLoggedIn) onSellerLoggedIn();
+    navigate("/seller/dashboard");
   };
 
   return (
