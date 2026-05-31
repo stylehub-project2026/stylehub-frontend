@@ -1135,7 +1135,7 @@ export default function SellerAuthPage({ onSellerLoggedIn }) {
             )}
 
             {mode === "signin" && <SellerSignInForm onForgot={() => go("forgot")} onSwitchSignUp={() => go("signup")} onDone={handleDone} />}
-            {mode === "signup" && <SellerSignUpForm onSwitchSignIn={() => go("signin")} onDone={() => handleDone("/seller/payment")} />}
+            {mode === "signup" && <SellerSignUpForm onSwitchSignIn={() => go("signin")} onDone={() => go("signin")} />}
             {mode === "forgot" && <SellerForgotForm onBack={() => go("signin")} />}
           </div>
         </div>
