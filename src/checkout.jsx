@@ -591,7 +591,12 @@ function StepSuccess({ brandGroups, form, confirmedOrder, onContinue }) {
 }
 
 // ─── MAIN CHECKOUT ───
-export default function Checkout({ cart = [], setCart, wish = [], setWish }) {
+export default function Checkout({ cart: cartProp = [], setCart, wish = [], setWish }) {
+  // Always read from localStorage as source of truth for static products
+  const cart = (() => {
+    const local = JSON.parse(localStorage.getItem("stylehub-cart") || "[]");
+    return local.length > 0 ? local : cartProp;
+  })();
   const navigate = useNavigate();
   const token = localStorage.getItem("token");
 
