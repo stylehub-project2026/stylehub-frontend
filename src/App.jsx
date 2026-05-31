@@ -38,6 +38,23 @@ function isSellerLoggedIn() {
   return !!localStorage.getItem("sellerToken") && !!localStorage.getItem("seller");
 }
 
+function getSellerData() {
+  try {
+    return JSON.parse(localStorage.getItem("seller") || "null");
+  } catch {
+    return null;
+  }
+}
+
+function canOpenSellerDashboard() {
+  const seller = getSellerData();
+  return (
+    !!localStorage.getItem("sellerToken") &&
+    seller?.isApproved === true &&
+    seller?.subscriptionStatus === "active"
+  );
+}
+
 // ─── SCROLL REVEAL ───
 function useScrollReveal() {
   const refs = useRef([]);
@@ -661,12 +678,48 @@ export default function App() {
         <Route path="/men" element={<MenPage cart={cart} setCart={setCart} wish={wish} setWish={setWish} />} />
         <Route path="/menpage" element={<MenPage cart={cart} setCart={setCart} wish={wish} setWish={setWish} />} />
 
-        {/* ── SELLER ROUTES (protected) ── */}
-        <Route path="/seller" element={sellerLoggedIn ? <SellerDashboard onLogout={handleSellerLogout} /> : <Seller onSellerLoggedIn={handleSellerLogin} cart={cart} wish={wish} />} />
-        <Route path="/seller/dashboard" element={sellerLoggedIn ? <SellerDashboard onLogout={handleSellerLogout} /> : <Seller onSellerLoggedIn={handleSellerLogin} cart={cart} wish={wish} />} />
-        <Route path="/seller/login" element={sellerLoggedIn ? <SellerDashboard onLogout={handleSellerLogout} /> : <Seller onSellerLoggedIn={handleSellerLogin} cart={cart} wish={wish} />} />
-        {/* Payment page: only accessible after seller login */}
-        <Route path="/seller/payment" element={isSellerLoggedIn() ? <SellerPayment /> : <Seller onSellerLoggedIn={handleSellerLogin} cart={cart} wish={wish} />} />
+        {/* ── SELLER ROUTES ── */}
+        <Route
+          path="/seller"
+          element={
+            <Seller
+              onSellerLoggedIn={handleSellerLogin}
+              cart={cart}
+              wish={wish}
+            />
+          }
+        />
+
+        <Route
+          path="/seller/login"
+          element={
+            <Seller
+              onSellerLoggedIn={handleSellerLogin}
+              cart={cart}
+              wish={wish}
+            />
+          }
+        />
+
+        <Route
+          path="/seller/payment"
+          element={
+            isSellerLoggedIn()
+              ? <SellerPayment />
+              : <Seller onSellerLoggedIn={handleSellerLogin} cart={cart} wish={wish} />
+          }
+        />
+
+        <Route
+          path="/seller/dashboard"
+          element={
+            canOpenSellerDashboard()
+              ? <SellerDashboard onLogout={handleSellerLogout} />
+              : isSellerLoggedIn()
+                ? <SellerPayment />
+                : <Seller onSellerLoggedIn={handleSellerLogin} cart={cart} wish={wish} />
+          }
+        />
 
         <Route path="/buildoutfit" element={<BuildOutfit cart={cart} setCart={setCart} wish={wish} setWish={setWish} />} />
         <Route path="/BuildOutfit" element={<BuildOutfit cart={cart} setCart={setCart} wish={wish} setWish={setWish} />} />
