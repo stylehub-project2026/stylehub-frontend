@@ -7,6 +7,7 @@ const BACKEND_URL = 'https://stylehub-backend-tau.vercel.app';
 export default function AdminLogin() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [showPassword, setShowPassword] = useState(false);
     const [error, setError] = useState('');
     const navigate = useNavigate();
 
@@ -39,11 +40,20 @@ export default function AdminLogin() {
                         onChange={e => setEmail(e.target.value)}
                         style={{ width: '100%', padding: '10px 14px', marginBottom: 12, borderRadius: 8, border: '1px solid #e4e0da', fontSize: '.9rem', boxSizing: 'border-box' }}
                     />
-                    <input
-                        type="password" placeholder="Password" value={password}
-                        onChange={e => setPassword(e.target.value)}
-                        style={{ width: '100%', padding: '10px 14px', marginBottom: 20, borderRadius: 8, border: '1px solid #e4e0da', fontSize: '.9rem', boxSizing: 'border-box' }}
-                    />
+                    <div style={{ position: 'relative', marginBottom: 20 }}>
+                        <input
+                            type={showPassword ? 'text' : 'password'}
+                            placeholder="Password" value={password}
+                            onChange={e => setPassword(e.target.value)}
+                            style={{ width: '100%', padding: '10px 42px 10px 14px', borderRadius: 8, border: '1px solid #e4e0da', fontSize: '.9rem', boxSizing: 'border-box' }}
+                        />
+                        <button
+                            type="button"
+                            onClick={() => setShowPassword(s => !s)}
+                            style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: '#8c8880', fontSize: '.85rem', padding: 0 }}>
+                            {showPassword ? '🙈' : '👁️'}
+                        </button>
+                    </div>
                     <button type="submit" style={{ width: '100%', padding: 12, background: '#1a1a18', color: '#fff', borderRadius: 8, border: 'none', cursor: 'pointer', fontSize: '.85rem', letterSpacing: '.1em' }}>
                         LOGIN
                     </button>
