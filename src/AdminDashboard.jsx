@@ -1,4 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
+import { db } from './firebase';
+import { collection, addDoc, onSnapshot, orderBy, query, serverTimestamp } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
 import { getAdminToken, removeAdminToken } from './adminAuth';
 
@@ -11,6 +13,41 @@ export default function AdminDashboard() {
     const [subRevenue, setSubRevenue] = useState({ sellers: [], totalSubscriptionRevenue: 0 });
     const [tab, setTab] = useState('sellers');
     const [approveModal, setApproveModal] = useState(null); // seller object
+    const [chatSessions, setChatSessions] = useState([]);
+    const [activeSession, setActiveSession] = useState(null);
+    const [chatMessages, setChatMessages] = useState([]);
+    const [chatText, setChatText] = useState('');
+    const chatBottomRef = useRef();
+
+    // Load chat sessions
+    useEffect(() => {
+        const unsub = onSnapshot(collection(db, 'chats'), snap => {
+            setChatSessions(snap.docs.map(d => ({ id: d.id, ...d.data() })));
+        });
+        return unsub;
+    }, []);
+
+    // Load messages for active session
+    useEffect(() => {
+        if (!activeSession) return;
+        const q = query(collection(db, 'chats', activeSession, 'messages'), orderBy('createdAt'));
+        const unsub = onSnapshot(q, snap => {
+            setChatMessages(snap.docs.map(d => ({ id: d.id, ...d.data() })));
+            setTimeout(() => chatBottomRef.current?.scrollIntoView({ behavior: 'smooth' }), 100);
+        });
+        return unsub;
+    }, [activeSession]);
+
+    const sendChatMessage = async () => {
+        if (!chatText.trim() || !activeSession) return;
+        await addDoc(collection(db, 'chats', activeSession, 'messages'), {
+            text: chatText.trim(),
+            sender: 'admin',
+            senderName: 'StyleHub Support',
+            createdAt: serverTimestamp(),
+        });
+        setChatText('');
+    };
     const [paidAmount, setPaidAmount] = useState('');
     const navigate = useNavigate();
     const token = getAdminToken();
@@ -179,7 +216,7 @@ export default function AdminDashboard() {
 
                 {/* Tabs */}
                 <div style={{ display: 'flex', gap: 12, marginBottom: 24 }}>
-                    {[['sellers', `Sellers (${sellers.length})`], ['customers', `Customers (${customers.length})`], ['revenue', 'Revenue']].map(([key, label]) => (
+                    {[['sellers', `Sellers (${sellers.length})`], ['customers', `Customers (${customers.length})`], ['revenue', 'Revenue'], ['chat', `💬 Customer Chats`]].map(([key, label]) => (
                         <button key={key} onClick={() => setTab(key)}
                             style={{ padding: '8px 20px', background: tab === key ? '#1a1a18' : '#fff', color: tab === key ? '#fff' : '#1a1a18', border: '1px solid #e4e0da', borderRadius: 8, cursor: 'pointer', fontSize: '.85rem' }}>
                             {label}
@@ -278,6 +315,73 @@ export default function AdminDashboard() {
                                 ))}
                             </tbody>
                         </table>
+                    </div>
+                )}
+
+                {/* Chat Tab */}
+                {tab === 'chat' && (
+                    <div style={{ display: 'flex', height: 'calc(100vh - 240px)', background: '#fff', borderRadius: 12, border: '1px solid #e4e0da', overflow: 'hidden' }}>
+                        {/* Sessions list */}
+                        <div style={{ width: 220, borderRight: '1px solid #e4e0da', overflowY: 'auto', background: '#f9f7f4', flexShrink: 0 }}>
+                            <div style={{ padding: '1rem', fontWeight: 600, fontSize: '.85rem', borderBottom: '1px solid #e4e0da', color: '#1a1a18' }}>
+                                Customer Chats
+                            </div>
+                            {chatSessions.length === 0 && (
+                                <div style={{ padding: '1rem', color: '#aaa', fontSize: '.8rem' }}>No chats yet</div>
+                            )}
+                            {chatSessions.map(s => (
+                                <div key={s.id} onClick={() => setActiveSession(s.id)} style={{
+                                    padding: '.8rem 1rem', cursor: 'pointer', fontSize: '.83rem',
+                                    background: activeSession === s.id ? '#e8ede2' : 'transparent',
+                                    borderBottom: '1px solid #e4e0da',
+                                    color: '#1a1a18',
+                                }}>
+                                    👤 {s.id.startsWith('guest_') ? 'Guest' : s.id}
+                                </div>
+                            ))}
+                        </div>
+
+                        {/* Chat area */}
+                        <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+                            {!activeSession ? (
+                                <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#aaa', fontSize: '.9rem' }}>
+                                    Select a conversation to start replying
+                                </div>
+                            ) : (
+                                <>
+                                    <div style={{ padding: '1rem 1.2rem', borderBottom: '1px solid #e4e0da', fontWeight: 600, fontSize: '.85rem', color: '#1a1a18' }}>
+                                        Chat with: {activeSession}
+                                    </div>
+                                    <div style={{ flex: 1, overflowY: 'auto', padding: '1rem', display: 'flex', flexDirection: 'column', gap: '.5rem' }}>
+                                        {chatMessages.map(m => (
+                                            <div key={m.id} style={{
+                                                alignSelf: m.sender === 'admin' ? 'flex-end' : 'flex-start',
+                                                background: m.sender === 'admin' ? '#4a5e3a' : '#f4f1ec',
+                                                color: m.sender === 'admin' ? '#fff' : '#333',
+                                                padding: '.5rem .85rem', borderRadius: 12,
+                                                fontSize: '.83rem', maxWidth: '70%',
+                                            }}>
+                                                {m.text}
+                                            </div>
+                                        ))}
+                                        <div ref={chatBottomRef} />
+                                    </div>
+                                    <div style={{ display: 'flex', borderTop: '1px solid #e4e0da', padding: '.6rem 1rem', gap: 8 }}>
+                                        <input
+                                            value={chatText}
+                                            onChange={e => setChatText(e.target.value)}
+                                            onKeyDown={e => e.key === 'Enter' && sendChatMessage()}
+                                            placeholder="Reply to customer..."
+                                            style={{ flex: 1, border: '1px solid #e4e0da', borderRadius: 8, outline: 'none', fontSize: '.85rem', padding: '.5rem .8rem' }}
+                                        />
+                                        <button onClick={sendChatMessage} style={{
+                                            background: '#4a5e3a', color: '#fff', border: 'none',
+                                            borderRadius: 8, padding: '.5rem 1.2rem', cursor: 'pointer', fontSize: '.85rem', fontWeight: 600,
+                                        }}>Send</button>
+                                    </div>
+                                </>
+                            )}
+                        </div>
                     </div>
                 )}
 
