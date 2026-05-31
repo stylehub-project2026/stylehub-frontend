@@ -763,7 +763,7 @@ export default function Checkout({ cart = [], setCart, wish = [], setWish }) {
     }
   };
 
-  if (items.length === 0 && step < 4 && !(token && backendItems === null)) {
+  if (items.length === 0 && step < 4) {
     return (
       <div style={{ minHeight: "100vh", background: "var(--cream)" }}>
         <style>{SHARED_CSS}</style>
