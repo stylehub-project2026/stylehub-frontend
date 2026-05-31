@@ -217,19 +217,13 @@ export default function SellerPayment() {
                                 background: '#f0f7e8', borderRadius: 16,
                                 border: '2px solid #92A079'
                             }}>
-                                <div style={{ fontSize: '2.5rem', marginBottom: '1rem' }}>✅</div>
+                                <div style={{ fontSize: '2.5rem', marginBottom: '1rem' }}>⏳</div>
                                 <h3 style={{ fontFamily: 'Cormorant Garamond, serif', color: '#1a1a18', marginBottom: '.5rem', fontSize: '1.3rem' }}>
-                                    Payment Submitted!
+                                    Request Sent!
                                 </h3>
                                 <p style={{ color: '#555', fontSize: '.88rem', lineHeight: 1.6 }}>
-                                    Our team will verify your payment and activate your store within <strong>24 hours</strong>.
-                                    You'll receive a confirmation email once you're live.
+                                    Your request has been submitted successfully. Our team will review it and get back to you within <strong>24 hours</strong>.
                                 </p>
-                                <button
-                                    onClick={() => navigate('/seller/dashboard')}
-                                    style={{ marginTop: '1.2rem', padding: '10px 28px', background: '#92A079', color: '#fff', border: 'none', borderRadius: 25, fontWeight: 700, cursor: 'pointer', fontSize: '.85rem', letterSpacing: '1px' }}>
-                                    Go to Dashboard →
-                                </button>
                             </div>
                         ) : (
                             <>
