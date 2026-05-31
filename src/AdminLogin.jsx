@@ -86,7 +86,7 @@ export default function AdminLogin() {
                             <input
                                 className="admin-input"
                                 type={showPassword ? 'text' : 'password'}
-                                placeholder="••••••••" value={password}
+                                placeholder="Enter your password" value={password}
                                 onChange={e => setPassword(e.target.value)}
                                 style={{ ...inputStyle, paddingRight: 46 }}
                             />

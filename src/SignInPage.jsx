@@ -417,7 +417,7 @@ function SignInForm({ onForgot, onSwitchSignUp, onDone }) {
       <label className="sh-label">Password</label>
       <div className="sh-input-wrap sh-mb">
         <input className="sh-input" type={show ? "text" : "password"} style={{ paddingRight: 46 }}
-          placeholder="••••••••" value={pw} onChange={(e) => { setPw(e.target.value); setErr(""); }} />
+          placeholder="Enter your password" value={pw} onChange={(e) => { setPw(e.target.value); setErr(""); }} />
         <button type="button" className="sh-eye" onClick={() => setShow(!show)}>
           <i className={`far ${show ? "fa-eye-slash" : "fa-eye"}`} />
         </button>
