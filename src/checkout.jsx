@@ -596,7 +596,7 @@ export default function Checkout({ cart = [], setCart, wish = [], setWish }) {
   const token = localStorage.getItem("token");
 
   useEffect(() => {
-    if (!token) navigate("/signin?redirect=/checkout");
+    if (!token) navigate("/signin", { state: { from: "/checkout" } });
   }, [token, navigate]);
 
   if (!token) return null;
@@ -665,7 +665,7 @@ export default function Checkout({ cart = [], setCart, wish = [], setWish }) {
       acc[brand].push(item);
       return acc;
     }, {})
-  , [items]);
+    , [items]);
 
   const validate = () => {
     const e = {};

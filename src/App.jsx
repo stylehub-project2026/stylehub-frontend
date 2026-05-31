@@ -663,7 +663,7 @@ export default function App() {
         <Route path="/checkout" element={<Checkout cart={cart} setCart={setCart} wish={wish} setWish={setWish} />} />
         <Route path="/kids" element={<Kids cart={cart} setCart={setCart} wish={wish} setWish={setWish} />} />
         <Route path="/women" element={<Women cart={cart} setCart={setCart} wish={wish} setWish={setWish} />} />
-        <Route path="/signin" element={<SignIn cart={cart} wish={wish} />} />
+        <Route path="/signin" element={<SignIn cart={cart} setCart={setCart} wish={wish} setWish={setWish} />} />
         <Route path="/reset-password" element={<ResetPasswordPage />} />
         <Route path="/brand/marble" element={<MarbleBrand cart={cart} setCart={setCart} wish={wish} setWish={setWish} products={backendProducts} />} />
         <Route path="/brand/salty" element={<Salty cart={cart} setCart={setCart} wish={wish} setWish={setWish} products={backendProducts} />} />

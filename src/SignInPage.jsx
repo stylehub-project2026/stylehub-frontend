@@ -763,11 +763,18 @@ function ForgotWizard({ onBack }) {
 /* ═══════════════════════════════
    ROOT
 ═══════════════════════════════ */
-export default function SignIn({ cart = 0, wish = [] }) {
+export default function SignIn({ cart = [], setCart, wish = [], setWish }) {
   const navigate = useNavigate();
   const location = useLocation();
   const from = location.state?.from || "/";
-  const handleDone = () => navigate(from, { replace: true });
+  const handleDone = () => {
+    // Preserve cart items that were added before login
+    const savedCart = JSON.parse(localStorage.getItem("stylehub-cart") || "[]");
+    if (savedCart.length > 0 && setCart) {
+      setCart(savedCart);
+    }
+    navigate(from, { replace: true });
+  };
 
   const urlToken = new URLSearchParams(window.location.search).get("token");
   const [mode, setMode] = useState(urlToken ? "resetpw" : "signin");
