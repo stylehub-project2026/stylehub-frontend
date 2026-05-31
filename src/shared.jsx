@@ -331,7 +331,7 @@ export function SHNav({ cart = [], wish = [] }) {
         {NAV_LINKS.map(l => (
           <li key={l.label} className="nav-item d-flex align-items-center">
 
-            <a href={l.href} style={{
+            <Link to={l.href} style={{
               color: "var(--dark)",
               textDecoration: "none",
               fontSize: ".84rem",
@@ -341,7 +341,7 @@ export function SHNav({ cart = [], wish = [] }) {
               transition: "all .2s",
             }}>
               {l.label} {l.dropdown && <span style={{ fontSize: ".55rem", marginLeft: "3px" }}>▾</span>}
-            </a>
+            </Link>
 
 
             {l.dropdown && (
@@ -381,9 +381,9 @@ export function SHNav({ cart = [], wish = [] }) {
         <div style={{ position: "absolute", top: "56px", left: 0, right: 0, background: "#fff", borderTop: "1px solid var(--border)", zIndex: 999, padding: "1rem 1.5rem", boxShadow: "0 8px 24px rgba(0,0,0,.08)" }}>
           {NAV_LINKS.map(l => (
             <div key={l.label}>
-              <a href={l.href} onClick={() => setMenuOpen(false)} style={{ display: "block", padding: ".6rem 0", color: "var(--dark)", textDecoration: "none", fontSize: ".85rem", letterSpacing: ".04em", borderBottom: "1px solid var(--border)" }}>
+              <Link to={l.href} onClick={() => setMenuOpen(false)} style={{ display: "block", padding: ".6rem 0", color: "var(--dark)", textDecoration: "none", fontSize: ".85rem", letterSpacing: ".04em", borderBottom: "1px solid var(--border)" }}>
                 {l.label}
-              </a>
+              </Link>
               {l.dropdown && (
                 <div style={{ paddingLeft: "1rem" }}>
                   {navBrands.map(b => (
