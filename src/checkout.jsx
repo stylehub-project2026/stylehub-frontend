@@ -7,12 +7,45 @@ const API = "https://stylehub-backend-tau.vercel.app/api";
 // ─── helpers ───
 const toNum = s => parseInt(String(s || "").replace(/\D/g, "")) || 0;
 
+// Resolve a cart item to always have a product object with consistent shape
+// Works for: static PRODUCTS, items added from home/BuildOutfit, and backend items
+const resolveProduct = (item) => {
+  // Already has a fully resolved product with a name
+  if (item.product && item.product.name) return item.product;
+
+  // Try to find in static PRODUCTS by id
+  const staticMatch = PRODUCTS.find(p => p.id === item.id || p.id === item.productId);
+  if (staticMatch) return staticMatch;
+
+  // Fallback: build minimal product shape from whatever is on the item
+  return {
+    id: item.id || item.productId,
+    name: item.name || "Unknown Product",
+    brand: item.brand || "StyleHub",
+    price: item.price || "LE 0",
+    oldPrice: item.oldPrice || null,
+    img: item.img || null,
+    sizes: item.sizes || [],
+    colors: item.colors || [],
+  };
+};
+
+// Resolve image from either static (.img) or backend (.images[]) product
+const resolveImg = (product) => {
+  if (product.img) return product.img;
+  if (product.images?.[0]) {
+    return product.images[0].startsWith('http')
+      ? product.images[0]
+      : `https://stylehub-backend-tau.vercel.app${product.images[0]}`;
+  }
+  return null;
+};
+
 // Unit price = base price + personalization fee (if any)
 const itemUnitPrice = item => toNum(item.product.price) + (item.customization?.fee || 0);
 // Line total = unit price × quantity
 const itemLineTotal = item => itemUnitPrice(item) * item.qty;
 
-// ─── Change this one number to update shipping everywhere ───
 const SHIPPING = 80;
 
 // ─── CSS ───
@@ -20,7 +53,6 @@ const CSS = `
 .ck-page { background:var(--cream); min-height:100vh; }
 .ck-shell { max-width:1060px; margin:0 auto; padding:3rem 2rem 6rem; }
 
-/* STEPPER */
 .ck-steps { display:flex; align-items:center; gap:0; margin-bottom:3rem; }
 .ck-step-item { display:flex; align-items:center; gap:.55rem; flex:1; }
 .ck-step-item:last-child { flex:0; }
@@ -37,23 +69,17 @@ const CSS = `
 .ck-step-line { flex:1; height:1px; background:var(--border); margin:0 .5rem; }
 .ck-step-line.done { background:var(--sage); }
 
-/* LAYOUT */
 .ck-layout { display:grid; grid-template-columns:1fr 340px; gap:2.5rem; align-items:start; }
 .ck-main {}
 .ck-aside { position:sticky; top:80px; }
 
-/* SECTION CARD */
-.ck-card {
-  background:#fff; border:1px solid var(--border);
-  padding:1.8rem; margin-bottom:1.5rem;
-}
+.ck-card { background:#fff; border:1px solid var(--border); padding:1.8rem; margin-bottom:1.5rem; }
 .ck-card-title {
   font-family:'Cormorant Garamond',serif; font-size:1.35rem; font-weight:400;
   margin-bottom:1.3rem; color:var(--dark);
   border-bottom:1px solid var(--border); padding-bottom:.7rem;
 }
 
-/* FORM */
 .ck-row { display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:1rem; }
 .ck-row.full { grid-template-columns:1fr; }
 .ck-field { display:flex; flex-direction:column; gap:.3rem; }
@@ -67,7 +93,6 @@ const CSS = `
 .ck-input.err { border-color:#e63946; }
 .ck-err-msg { font-size:.6rem; color:#e63946; margin-top:.15rem; }
 
-/* RADIO ROWS */
 .ck-radio-row {
   display:flex; align-items:center; gap:.8rem; padding:.9rem 1rem;
   border:1.5px solid var(--border); margin-bottom:.6rem; cursor:pointer;
@@ -85,10 +110,7 @@ const CSS = `
 .ck-radio-label { font-size:.8rem; font-weight:500; }
 .ck-radio-sub { font-size:.68rem; color:var(--warm); margin-left:auto; }
 
-/* BRAND BILL */
-.ck-bill {
-  border:1px solid var(--border); margin-bottom:1.2rem; overflow:hidden;
-}
+.ck-bill { border:1px solid var(--border); margin-bottom:1.2rem; overflow:hidden; }
 .ck-bill-header {
   background:#f8f6f2; padding:.75rem 1rem;
   display:flex; justify-content:space-between; align-items:center;
@@ -96,10 +118,7 @@ const CSS = `
 }
 .ck-bill-brand { font-size:.65rem; letter-spacing:.18em; text-transform:uppercase; font-weight:700; color:var(--dark); }
 .ck-bill-subtotal { font-size:.75rem; font-weight:600; color:var(--dark); }
-.ck-bill-item {
-  display:flex; gap:1rem; align-items:center;
-  padding:.7rem 1rem; border-bottom:1px solid var(--border);
-}
+.ck-bill-item { display:flex; gap:1rem; align-items:center; padding:.7rem 1rem; border-bottom:1px solid var(--border); }
 .ck-bill-item:last-child { border-bottom:none; }
 .ck-bill-img { width:52px; height:64px; object-fit:cover; background:#f0ece6; flex-shrink:0; }
 .ck-bill-info { flex:1; }
@@ -107,7 +126,6 @@ const CSS = `
 .ck-bill-meta { font-size:.65rem; color:var(--warm); margin-top:.15rem; }
 .ck-bill-price { font-size:.82rem; font-weight:600; flex-shrink:0; }
 
-/* CUSTOMIZATION BADGE */
 .ck-custom {
   font-size:.65rem; color:#8b6f3d; margin-top:.35rem;
   padding:.3rem .5rem; background:#fbf6ea; border-left:2px solid #c8a96e;
@@ -115,7 +133,6 @@ const CSS = `
 }
 .ck-custom strong { color:var(--dark); }
 
-/* ORDER SUMMARY BOX */
 .ck-sumbox { background:#fff; border:1px solid var(--border); padding:1.5rem; }
 .ck-sum-title { font-size:.62rem; letter-spacing:.2em; text-transform:uppercase; font-weight:600; margin-bottom:1.2rem; }
 .ck-sum-row { display:flex; justify-content:space-between; font-size:.8rem; margin-bottom:.65rem; }
@@ -129,7 +146,6 @@ const CSS = `
 .ck-sum-meta { font-size:.62rem; color:var(--warm); }
 .ck-sum-price { font-size:.72rem; font-weight:600; margin-left:auto; flex-shrink:0; }
 
-/* BUTTONS */
 .ck-btn-primary {
   width:100%; background:var(--dark); color:#fff; border:none;
   padding:1rem; font-size:.72rem; letter-spacing:.14em; text-transform:uppercase;
@@ -144,7 +160,6 @@ const CSS = `
 }
 .ck-btn-back:hover { color:var(--dark); }
 
-/* SUCCESS */
 .ck-success { text-align:center; padding:5rem 2rem; }
 .ck-success-icon { font-size:3.5rem; margin-bottom:1rem; }
 .ck-success-title { font-family:'Cormorant Garamond',serif; font-size:2.4rem; font-weight:400; margin-bottom:.6rem; }
@@ -155,14 +170,12 @@ const CSS = `
 .ck-order-num { font-size:1.1rem; font-family:'Cormorant Garamond',serif; }
 .ck-order-total { font-size:.78rem; color:var(--warm); margin-top:.3rem; }
 
-/* ─── RESPONSIVE ─── */
 @media(max-width:1024px){
   .ck-shell { padding:2rem 1.5rem 4rem; }
   .ck-layout { grid-template-columns:1fr; gap:1.5rem; }
   .ck-aside { position:static; }
   .ck-row { grid-template-columns:1fr; }
 }
-
 @media(max-width:768px){
   .ck-shell { padding:2rem 1rem 4rem; }
   .ck-card { padding:1.2rem; }
@@ -176,7 +189,6 @@ const CSS = `
   .ck-bill-header { flex-direction:column; align-items:flex-start; gap:.3rem; }
   .ck-bill-item { gap:.7rem; }
 }
-
 @media(max-width:480px){
   .ck-shell { padding:1.5rem .75rem 4rem; }
   .ck-card { padding:1rem; }
@@ -190,7 +202,7 @@ const CSS = `
 }
 `;
 
-// ─── Customization details badge (reusable) ───
+// ─── Customization badge ───
 const FONT_LABELS = { "serif-italic": "Italic", "serif": "Serif", "block": "Block" };
 function CustomBadge({ customization }) {
   if (!customization) return null;
@@ -235,26 +247,28 @@ function OrderSummary({ items, brandGroups, shipping }) {
   return (
     <div className="ck-sumbox">
       <div className="ck-sum-title">Order Summary</div>
-
-      {/* Items */}
       <div style={{ marginBottom: "1rem" }}>
-        {items.map(item => (
-          <div key={`${item.id}-${item.size}-${item.customization?.text || ""}`} className="ck-sum-item">
-            <img className="ck-sum-img" src={item.product.img} alt={item.product.name}
-              onError={e => e.target.style.display = "none"} />
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <div className="ck-sum-name">{item.product.name}</div>
-              <div className="ck-sum-meta">{item.product.brand} · Size {item.size} · ×{item.qty}</div>
-              {item.customization && <CustomBadge customization={item.customization} />}
+        {items.map((item, idx) => {
+          const img = resolveImg(item.product);
+          return (
+            <div key={`${item.id}-${item.size}-${item.customization?.text || ""}-${idx}`} className="ck-sum-item">
+              {img
+                ? <img className="ck-sum-img" src={img} alt={item.product.name} onError={e => e.target.style.display = "none"} />
+                : <div className="ck-sum-img" style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
+                  <span style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: "1.2rem", color: "rgba(26,26,24,.15)" }}>{item.product.brand?.[0]}</span>
+                </div>
+              }
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div className="ck-sum-name">{item.product.name}</div>
+                <div className="ck-sum-meta">{item.product.brand} · Size {item.size} · ×{item.qty}</div>
+                {item.customization && <CustomBadge customization={item.customization} />}
+              </div>
+              <div className="ck-sum-price">LE {itemLineTotal(item).toLocaleString()}</div>
             </div>
-            <div className="ck-sum-price">LE {itemLineTotal(item).toLocaleString()}</div>
-          </div>
-        ))}
+          );
+        })}
       </div>
-
       <hr className="ck-sum-divider" />
-
-      {/* Per-brand subtotals (now include personalization fees) */}
       {Object.entries(brandGroups).map(([brand, bItems]) => {
         const sub = bItems.reduce((s, x) => s + itemLineTotal(x), 0);
         return (
@@ -268,14 +282,11 @@ function OrderSummary({ items, brandGroups, shipping }) {
         <span>Shipping</span>
         <span>LE {shipping.toLocaleString()}</span>
       </div>
-
       <hr className="ck-sum-divider" />
       <div className="ck-sum-total">
         <span>Total</span>
         <span>LE {total.toLocaleString()}</span>
       </div>
-
-      {/* Payment badges */}
       <div style={{ display: "flex", gap: ".4rem", justifyContent: "center", marginTop: "1.2rem", flexWrap: "wrap" }}>
         {["VISA", "FAWRY", "CASH"].map(m => (
           <span key={m} style={{ background: "rgba(0,0,0,.06)", borderRadius: 3, padding: ".2rem .5rem", fontSize: ".52rem", color: "var(--warm)", fontWeight: 600 }}>{m}</span>
@@ -331,7 +342,7 @@ function StepDelivery({ form, setForm, errors, onNext }) {
   );
 
   const selectStyle = {
-    width: "100%", padding: ".65rem .85rem", border: `1.5px solid ${errors["governorate"] || errors["city"] ? "#e63946" : "var(--border)"}`,
+    width: "100%", padding: ".65rem .85rem", border: "1.5px solid var(--border)",
     fontFamily: "'DM Sans',sans-serif", fontSize: ".82rem", color: "var(--dark)",
     background: "#fff", outline: "none", appearance: "none",
     backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24'%3E%3Cpath fill='%238c8880' d='M7 10l5 5 5-5z'/%3E%3C/svg%3E")`,
@@ -346,13 +357,10 @@ function StepDelivery({ form, setForm, errors, onNext }) {
       <div className="ck-row full">{fields("email", "Email Address")}</div>
       <div className="ck-row full">{fields("phone", "Phone Number")}</div>
       <div className="ck-row full">{fields("address", "Street Address")}</div>
-
       <div className="ck-row">
-        {/* Governorate dropdown */}
         <div className="ck-field">
           <label className="ck-label">Governorate</label>
-          <select
-            style={{ ...selectStyle, borderColor: errors["governorate"] ? "#e63946" : "var(--border)" }}
+          <select style={{ ...selectStyle, borderColor: errors["governorate"] ? "#e63946" : "var(--border)" }}
             value={form.governorate}
             onChange={e => setForm(f => ({ ...f, governorate: e.target.value, city: "" }))}>
             <option value="">Select Governorate...</option>
@@ -360,12 +368,9 @@ function StepDelivery({ form, setForm, errors, onNext }) {
           </select>
           {errors["governorate"] && <span className="ck-err-msg">{errors["governorate"]}</span>}
         </div>
-
-        {/* City dropdown */}
         <div className="ck-field">
           <label className="ck-label">City / District</label>
-          <select
-            style={{ ...selectStyle, borderColor: errors["city"] ? "#e63946" : "var(--border)", opacity: !form.governorate ? 0.5 : 1 }}
+          <select style={{ ...selectStyle, borderColor: errors["city"] ? "#e63946" : "var(--border)", opacity: !form.governorate ? 0.5 : 1 }}
             value={form.city}
             disabled={!form.governorate}
             onChange={e => setForm(f => ({ ...f, city: e.target.value }))}>
@@ -375,7 +380,6 @@ function StepDelivery({ form, setForm, errors, onNext }) {
           {errors["city"] && <span className="ck-err-msg">{errors["city"]}</span>}
         </div>
       </div>
-
       <div style={{ marginTop: "1.2rem" }}>
         <div className="ck-label" style={{ marginBottom: ".6rem" }}>Delivery Method</div>
         {[
@@ -390,7 +394,6 @@ function StepDelivery({ form, setForm, errors, onNext }) {
           </div>
         ))}
       </div>
-
       <button className="ck-btn-primary" onClick={onNext}>Continue to Payment →</button>
     </div>
   );
@@ -404,32 +407,23 @@ function StepPayment({ form, setForm, errors, brandGroups, onNext, onBack }) {
   return (
     <>
       <button className="ck-btn-back" onClick={onBack}>← Back to Delivery</button>
-
-      {/* Multi-brand notice */}
       {multiBrand && (
         <div style={{ background: "#fff8e6", border: "1px solid #f0d080", padding: "1rem 1.2rem", marginBottom: "1.2rem", fontSize: ".78rem", lineHeight: 1.7, color: "#5a4a10" }}>
           <strong>You're ordering from {brands.length} brands.</strong><br />
-          Each brand processes and ships your items separately. You'll receive{" "}
-          <strong>{brands.length} separate order confirmations</strong>, one per brand.
+          Each brand processes and ships your items separately. You'll receive <strong>{brands.length} separate order confirmations</strong>, one per brand.
         </div>
       )}
-
-      {/* Per-brand payment */}
-      {brands.map((brand, bi) => {
+      {brands.map((brand) => {
         const bItems = brandGroups[brand];
         const sub = bItems.reduce((s, x) => s + itemLineTotal(x), 0);
         const pKey = `payment_${brand}`;
         const current = form[pKey] || "cod";
-
         return (
           <div key={brand} className="ck-card">
             <div className="ck-card-title">
               Payment for <span style={{ color: "var(--sage)" }}>{brand}</span>
-              <span style={{ fontSize: ".78rem", fontWeight: 400, color: "var(--warm)", marginLeft: ".6rem" }}>
-                (LE {sub.toLocaleString()})
-              </span>
+              <span style={{ fontSize: ".78rem", fontWeight: 400, color: "var(--warm)", marginLeft: ".6rem" }}>(LE {sub.toLocaleString()})</span>
             </div>
-
             {[
               { key: "cod", label: "Cash on Delivery", sub: "Pay when your order arrives" },
               { key: "fawry", label: "Fawry", sub: "Pay at any Fawry outlet" },
@@ -442,31 +436,20 @@ function StepPayment({ form, setForm, errors, brandGroups, onNext, onBack }) {
                 <span className="ck-radio-sub">{opt.sub}</span>
               </div>
             ))}
-
             {current === "card" && (
               <div style={{ marginTop: ".8rem", padding: ".85rem 1rem", background: "#f0f7ff", border: "1px solid #c0d8f0", fontSize: ".76rem", color: "#1a3a5c", lineHeight: 1.6 }}>
                 You'll enter your card details securely on the next step via Paymob.
               </div>
             )}
-
             {current === "fawry" && (
               <div style={{ marginTop: ".8rem", padding: ".85rem 1rem", background: "#fff8e6", border: "1px solid #f0d080", fontSize: ".76rem", color: "#5a4a10", lineHeight: 1.6 }}>
                 After placing your order you'll receive a <strong>Fawry reference code</strong>.<br />
                 Pay at any Fawry outlet within <strong>48 hours</strong> to confirm your order.
               </div>
             )}
-
-            {current === "instapay" && (
-              <div style={{ marginTop: ".8rem", padding: ".85rem 1rem", background: "#e8f4f0", border: "1px solid #a0d4c4", fontSize: ".76rem", color: "#1a4a3a", lineHeight: 1.6 }}>
-                Transfer <strong>LE {sub.toLocaleString()}</strong> via InstaPay to:<br />
-                <strong>01xxxxxxxxxx @ CIB</strong><br />
-                Use your name as the transfer note, then upload proof below.
-              </div>
-            )}
           </div>
         );
       })}
-
       <button className="ck-btn-primary" onClick={onNext}>Review Order →</button>
     </>
   );
@@ -481,27 +464,21 @@ function StepReview({ form, brandGroups, onBack, onPlace, placing }) {
   const total = itemsBase + customFees;
   const shipping = form.delivery === "express" ? 120 : 80;
   const hasCustom = customFees > 0;
-
   const payLabel = key => ({ cod: "Cash on Delivery", fawry: "Fawry", card: "Credit/Debit Card", instapay: "InstaPay" }[key] || key);
 
   return (
     <>
       <button className="ck-btn-back" onClick={onBack}>← Back to Payment</button>
-
-      {/* Delivery summary */}
       <div className="ck-card">
         <div className="ck-card-title">Delivery Details</div>
         <div style={{ fontSize: ".82rem", lineHeight: 2, color: "var(--dark)" }}>
           <strong>{form.firstName} {form.lastName}</strong><br />
           {form.address}, {form.city}, {form.governorate}<br />
           {form.phone} · {form.email}<br />
-          <span style={{ color: "var(--warm)" }}>
-            {"Shipping · LE " + (form.delivery === "express" ? 120 : 80)}
-          </span>
+          <span style={{ color: "var(--warm)" }}>Shipping · LE {shipping}</span>
         </div>
       </div>
 
-      {/* Per-brand order bills */}
       {brands.map(brand => {
         const bItems = brandGroups[brand];
         const sub = bItems.reduce((s, x) => s + itemLineTotal(x), 0);
@@ -512,23 +489,29 @@ function StepReview({ form, brandGroups, onBack, onPlace, placing }) {
               <span className="ck-bill-brand">📦 Order from {brand}</span>
               <span className="ck-bill-subtotal">LE {sub.toLocaleString()} · {payLabel(pKey)}</span>
             </div>
-            {bItems.map(item => (
-              <div key={`${item.id}-${item.size}-${item.customization?.text || ""}`} className="ck-bill-item">
-                <img className="ck-bill-img" src={item.product.img} alt={item.product.name}
-                  onError={e => e.target.style.display = "none"} />
-                <div className="ck-bill-info">
-                  <div className="ck-bill-name">{item.product.name}</div>
-                  <div className="ck-bill-meta">Size: {item.size} · Qty: {item.qty}</div>
-                  {item.customization && <CustomBadge customization={item.customization} />}
+            {bItems.map((item, idx) => {
+              const img = resolveImg(item.product);
+              return (
+                <div key={`${item.id}-${item.size}-${item.customization?.text || ""}-${idx}`} className="ck-bill-item">
+                  {img
+                    ? <img className="ck-bill-img" src={img} alt={item.product.name} onError={e => e.target.style.display = "none"} />
+                    : <div className="ck-bill-img" style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
+                      <span style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: "1.2rem", color: "rgba(26,26,24,.15)" }}>{item.product.brand?.[0]}</span>
+                    </div>
+                  }
+                  <div className="ck-bill-info">
+                    <div className="ck-bill-name">{item.product.name}</div>
+                    <div className="ck-bill-meta">Size: {item.size} · Qty: {item.qty}</div>
+                    {item.customization && <CustomBadge customization={item.customization} />}
+                  </div>
+                  <div className="ck-bill-price">LE {itemLineTotal(item).toLocaleString()}</div>
                 </div>
-                <div className="ck-bill-price">LE {itemLineTotal(item).toLocaleString()}</div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         );
       })}
 
-      {/* Grand total */}
       <div className="ck-card" style={{ background: "#f8f6f2" }}>
         <div style={{ display: "flex", justifyContent: "space-between", fontSize: ".82rem", marginBottom: ".5rem" }}>
           <span style={{ color: "var(--warm)" }}>Items subtotal</span>
@@ -542,9 +525,7 @@ function StepReview({ form, brandGroups, onBack, onPlace, placing }) {
         )}
         <div style={{ display: "flex", justifyContent: "space-between", fontSize: ".82rem", marginBottom: ".5rem" }}>
           <span style={{ color: "var(--warm)" }}>Shipping</span>
-          <span style={{ color: "var(--dark)", fontWeight: 600 }}>
-            {`LE ${shipping}`}
-          </span>
+          <span style={{ fontWeight: 600 }}>LE {shipping}</span>
         </div>
         <div style={{ borderTop: "1px solid var(--border)", paddingTop: ".8rem", marginTop: ".5rem", display: "flex", justifyContent: "space-between", fontSize: "1.05rem", fontWeight: 700 }}>
           <span>Grand Total</span>
@@ -579,7 +560,6 @@ function StepSuccess({ brandGroups, form, confirmedOrder, onContinue }) {
         Thank you, <strong>{form.firstName}</strong>! Your order has been placed successfully.<br />
         Confirmation will be sent to <strong>{form.email}</strong>.
       </p>
-
       <div className="ck-order-cards">
         {confirmedOrder ? (
           <div className="ck-order-card">
@@ -602,7 +582,6 @@ function StepSuccess({ brandGroups, form, confirmedOrder, onContinue }) {
           })
         )}
       </div>
-
       <button onClick={onContinue}
         style={{ background: "var(--dark)", color: "#fff", border: "none", padding: ".85rem 2.5rem", fontSize: ".72rem", letterSpacing: ".14em", textTransform: "uppercase", cursor: "pointer", fontFamily: "'DM Sans',sans-serif", marginTop: "1rem" }}>
         Continue Shopping
@@ -616,11 +595,8 @@ export default function Checkout({ cart = [], setCart, wish = [], setWish }) {
   const navigate = useNavigate();
   const token = localStorage.getItem("token");
 
-  // ── Redirect to sign in if not logged in
   useEffect(() => {
-    if (!token) {
-      navigate("/signin?redirect=/checkout");
-    }
+    if (!token) navigate("/signin?redirect=/checkout");
   }, [token, navigate]);
 
   if (!token) return null;
@@ -637,7 +613,7 @@ export default function Checkout({ cart = [], setCart, wish = [], setWish }) {
     delivery: "standard",
   });
 
-  // ─── Backend cart (if logged in) ───
+  // ─── Backend cart (logged-in users) ───
   const [backendItems, setBackendItems] = useState(null);
 
   useEffect(() => {
@@ -660,7 +636,9 @@ export default function Checkout({ cart = [], setCart, wish = [], setWish }) {
               price: `LE ${i.product.salePrice || i.product.price}`,
               rawPrice: i.product.salePrice || i.product.price,
               oldPrice: i.product.salePrice ? `LE ${i.product.price}` : null,
-              img: i.product.images?.[0] ? (i.product.images[0].startsWith('http') ? i.product.images[0] : `https://stylehub-backend-tau.vercel.app${i.product.images[0]}`) : null,
+              img: i.product.images?.[0]
+                ? (i.product.images[0].startsWith('http') ? i.product.images[0] : `https://stylehub-backend-tau.vercel.app${i.product.images[0]}`)
+                : null,
               brand: i.product.seller?.brandName || "StyleHub",
             }
           }));
@@ -670,27 +648,25 @@ export default function Checkout({ cart = [], setCart, wish = [], setWish }) {
       .catch(console.error);
   }, [token]);
 
-  // Use backend items if logged in, otherwise fall back to local cart
+  // Use backend items if logged in, otherwise resolve from local cart (static + home + BuildOutfit)
   const items = useMemo(() => {
     if (token && backendItems !== null) return backendItems;
     return (cart || []).map(item => {
-      if (item.product) return item;
-      const p = PRODUCTS.find(x => x.id === item.id);
-      return p ? { ...item, product: p } : null;
+      const product = resolveProduct(item);
+      return product ? { ...item, product } : null;
     }).filter(Boolean);
   }, [cart, backendItems, token]);
 
   // Group by brand
   const brandGroups = useMemo(() =>
     items.reduce((acc, item) => {
-      const brand = item.product.brand;
+      const brand = item.product.brand || "StyleHub";
       if (!acc[brand]) acc[brand] = [];
       acc[brand].push(item);
       return acc;
     }, {})
-    , [items]);
+  , [items]);
 
-  // Validation
   const validate = () => {
     const e = {};
     if (!form.firstName.trim()) e.firstName = "Required";
@@ -716,7 +692,6 @@ export default function Checkout({ cart = [], setCart, wish = [], setWish }) {
         const paymentMethod = form[`payment_${firstBrand}`] || "cod";
         const validPayment = ["cod", "card", "fawry", "instapay"].includes(paymentMethod) ? paymentMethod : "cod";
 
-        // Include customization in each order item so backend stores + emails it
         const orderItems = items.map(item => ({
           productId: item.product._id || item.product.id,
           quantity: item.qty,
@@ -770,7 +745,6 @@ export default function Checkout({ cart = [], setCart, wish = [], setWish }) {
     }
   };
 
-  // Empty cart redirect
   if (items.length === 0 && step < 4 && !(token && backendItems === null)) {
     return (
       <div style={{ minHeight: "100vh", background: "var(--cream)" }}>
@@ -794,15 +768,12 @@ export default function Checkout({ cart = [], setCart, wish = [], setWish }) {
       <style>{SHARED_CSS}</style>
       <style>{CSS}</style>
       <SHNav cart={cart} wish={wish} />
-
       <div className="ck-shell">
         <h1 style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: "2rem", fontWeight: 400, marginBottom: ".3rem" }}>
           {step === 4 ? "Order Confirmed" : "Checkout"}
         </h1>
         <div style={{ width: 36, height: 2, background: "var(--sage)", marginBottom: "2rem" }} />
-
         {step < 4 && <Stepper step={step} />}
-
         {step === 4 ? (
           <StepSuccess brandGroups={brandGroups} form={form} confirmedOrder={confirmedOrder} onContinue={() => navigate("/")} />
         ) : (
@@ -827,7 +798,6 @@ export default function Checkout({ cart = [], setCart, wish = [], setWish }) {
           </div>
         )}
       </div>
-
       {step < 4 && <SHFooter />}
     </div>
   );
