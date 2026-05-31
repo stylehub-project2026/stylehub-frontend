@@ -1081,9 +1081,9 @@ export default function SellerAuthPage({ onSellerLoggedIn }) {
   const navigate = useNavigate();
 
   const go = (m) => setMode(m);
-  const handleDone = () => {
+  const handleDone = (destination = "/seller/dashboard") => {
     if (onSellerLoggedIn) onSellerLoggedIn();
-    navigate("/seller/dashboard");
+    navigate(destination);
   };
 
   return (
@@ -1135,7 +1135,7 @@ export default function SellerAuthPage({ onSellerLoggedIn }) {
             )}
 
             {mode === "signin" && <SellerSignInForm onForgot={() => go("forgot")} onSwitchSignUp={() => go("signup")} onDone={handleDone} />}
-            {mode === "signup" && <SellerSignUpForm onSwitchSignIn={() => go("signin")} onDone={handleDone} />}
+            {mode === "signup" && <SellerSignUpForm onSwitchSignIn={() => go("signin")} onDone={() => handleDone("/seller/payment")} />}
             {mode === "forgot" && <SellerForgotForm onBack={() => go("signin")} />}
           </div>
         </div>
