@@ -648,9 +648,26 @@ export default function Checkout({ cart = [], setCart, wish = [], setWish }) {
       .catch(console.error);
   }, [token]);
 
-  // Use backend items if logged in, otherwise resolve from local cart (static + home + BuildOutfit)
+  // Use backend items if logged in, merged with any local items not yet in backend
   const items = useMemo(() => {
-    if (token && backendItems !== null) return backendItems;
+    if (token && backendItems !== null) {
+      // Also include local cart items that have a full product object but aren't in backend
+      const localItems = (cart || [])
+        .map(item => {
+          // Skip if already in backend cart
+          const inBackend = backendItems.some(
+            bi => String(bi.product?._id) === String(item.id) || String(bi.product?.id) === String(item.id)
+          );
+          if (inBackend) return null;
+          // Use existing product object if available
+          if (item.product && item.product.name) return { ...item, _isLocal: true };
+          // Try resolving from static products
+          const product = resolveProduct(item);
+          return product ? { ...item, product, _isLocal: true } : null;
+        })
+        .filter(Boolean);
+      return [...backendItems, ...localItems];
+    }
     return (cart || []).map(item => {
       const product = resolveProduct(item);
       return product ? { ...item, product } : null;
