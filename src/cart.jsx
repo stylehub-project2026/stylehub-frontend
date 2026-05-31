@@ -32,9 +32,9 @@ const resolveImg = (product) => {
 };
 
 // ─── CUSTOMIZATION ───
-const FONT_LABEL  = { "serif-italic": "Italic", serif: "Serif", block: "Block" };
+const FONT_LABEL = { "serif-italic": "Italic", serif: "Serif", block: "Block" };
 const COLOR_LABEL = { "#c8a96e": "Gold", "#ffffff": "White", "#c84a3d": "Red", "#9eaa8a": "Sage", "#1a1a18": "Black" };
-const POS_LABEL   = { chest: "Chest", sleeve: "Sleeve", back: "Back" };
+const POS_LABEL = { chest: "Chest", sleeve: "Sleeve", back: "Back" };
 
 function CustomizationLine({ customization }) {
   if (!customization) return null;
@@ -160,11 +160,18 @@ function BackendCart({ cart, setCart, wish }) {
   // { id, size, qty } with numeric ids. Merge them alongside backend items.
   const localItems = (cart || [])
     .map(item => {
-      // Skip items that are already in the backend cart (matched by product id)
+      // Skip items already in backend cart
       const alreadyInBackend = backendItems.some(
         bi => String(bi.product?._id) === String(item.id) || String(bi.product?.id) === String(item.id)
       );
       if (alreadyInBackend) return null;
+
+      // If item already has a full product object (from ProductDetail), use it directly
+      if (item.product && item.product.name) {
+        return { ...item, _isLocal: true };
+      }
+
+      // Otherwise resolve from static PRODUCTS array (homepage/BuildOutfit items)
       const product = resolveStaticProduct(item);
       if (!product) return null;
       return { ...item, product, _isLocal: true };
@@ -212,17 +219,17 @@ function BackendCart({ cart, setCart, wish }) {
   // Subtotals
   const backendSubtotal = backendItems.reduce((sum, i) => {
     const base = i.product?.salePrice || i.product?.price || 0;
-    const fee  = i.customization?.fee || 0;
+    const fee = i.customization?.fee || 0;
     return sum + (base + fee) * i.quantity;
   }, 0);
 
   const localSubtotal = localItems.reduce((sum, item) => {
     const base = toNum(item.product.price);
-    const fee  = item.customization?.fee || 0;
+    const fee = item.customization?.fee || 0;
     return sum + (base + fee) * item.qty;
   }, 0);
 
-  const subtotal   = backendSubtotal + localSubtotal;
+  const subtotal = backendSubtotal + localSubtotal;
   const totalCount = backendItems.length + localItems.length;
 
   if (loading) return (
@@ -256,11 +263,11 @@ function BackendCart({ cart, setCart, wish }) {
           <div>
             {/* ── Backend items (from API) ── */}
             {backendItems.map(item => {
-              const p   = item.product;
+              const p = item.product;
               if (!p) return null;
               const img = resolveImg(p);
               const basePrice = p.salePrice || p.price;
-              const fee       = item.customization?.fee || 0;
+              const fee = item.customization?.fee || 0;
               const unitPrice = basePrice + fee;
 
               return (
@@ -269,8 +276,8 @@ function BackendCart({ cart, setCart, wish }) {
                     {img
                       ? <img src={img} alt={p.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
                       : <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                          <span style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: "2rem", color: "rgba(26,26,24,.1)" }}>S</span>
-                        </div>
+                        <span style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: "2rem", color: "rgba(26,26,24,.1)" }}>S</span>
+                      </div>
                     }
                   </div>
                   <div style={{ flex: 1, minWidth: 0 }}>
@@ -297,13 +304,13 @@ function BackendCart({ cart, setCart, wish }) {
 
             {/* ── Local static items (home / BuildOutfit) ── */}
             {localItems.map((item, idx) => {
-              const p         = item.product;
-              const img       = resolveImg(p);
-              const base      = toNum(p.price);
-              const fee       = item.customization?.fee || 0;
+              const p = item.product;
+              const img = resolveImg(p);
+              const base = toNum(p.price);
+              const fee = item.customization?.fee || 0;
               const unitPrice = base + fee;
-              const oldBase   = p.oldPrice ? toNum(p.oldPrice) : null;
-              const oldUnit   = oldBase ? oldBase + fee : null;
+              const oldBase = p.oldPrice ? toNum(p.oldPrice) : null;
+              const oldUnit = oldBase ? oldBase + fee : null;
 
               return (
                 <div key={`local-${item.id}-${item.size}-${idx}`} className="cart-item">
@@ -311,8 +318,8 @@ function BackendCart({ cart, setCart, wish }) {
                     {img
                       ? <img src={img} alt={p.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
                       : <div style={{ width: "100%", height: "100%", background: p.gradient ? `linear-gradient(${p.gradient})` : "#f0ece6", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                          <span style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: "1.5rem", color: "rgba(26,26,24,.15)" }}>{p.brand?.[0]}</span>
-                        </div>
+                        <span style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: "1.5rem", color: "rgba(26,26,24,.15)" }}>{p.brand?.[0]}</span>
+                      </div>
                     }
                   </div>
                   <div style={{ flex: 1, minWidth: 0 }}>
@@ -362,7 +369,7 @@ function LocalCart({ cart, setCart, wish }) {
 
   const subtotal = items.reduce((sum, item) => {
     const base = toNum(item.product.price);
-    const fee  = item.customization?.fee || 0;
+    const fee = item.customization?.fee || 0;
     return sum + (base + fee) * item.qty;
   }, 0);
 
@@ -386,13 +393,13 @@ function LocalCart({ cart, setCart, wish }) {
         <div className="cart-grid">
           <div>
             {items.map((item, idx) => {
-              const p         = item.product;
-              const img       = resolveImg(p);
-              const base      = toNum(p.price);
-              const fee       = item.customization?.fee || 0;
+              const p = item.product;
+              const img = resolveImg(p);
+              const base = toNum(p.price);
+              const fee = item.customization?.fee || 0;
               const unitPrice = base + fee;
-              const oldBase   = p.oldPrice ? toNum(p.oldPrice) : null;
-              const oldUnit   = oldBase ? oldBase + fee : null;
+              const oldBase = p.oldPrice ? toNum(p.oldPrice) : null;
+              const oldUnit = oldBase ? oldBase + fee : null;
 
               return (
                 <div key={`${item.id}-${item.size}-${idx}`} className="cart-item">
@@ -400,8 +407,8 @@ function LocalCart({ cart, setCart, wish }) {
                     {img
                       ? <img src={img} alt={p.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
                       : <div style={{ width: "100%", height: "100%", background: p.gradient ? `linear-gradient(${p.gradient})` : "#f0ece6", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                          <span style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: "1.5rem", color: "rgba(26,26,24,.15)" }}>{p.brand?.[0]}</span>
-                        </div>
+                        <span style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: "1.5rem", color: "rgba(26,26,24,.15)" }}>{p.brand?.[0]}</span>
+                      </div>
                     }
                   </div>
                   <div style={{ flex: 1, minWidth: 0 }}>
