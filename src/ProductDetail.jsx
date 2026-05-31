@@ -102,7 +102,7 @@ function SizeGuidePopup({ onClose }) {
               </tr>
             </thead>
             <tbody>
-              {[["XS","80-84","60-64","86-90"],["S","84-88","64-68","90-94"],["M","88-92","68-72","94-98"],["L","92-96","72-76","98-102"],["XL","96-100","76-80","102-106"]].map(([size,...vals]) => (
+              {[["XS", "80-84", "60-64", "86-90"], ["S", "84-88", "64-68", "90-94"], ["M", "88-92", "68-72", "94-98"], ["L", "92-96", "72-76", "98-102"], ["XL", "96-100", "76-80", "102-106"]].map(([size, ...vals]) => (
                 <tr key={size} style={{ borderBottom: "1px solid var(--border)" }}>
                   <td style={{ padding: ".55rem .8rem", fontWeight: 600 }}>{size}</td>
                   {vals.map((v, i) => <td key={i} style={{ padding: ".55rem .8rem", color: "var(--warm)" }}>{v}</td>)}
@@ -123,7 +123,7 @@ function SizeGuidePopup({ onClose }) {
               </tr>
             </thead>
             <tbody>
-              {[["4Y","3-4","98-104","54-56"],["6Y","5-6","110-116","57-59"],["8Y","7-8","122-128","60-63"],["10Y","9-10","134-140","64-67"],["12Y","11-12","146-152","68-72"],["14Y","13-14","158-164","73-77"]].map(([size,...vals]) => (
+              {[["4Y", "3-4", "98-104", "54-56"], ["6Y", "5-6", "110-116", "57-59"], ["8Y", "7-8", "122-128", "60-63"], ["10Y", "9-10", "134-140", "64-67"], ["12Y", "11-12", "146-152", "68-72"], ["14Y", "13-14", "158-164", "73-77"]].map(([size, ...vals]) => (
                 <tr key={size} style={{ borderBottom: "1px solid var(--border)" }}>
                   <td style={{ padding: ".55rem .8rem", fontWeight: 600 }}>{size}</td>
                   {vals.map((v, i) => <td key={i} style={{ padding: ".55rem .8rem", color: "var(--warm)" }}>{v}</td>)}
@@ -236,7 +236,7 @@ export default function ProductDetail({ cart, setCart, wish, setWish }) {
         const prods = (data.data?.products || []).filter(p => p._id !== id).slice(0, 4);
         setBackendSimilar(prods);
       })
-      .catch(() => {});
+      .catch(() => { });
   }, [product, id]);
 
   const toggleWish = () => setWish(w => w.includes(id) ? w.filter(x => x !== id) : [...w, id]);
@@ -285,8 +285,8 @@ export default function ProductDetail({ cart, setCart, wish, setWish }) {
           id: product.id,
           _id: product._id,
           name: product.name,
-          price: `LE ${product.price?.toLocaleString()}`,                                   // ORIGINAL price
-          salePrice: product.salePrice ? `LE ${product.salePrice?.toLocaleString()}` : null, // ORIGINAL salePrice
+          price: `LE ${(product.salePrice || product.price)?.toLocaleString()}`,   // discounted price (shown price)
+          oldPrice: product.salePrice ? `LE ${product.price?.toLocaleString()}` : null, // original price (strikethrough)
           img: getImageUrl(product.images[0]),
           brand: product.brand,
         }
@@ -398,7 +398,7 @@ export default function ProductDetail({ cart, setCart, wish, setWish }) {
           <h1 style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: "2.2rem", fontWeight: 400, lineHeight: 1.2, marginBottom: "1rem", color: "var(--dark)" }}>{product.name}</h1>
           <div style={{ display: "flex", alignItems: "center", gap: ".5rem", marginBottom: "1.2rem" }}>
             <div style={{ display: "flex", gap: ".1rem" }}>
-              {[1,2,3,4,5].map(i => <StarIcon key={i} filled={i <= Math.round(product.rating)} />)}
+              {[1, 2, 3, 4, 5].map(i => <StarIcon key={i} filled={i <= Math.round(product.rating)} />)}
             </div>
             <span style={{ fontSize: ".72rem", color: "var(--warm)", fontFamily: "'DM Sans',sans-serif" }}>
               {product.rating.toFixed(1)} · {product.reviewCount} review{product.reviewCount !== 1 ? "s" : ""}
@@ -483,8 +483,8 @@ export default function ProductDetail({ cart, setCart, wish, setWish }) {
                     <div style={{ display: "flex", gap: ".4rem", flexWrap: "wrap" }}>
                       {[
                         { id: "serif-italic", label: customText || "Text", style: { fontFamily: "'Cormorant Garamond',serif", fontStyle: "italic" } },
-                        { id: "serif",        label: customText || "Text", style: { fontFamily: "'Cormorant Garamond',serif" } },
-                        { id: "block",        label: (customText || "Text").toUpperCase(), style: { fontFamily: "'DM Sans',sans-serif", fontWeight: 700, letterSpacing: ".1em" } },
+                        { id: "serif", label: customText || "Text", style: { fontFamily: "'Cormorant Garamond',serif" } },
+                        { id: "block", label: (customText || "Text").toUpperCase(), style: { fontFamily: "'DM Sans',sans-serif", fontWeight: 700, letterSpacing: ".1em" } },
                       ].map(f => (
                         <button key={f.id} onClick={() => setCustomFont(f.id)}
                           style={{ padding: ".5rem .85rem", border: `1.5px solid ${customFont === f.id ? "var(--dark)" : "var(--border)"}`, background: customFont === f.id ? "var(--dark)" : "#fff", color: customFont === f.id ? "#fff" : "var(--dark)", cursor: "pointer", fontSize: ".78rem", borderRadius: 3, transition: "all .2s", ...f.style }}>
@@ -622,7 +622,7 @@ export default function ProductDetail({ cart, setCart, wish, setWish }) {
                 <div style={{ marginBottom: "1.2rem" }}>
                   <div style={{ fontSize: ".62rem", letterSpacing: ".18em", textTransform: "uppercase", fontWeight: 700, color: "var(--dark)", marginBottom: ".6rem", fontFamily: "'DM Sans',sans-serif" }}>Your Rating</div>
                   <div style={{ display: "flex", gap: ".3rem" }}>
-                    {[1,2,3,4,5].map(i => (
+                    {[1, 2, 3, 4, 5].map(i => (
                       <button key={i} type="button" onClick={() => setReviewRating(i)} onMouseEnter={() => setReviewHover(i)} onMouseLeave={() => setReviewHover(0)} style={{ background: "none", border: "none", cursor: "pointer", padding: 0 }}>
                         <svg width="26" height="26" viewBox="0 0 24 24" fill={(reviewHover || reviewRating) >= i ? "#c8a96e" : "none"} stroke="#c8a96e" strokeWidth="1.5">
                           <polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26" />
@@ -664,7 +664,7 @@ export default function ProductDetail({ cart, setCart, wish, setWish }) {
                 {reviews.map(r => (
                   <div key={r._id} style={{ padding: "1.2rem", border: "1px solid var(--border)", background: "var(--cream)", borderRadius: 4 }}>
                     <div style={{ display: "flex", gap: ".1rem", marginBottom: ".5rem" }}>
-                      {[1,2,3,4,5].map(i => <StarIcon key={i} filled={i <= r.rating} />)}
+                      {[1, 2, 3, 4, 5].map(i => <StarIcon key={i} filled={i <= r.rating} />)}
                     </div>
                     {r.comment && <p style={{ fontSize: ".8rem", color: "#555", lineHeight: 1.6, marginBottom: ".5rem" }}>{r.comment}</p>}
                     <div style={{ fontSize: ".65rem", color: "var(--warm)", fontFamily: "'DM Sans',sans-serif" }}>

@@ -224,7 +224,7 @@ function BackendCart({ cart, setCart, wish }) {
   }, 0);
 
   const localSubtotal = localItems.reduce((sum, item) => {
-    const base = toNum(item.product.price);
+    const base = toNum(item.product.salePrice || item.product.price);
     const fee = item.customization?.fee || 0;
     return sum + (base + fee) * item.qty;
   }, 0);
@@ -306,7 +306,7 @@ function BackendCart({ cart, setCart, wish }) {
             {localItems.map((item, idx) => {
               const p = item.product;
               const img = resolveImg(p);
-              const base = toNum(p.price);
+              const base = toNum(p.salePrice || p.price);
               const fee = item.customization?.fee || 0;
               const unitPrice = base + fee;
               const oldBase = p.oldPrice ? toNum(p.oldPrice) : null;
@@ -368,7 +368,7 @@ function LocalCart({ cart, setCart, wish }) {
   }).filter(Boolean);
 
   const subtotal = items.reduce((sum, item) => {
-    const base = toNum(item.product.price);
+    const base = toNum(item.product.salePrice || item.product.price);
     const fee = item.customization?.fee || 0;
     return sum + (base + fee) * item.qty;
   }, 0);
@@ -395,7 +395,7 @@ function LocalCart({ cart, setCart, wish }) {
             {items.map((item, idx) => {
               const p = item.product;
               const img = resolveImg(p);
-              const base = toNum(p.price);
+              const base = toNum(p.salePrice || p.price);
               const fee = item.customization?.fee || 0;
               const unitPrice = base + fee;
               const oldBase = p.oldPrice ? toNum(p.oldPrice) : null;
