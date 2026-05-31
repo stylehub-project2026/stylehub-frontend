@@ -19,8 +19,16 @@ export default function Wishlist({ cart, setCart, wish, setWish }) {
 
   useEffect(() => {
     if (!wish || wish.length === 0) { setBackendProducts([]); return; }
+
+    // Only fetch from backend for MongoDB-style IDs (24 hex chars)
+    const mongoIds = wish.filter(id => /^[a-f\d]{24}$/i.test(id));
+
+    if (mongoIds.length === 0) { setBackendProducts([]); return; }
+
     Promise.all(
-      wish.map(id => fetch(`${API}/products/${id}`).then(r => r.json()).catch(() => null))
+      mongoIds.map(id =>
+        fetch(`${API}/products/${id}`).then(r => r.json()).catch(() => null)
+      )
     ).then(results => {
       const prods = results.filter(r => r?.success).map(r => {
         const p = r.data.product;
@@ -29,7 +37,9 @@ export default function Wishlist({ cart, setCart, wish, setWish }) {
           brand: p.seller?.brandName || "StyleHub",
           price: `LE ${p.price?.toLocaleString()}`,
           oldPrice: p.salePrice ? `LE ${p.salePrice?.toLocaleString()}` : null,
-          img: p.images?.[0] ? (p.images[0].startsWith('http') ? p.images[0] : `https://stylehub-backend-tau.vercel.app${p.images[0]}` ) : null,
+          img: p.images?.[0]
+            ? (p.images[0].startsWith('http') ? p.images[0] : `https://stylehub-backend-tau.vercel.app${p.images[0]}`)
+            : null,
           sizes: p.sizes || [], colors: p.colors || [],
         };
       });
@@ -37,8 +47,13 @@ export default function Wishlist({ cart, setCart, wish, setWish }) {
     });
   }, [wish]);
 
-  const staticItems = (wish || []).map(id => PRODUCTS.find(p => p.id === id)).filter(Boolean);
-  const items = backendProducts.length > 0 ? backendProducts : staticItems;
+  // Merge: backend results + static fallback for any non-backend IDs
+  const fetchedIds = new Set(backendProducts.map(p => p.id));
+  const staticItems = (wish || [])
+    .filter(id => !fetchedIds.has(id))
+    .map(id => PRODUCTS.find(p => p.id === id))
+    .filter(Boolean);
+  const items = [...backendProducts, ...staticItems];
 
   const removeWish = id => setWish(w => w.filter(x => x !== id));
 
