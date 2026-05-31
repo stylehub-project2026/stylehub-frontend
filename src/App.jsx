@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from "react";
-import { Routes, Route, useNavigate, useLocation } from "react-router-dom";
+import { Routes, Route, useNavigate, useLocation, Link } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { PRODUCTS, BRANDS, CATS, NAV_LINKS, FOOTER_COLS, SHNav, SHFooter, shuffle } from "./shared";
 
@@ -476,7 +476,7 @@ const LOGO_MAP = {
 function BrandsCarousel() {
   const [idx, setIdx] = useState(0);
   const [slidesVisible, setSlidesVisible] = useState(4);
-  const [brands, setBrands] = useState(BRANDS); // fallback للـ hardcoded
+  const [brands, setBrands] = useState(BRANDS);
 
   useEffect(() => {
     fetch("https://stylehub-backend-tau.vercel.app/api/sellers")
@@ -491,7 +491,7 @@ function BrandsCarousel() {
           setBrands(fetched);
         }
       })
-      .catch(() => { }); // لو فشل يفضل الـ hardcoded
+      .catch(() => { });
   }, []);
 
   useEffect(() => {
@@ -600,7 +600,7 @@ export default function App() {
 
   const [toast, setToast] = useState("");
 
-  // ─── HOMEPAGE PRODUCTS (object keyed by tab) ───
+  // ─── HOMEPAGE PRODUCTS ───
   const [homeProducts] = useState(() => {
     const interleaveByBrand = (arr) => {
       const byBrand = {};
@@ -660,8 +660,14 @@ export default function App() {
         <Route path="/profile" element={<ProfilePage cart={cart} wish={wish} />} />
         <Route path="/men" element={<MenPage cart={cart} setCart={setCart} wish={wish} setWish={setWish} />} />
         <Route path="/menpage" element={<MenPage cart={cart} setCart={setCart} wish={wish} setWish={setWish} />} />
+
+        {/* ── SELLER ROUTES (protected) ── */}
         <Route path="/seller" element={sellerLoggedIn ? <SellerDashboard onLogout={handleSellerLogout} /> : <Seller onSellerLoggedIn={handleSellerLogin} cart={cart} wish={wish} />} />
         <Route path="/seller/dashboard" element={sellerLoggedIn ? <SellerDashboard onLogout={handleSellerLogout} /> : <Seller onSellerLoggedIn={handleSellerLogin} cart={cart} wish={wish} />} />
+        <Route path="/seller/login" element={sellerLoggedIn ? <SellerDashboard onLogout={handleSellerLogout} /> : <Seller onSellerLoggedIn={handleSellerLogin} cart={cart} wish={wish} />} />
+        {/* Payment page: only accessible after seller login */}
+        <Route path="/seller/payment" element={isSellerLoggedIn() ? <SellerPayment /> : <Seller onSellerLoggedIn={handleSellerLogin} cart={cart} wish={wish} />} />
+
         <Route path="/buildoutfit" element={<BuildOutfit cart={cart} setCart={setCart} wish={wish} setWish={setWish} />} />
         <Route path="/BuildOutfit" element={<BuildOutfit cart={cart} setCart={setCart} wish={wish} setWish={setWish} />} />
         <Route path="/aboutus" element={<AboutUs cart={cart} wish={wish} />} />
@@ -669,8 +675,6 @@ export default function App() {
         <Route path="/admin/chat" element={<AdminChat />} />
         <Route path="/admin/login" element={<AdminLogin />} />
         <Route path="/admin/dashboard" element={<AdminDashboard />} />
-        <Route path="/seller/payment" element={<SellerPayment />} />
-        <Route path="/seller/login" element={sellerLoggedIn ? <SellerDashboard onLogout={handleSellerLogout} /> : <Seller onSellerLoggedIn={handleSellerLogin} cart={cart} wish={wish} />} />
 
         <Route path="/" element={
           <div key={location.key}>
@@ -685,7 +689,7 @@ export default function App() {
             {/* BRANDS */}
             <BrandsCarousel />
 
-            {/* PRODUCTS — fixed: homeProducts is an object, use homeProducts[tab] */}
+            {/* PRODUCTS */}
             <section id="new" className="products-section py-3 my-1">
               <div className="sh-tabs reveal" ref={addRef}>
                 {[["best", "Best Sellers"], ["new", "New Arrivals"], ["sale", "Sale"]].map(([key, label]) => (
@@ -701,14 +705,14 @@ export default function App() {
               </div>
             </section>
 
-            {/* JOIN */}
+            {/* JOIN — FIX: استخدام Link بدل href عشان ما يعملش page reload */}
             <div
               className="sh-join join-section text-center reveal py-5"
               ref={addRef}
               style={{ marginTop: "7rem", marginLeft: "1rem", marginRight: "1rem" }}
             >
               <h3 className="mb-2">Join Style Hub</h3>
-              <a href="/seller">Sell with us ›</a>
+              <Link to="/seller">Sell with us ›</Link>
             </div>
 
             {/* WHO WE ARE */}
@@ -721,7 +725,6 @@ export default function App() {
                 <h3 className="mb-3">Who We Are?</h3>
                 <p className="mb-4">We support local Egyptian fashion brands and help them reach customers across Egypt — all in one place.</p>
                 <div><a href="/aboutus" className="sh-btn sh-btn-ol sh-btn-sm">Learn more ›</a></div>
-
               </div>
               <div className="col-md-6 who-right">
                 <img src="/who.jpg" alt="support local" />
@@ -747,7 +750,7 @@ export default function App() {
               </div>
             </section>
 
-            {/* TRENDING — fixed: homeProducts is an object, use homeProducts.trend */}
+            {/* TRENDING */}
             <section id="trend" className="px-4 py-4 mobile-mt-sm" style={{ marginTop: "6rem" }}>
               <div className="sec-title reveal" ref={addRef}>Trending Now</div>
               <TrendingCarousel
