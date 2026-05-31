@@ -1625,6 +1625,7 @@ function SettingsView() {
 
 export default function SellerDashboard({ onLogout }) {
   const [activeNav, setActiveNav] = useState("dashboard");
+  const [subscriptionStatus, setSubscriptionStatus] = useState(null); // null = loading
   const seller = (() => { try { return JSON.parse(localStorage.getItem("seller") || "{}"); } catch { return {}; } })();
   const brandName = seller.brandName || seller.storeName || seller.name || "Seller";
 
@@ -1634,6 +1635,21 @@ export default function SellerDashboard({ onLogout }) {
     month: "long",
     day: "numeric",
   });
+
+  // Check subscription status from backend on mount
+  useEffect(() => {
+    const checkSubscription = async () => {
+      try {
+        const data = await sellerRequest("GET", "/seller/dashboard");
+        const status = data?.data?.seller?.subscriptionStatus || data?.seller?.subscriptionStatus || "none";
+        setSubscriptionStatus(status);
+      } catch (err) {
+        console.error("Failed to fetch subscription status", err);
+        setSubscriptionStatus("none");
+      }
+    };
+    checkSubscription();
+  }, []);
 
   const renderContent = () => {
     switch (activeNav) {
@@ -1655,6 +1671,56 @@ export default function SellerDashboard({ onLogout }) {
         return <DashboardView setActiveNav={setActiveNav} />;
     }
   };
+
+  // Loading state
+  if (subscriptionStatus === null) {
+    return (
+      <>
+        <style>{CSS}</style>
+        <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "#f5f7f0" }}>
+          <div style={{ textAlign: "center", color: "#7b8b5b" }}>
+            <div style={{ fontSize: "2rem", marginBottom: "1rem" }}>⏳</div>
+            <p style={{ fontFamily: "Jost, sans-serif", fontSize: ".95rem" }}>Loading your store...</p>
+          </div>
+        </div>
+      </>
+    );
+  }
+
+  // Pending state — waiting for admin approval
+  if (subscriptionStatus === "pending") {
+    return (
+      <>
+        <style>{CSS}</style>
+        <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "#f5f7f0", padding: "2rem" }}>
+          <div style={{ maxWidth: 480, textAlign: "center", background: "#fff", borderRadius: 20, padding: "3rem 2rem", boxShadow: "0 8px 32px rgba(0,0,0,0.08)", border: "2px solid #e3e8d9" }}>
+            <div style={{ fontSize: "3rem", marginBottom: "1.2rem" }}>⏳</div>
+            <h2 style={{ fontFamily: "Cormorant Garamond, serif", fontSize: "1.8rem", color: "#1a1a18", marginBottom: ".8rem" }}>
+              Your Request is Under Review
+            </h2>
+            <p style={{ color: "#555", fontSize: ".9rem", lineHeight: 1.7, marginBottom: "1.5rem" }}>
+              Our team is reviewing your payment. Your store will be activated within <strong>24 hours</strong>.
+              You'll receive a confirmation email once you're live.
+            </p>
+            <div style={{ background: "#f5f7f0", borderRadius: 12, padding: "1rem", fontSize: ".82rem", color: "#7b8b5b", marginBottom: "1.5rem" }}>
+              📧 Make sure to check your email inbox for updates.
+            </div>
+            <button
+              onClick={onLogout}
+              style={{ padding: "10px 28px", background: "#7b8b5b", color: "#fff", border: "none", borderRadius: 25, fontWeight: 700, cursor: "pointer", fontSize: ".85rem", fontFamily: "Jost, sans-serif" }}>
+              Logout
+            </button>
+          </div>
+        </div>
+      </>
+    );
+  }
+
+  // No subscription — redirect to payment
+  if (subscriptionStatus === "none") {
+    window.location.href = "/seller/payment";
+    return null;
+  }
 
   return (
     <>
