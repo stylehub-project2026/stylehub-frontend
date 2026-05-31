@@ -1,4 +1,4 @@
-import { useMemo, useState, useEffect, useRef } from "react";
+import { useMemo, useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { PRODUCTS, SHARED_CSS, SHFooter, SHNav } from "./shared";
 
@@ -9,6 +9,30 @@ const getImageUrl = (img) => {
   if (img.startsWith("http")) return img;
   return `${API.replace("/api", "")}${img}`;
 };
+
+// ── Size calculation — based on your brand size chart ────────────────────────
+// Chart: XS: chest 80-84, waist 60-64, hips 86-90
+//         S:  chest 84-88, waist 64-68, hips 90-94
+//         M:  chest 88-92, waist 68-72, hips 94-98
+//         L:  chest 92-96, waist 72-76, hips 98-102
+//        XL:  chest 96-100,waist 76-80, hips 102-106
+//
+// Top size → chest (cm)
+function calcTopSize(chest) {
+  if (chest < 84)  return "XS";
+  if (chest < 88)  return "S";
+  if (chest < 92)  return "M";
+  if (chest < 96)  return "L";
+  return "XL";
+}
+// Bottom size → hips (cm)
+const SIZES = ["XS","S","M","L","XL"];
+
+function calcBottomSize(waist, hips) {
+  const fromWaist = waist < 64 ? "XS" : waist < 68 ? "S" : waist < 72 ? "M" : waist < 76 ? "L" : "XL";
+  const fromHips  = hips  < 90 ? "XS" : hips  < 94 ? "S" : hips  < 98 ? "M" : hips  < 102 ? "L" : "XL";
+  return SIZES[Math.max(SIZES.indexOf(fromWaist), SIZES.indexOf(fromHips))];
+}
 
 const PAGE_CSS = `
 .bo-page {
@@ -31,6 +55,12 @@ const PAGE_CSS = `
 .bo-range { appearance: none; width: 100%; height: 7px; border-radius: 999px; background: linear-gradient(90deg, #d3d7c7, #abb28e); outline: none; }
 .bo-range::-webkit-slider-thumb { appearance: none; width: 15px; height: 15px; border-radius: 50%; background: #818a63; border: 3px solid #edf0e5; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,.16); }
 .bo-data-note { margin-top: .55rem; padding: .85rem .9rem; border-radius: 14px; background: rgba(167, 176, 138, .16); color: #5e644c; font-size: .72rem; line-height: 1.5; }
+.bo-size-result { margin-top: .85rem; padding: .75rem 1rem; border-radius: 16px; background: linear-gradient(135deg, rgba(167,176,138,.22) 0%, rgba(167,176,138,.08) 100%); border: 1px solid rgba(123,132,91,.22); display: flex; align-items: center; justify-content: space-between; gap: .5rem; }
+.bo-size-result-label { font-size: .62rem; letter-spacing: .14em; text-transform: uppercase; color: #8a8173; }
+.bo-size-badges { display: flex; gap: .45rem; }
+.bo-size-badge { display: flex; flex-direction: column; align-items: center; gap: .12rem; }
+.bo-size-badge span:first-child { font-size: .55rem; letter-spacing: .1em; text-transform: uppercase; color: #a7af8a; }
+.bo-size-badge span:last-child { font-size: 1rem; font-weight: 700; color: #3a4228; font-family: 'Cormorant Garamond', serif; letter-spacing: .04em; }
 .bo-favorites { margin-top: 1rem; padding: 1.15rem; }
 .bo-fav-title { display: flex; justify-content: center; align-items: center; gap: .35rem; font-family: 'Cormorant Garamond', serif; font-size: 1.18rem; color: #2e2922; margin-bottom: .85rem; }
 .bo-mini-list { display: grid; gap: .65rem; }
@@ -51,12 +81,14 @@ const PAGE_CSS = `
 .bo-product.on { border-color: rgba(123, 132, 91, .7); box-shadow: 0 18px 34px rgba(123, 132, 91, .18); }
 .bo-thumb { position: relative; overflow: hidden; border-radius: 20px; aspect-ratio: .82; background: #ece7df; margin-bottom: .8rem; }
 .bo-thumb img { width: 100%; height: 100%; object-fit: cover; object-position: top center; }
-.bo-heart { position: absolute; left: .6rem; bottom: .6rem; width: 28px; height: 28px; border: none; border-radius: 50%; background: rgba(255,255,255,.96); color: #df5e59; font-size: .88rem; box-shadow: 0 8px 18px rgba(0,0,0,.12); }
+.bo-heart { position: absolute; left: .6rem; bottom: .6rem; width: 28px; height: 28px; border: none; border-radius: 50%; background: rgba(255,255,255,.96); color: #df5e59; font-size: .88rem; box-shadow: 0 8px 18px rgba(0,0,0,.12); cursor: pointer; transition: transform .15s ease, background .15s ease; }
+.bo-heart:hover { transform: scale(1.15); background: #fff4f4; }
+.bo-heart.wishlisted { background: #df5e59; color: #fff; }
 .bo-brand { font-size: .63rem; letter-spacing: .18em; text-transform: uppercase; color: #8a8173; margin-bottom: .25rem; }
 .bo-name { min-height: 2.45em; font-size: .82rem; font-weight: 600; color: #27211b; }
 .bo-price { margin: .18rem 0 .7rem; color: #6f695e; font-size: .74rem; }
 .bo-model-badge { display: inline-flex; margin-bottom: .55rem; padding: .18rem .45rem; border-radius: 999px; background: rgba(167, 176, 138, .18); color: #66704d; font-size: .6rem; letter-spacing: .12em; text-transform: uppercase; }
-.bo-btn { min-width: 88px; border: none; border-radius: 8px; padding: .48rem .85rem; font-size: .69rem; background: #a7b08a; color: #fff; }
+.bo-btn { min-width: 88px; border: none; border-radius: 8px; padding: .48rem .85rem; font-size: .69rem; background: #a7b08a; color: #fff; cursor: pointer; }
 .bo-btn.dark { background: #25211b; }
 .bo-recs { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1rem; }
 .bo-rec { text-align: center; padding: .9rem; border-radius: 25px; background: rgba(255,255,255,.76); border: 1px solid rgba(86, 76, 60, .12); box-shadow: 0 12px 28px rgba(37, 31, 23, .05); transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease; }
@@ -69,8 +101,10 @@ const PAGE_CSS = `
 .bo-pill small { display: block; margin-bottom: .32rem; color: #8c8479; font-size: .57rem; letter-spacing: .18em; text-transform: uppercase; }
 .bo-pill strong { color: #28231d; font-size: .88rem; }
 .bo-actions { display: flex; gap: .8rem; margin-top: 1rem; }
-.bo-primary, .bo-secondary { border: none; border-radius: 12px; padding: .95rem 1rem; text-transform: uppercase; letter-spacing: .1em; font-size: .73rem; }
-.bo-primary { flex: 1; background: #25211b; color: #fff; }
+.bo-primary, .bo-secondary { border: none; border-radius: 12px; padding: .95rem 1rem; text-transform: uppercase; letter-spacing: .1em; font-size: .73rem; cursor: pointer; }
+.bo-primary { flex: 1; background: #25211b; color: #fff; transition: background .25s ease, box-shadow .25s ease; }
+.bo-primary.ready { background: linear-gradient(135deg, #7b9c5a 0%, #a7b08a 100%); box-shadow: 0 8px 24px rgba(123,156,90,.28); }
+.bo-primary:disabled { opacity: .45; cursor: default; }
 .bo-secondary { min-width: 240px; background: rgba(167, 176, 138, .16); color: #5a6249; }
 .bo-carousel { position: relative; }
 .bo-carousel-track { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1rem; transition: none; }
@@ -99,7 +133,6 @@ function SilhouettePreview({ selectedTop, selectedBottom, body }) {
   const hi = body?.hips   || 96;
 
   const heightScale = 0.80 + ((h - 140) / 55) * 0.38;
-
   const widthScale = Math.min(1.55, Math.max(0.70,
     0.75
     + ((w  - 45) / 85) * 0.58
@@ -108,7 +141,6 @@ function SilhouettePreview({ selectedTop, selectedBottom, body }) {
   ));
 
   const clothWidthPct = 68 * widthScale;
-
   const bodyTopPct    = 50 - (88 * heightScale) / 2;
   const bodyHeightPct = 88 * heightScale;
 
@@ -129,7 +161,6 @@ function SilhouettePreview({ selectedTop, selectedBottom, body }) {
 
   const topGarmentTop    = shoulderTopPct;
   const topGarmentHeight = (waistPct - shoulderTopPct) * 1.45;
-
   const bottomGarmentTop    = waistPct - (hipsEndPct - waistPct) * 0.18;
   const bottomGarmentHeight = feetPct - bottomGarmentTop;
 
@@ -144,89 +175,50 @@ function SilhouettePreview({ selectedTop, selectedBottom, body }) {
         color:"rgba(255,255,255,.28)", zIndex:10, pointerEvents:"none",
       }}>Outfit Preview</div>
 
-      <img
-        src="/body.png"
-        alt=""
-        style={{
-          position:"absolute",
-          top:`${silhouetteTop}%`,
-          left:"50%",
-          transform:`translateX(-50%) scaleX(${widthScale})`,
-          height:`${silhouetteHeight}%`,
-          width:"auto",
-          zIndex:0,
-          pointerEvents:"none",
-          opacity:0.40,
-          userSelect:"none",
-        }}
-        draggable={false}
-      />
+      <img src="/body.png" alt="" style={{
+        position:"absolute", top:`${silhouetteTop}%`, left:"50%",
+        transform:`translateX(-50%) scaleX(${widthScale})`,
+        height:`${silhouetteHeight}%`, width:"auto", zIndex:0,
+        pointerEvents:"none", opacity:0.40, userSelect:"none",
+      }} draggable={false} />
 
       <div style={{
-        position:"absolute",
-        top: `${topGarmentTop}%`,
-        left:"50%",
-        transform:"translateX(-50%)",
-        width: `${clothWidthPct}%`,
-        height: `${topGarmentHeight}%`,
-        zIndex:2,
+        position:"absolute", top:`${topGarmentTop}%`, left:"50%",
+        transform:"translateX(-50%)", width:`${clothWidthPct}%`,
+        height:`${topGarmentHeight}%`, zIndex:2,
         display:"flex", alignItems:"flex-start", justifyContent:"center",
         transition:"all .35s ease",
       }}>
         {selectedTop ? (
-          <img
-            key={selectedTop.id}
-            src={selectedTop.img3d || selectedTop.img}
-            alt={selectedTop.name}
-            style={{
-              width:"100%", height:"100%",
-              objectFit:"fill",
-              filter:"drop-shadow(0 8px 20px rgba(0,0,0,.6))",
-              animation:"fadeInUp .3s ease",
-            }}
-          />
+          <img key={selectedTop.id} src={selectedTop.img3d || selectedTop.img} alt={selectedTop.name}
+            style={{ width:"100%", height:"100%", objectFit:"fill",
+              filter:"drop-shadow(0 8px 20px rgba(0,0,0,.6))", animation:"fadeInUp .3s ease" }} />
         ) : (
-          <div style={{
-            width:"80%", height:"75%",
-            border:"1.5px dashed rgba(255,255,255,.12)", borderRadius:6,
-            display:"flex", alignItems:"center", justifyContent:"center",
-            color:"rgba(255,255,255,.2)", fontSize:".58rem",
-            letterSpacing:".12em", textTransform:"uppercase",
-          }}>Choose Top</div>
+          <div style={{ width:"80%", height:"75%", border:"1.5px dashed rgba(255,255,255,.12)",
+            borderRadius:6, display:"flex", alignItems:"center", justifyContent:"center",
+            color:"rgba(255,255,255,.2)", fontSize:".58rem", letterSpacing:".12em", textTransform:"uppercase" }}>
+            Choose Top
+          </div>
         )}
       </div>
 
       <div style={{
-        position:"absolute",
-        top: `${bottomGarmentTop}%`,
-        left:"50%",
-        transform:"translateX(-50%)",
-        width: `${clothWidthPct}%`,
-        height: `${bottomGarmentHeight}%`,
-        zIndex:1,
+        position:"absolute", top:`${bottomGarmentTop}%`, left:"50%",
+        transform:"translateX(-50%)", width:`${clothWidthPct}%`,
+        height:`${bottomGarmentHeight}%`, zIndex:1,
         display:"flex", alignItems:"flex-start", justifyContent:"center",
         transition:"all .35s ease",
       }}>
         {selectedBottom ? (
-          <img
-            key={selectedBottom.id}
-            src={selectedBottom.img3d || selectedBottom.img}
-            alt={selectedBottom.name}
-            style={{
-              width:"100%", height:"100%",
-              objectFit:"fill",
-              filter:"drop-shadow(0 6px 16px rgba(0,0,0,.5))",
-              animation:"fadeInDown .3s ease",
-            }}
-          />
+          <img key={selectedBottom.id} src={selectedBottom.img3d || selectedBottom.img} alt={selectedBottom.name}
+            style={{ width:"100%", height:"100%", objectFit:"fill",
+              filter:"drop-shadow(0 6px 16px rgba(0,0,0,.5))", animation:"fadeInDown .3s ease" }} />
         ) : (
-          <div style={{
-            width:"75%", height:"70%",
-            border:"1.5px dashed rgba(255,255,255,.12)", borderRadius:6,
-            display:"flex", alignItems:"center", justifyContent:"center",
-            color:"rgba(255,255,255,.2)", fontSize:".58rem",
-            letterSpacing:".12em", textTransform:"uppercase",
-          }}>Choose Bottom</div>
+          <div style={{ width:"75%", height:"70%", border:"1.5px dashed rgba(255,255,255,.12)",
+            borderRadius:6, display:"flex", alignItems:"center", justifyContent:"center",
+            color:"rgba(255,255,255,.2)", fontSize:".58rem", letterSpacing:".12em", textTransform:"uppercase" }}>
+            Choose Bottom
+          </div>
         )}
       </div>
 
@@ -235,8 +227,7 @@ function SilhouettePreview({ selectedTop, selectedBottom, body }) {
           position:"absolute", bottom:0, left:0, right:0,
           background:"linear-gradient(transparent,rgba(0,0,0,.75))",
           padding:".6rem .8rem .7rem",
-          display:"flex", justifyContent:"space-between", gap:".5rem",
-          zIndex:10,
+          display:"flex", justifyContent:"space-between", gap:".5rem", zIndex:10,
         }}>
           <div style={{flex:1}}>
             {selectedTop && <>
@@ -259,18 +250,24 @@ function SilhouettePreview({ selectedTop, selectedBottom, body }) {
   );
 }
 
-function ProductCard({ item, selected, onSelect }) {
+function ProductCard({ item, selected, onSelect, wish, onWish }) {
+  const isWished = wish && wish.some(w => w.id === item.id);
   return (
     <article className={`bo-product bo-soft${selected ? " on" : ""}`}>
       <div className="bo-thumb">
         <img src={item.img} alt={item.name}/>
-        <button className="bo-heart" type="button">&#10084;</button>
+        <button
+          className={`bo-heart${isWished ? " wishlisted" : ""}`}
+          type="button"
+          title={isWished ? "Remove from wishlist" : "Add to wishlist"}
+          onClick={() => onWish && onWish(item)}
+        >&#10084;</button>
       </div>
       <div className="bo-model-badge">{item.img3d ? "2D Try-On Ready" : "3D Fit Ready"}</div>
       <div className="bo-brand">{item.brand}</div>
       <div className="bo-name">{item.name}</div>
       <div className="bo-price">{item.price}</div>
-      <button className={`bo-btn${selected ? " dark" : ""}`} type="button" onClick={()=>onSelect(item)}>
+      <button className={`bo-btn${selected ? " dark" : ""}`} type="button" onClick={() => onSelect(item)}>
         {selected ? "Selected" : "Select"}
       </button>
     </article>
@@ -287,24 +284,30 @@ function MiniFavorite({ item }) {
   );
 }
 
-function RecCard({ item, selected, onSelect }) {
+function RecCard({ item, selected, onSelect, wish, onWish }) {
+  const isWished = wish && wish.some(w => w.id === item.id);
   return (
     <article className={`bo-rec${selected ? " on" : ""}`}>
       <div className="bo-thumb">
         <img src={item.img} alt={item.name}/>
-        <button className="bo-heart" type="button">&#10084;</button>
+        <button
+          className={`bo-heart${isWished ? " wishlisted" : ""}`}
+          type="button"
+          title={isWished ? "Remove from wishlist" : "Add to wishlist"}
+          onClick={() => onWish && onWish(item)}
+        >&#10084;</button>
       </div>
       <div className="bo-brand">{item.brand}</div>
       <div className="bo-name">{item.name}</div>
       <div className="bo-price">{item.price}</div>
-      <button className={`bo-btn${selected ? " dark" : ""}`} type="button" onClick={()=>onSelect(item)}>
+      <button className={`bo-btn${selected ? " dark" : ""}`} type="button" onClick={() => onSelect(item)}>
         {selected ? "Selected" : "Select"}
       </button>
     </article>
   );
 }
 
-function ProductCarousel({ products, selectedId, onSelect }) {
+function ProductCarousel({ products, selectedId, onSelect, wish, onWish }) {
   const [idx, setIdx] = useState(0);
   const visible = 3;
   const total   = products.length;
@@ -318,7 +321,12 @@ function ProductCarousel({ products, selectedId, onSelect }) {
 
       <div className="bo-carousel-track">
         {shown.map(item => (
-          <ProductCard key={item.id} item={item} selected={selectedId === item.id} onSelect={() => onSelect(item)} />
+          <ProductCard
+            key={item.id} item={item}
+            selected={selectedId === item.id}
+            onSelect={onSelect}
+            wish={wish} onWish={onWish}
+          />
         ))}
         {shown.length < visible && Array.from({ length: visible - shown.length }).map((_, i) => (
           <div key={`pad-${i}`} />
@@ -344,11 +352,15 @@ const parsePrice = (priceStr) => {
   return parseFloat(priceStr.replace(/[^0-9.-]+/g, "")) || 0;
 };
 
-export default function BuildOutfit({ cart=[], setCart, wish=[] }) {
+export default function BuildOutfit({ cart=[], setCart, wish=[], setWish }) {
   const [selectedTop,    setSelectedTop]    = useState(null);
   const [selectedBottom, setSelectedBottom] = useState(null);
   const [favorites,      setFavorites]      = useState([]);
   const [body, setBody] = useState({ height:170, chest:88, waist:70, hips:96, weight:70 });
+
+  // Derived sizes — recalculated live as sliders move
+  const topSize    = calcTopSize(body.chest);
+  const bottomSize = calcBottomSize(body.waist, body.hips);
 
   const adultProducts = useMemo(()=>
     PRODUCTS.filter(p=>{
@@ -361,25 +373,16 @@ export default function BuildOutfit({ cart=[], setCart, wish=[] }) {
     }), []
   );
 
-  const topProducts     = useMemo(()=>TOP_PRODUCT_IDS.map(id=>adultProducts.find(p=>p.id===id)).filter(Boolean),[adultProducts]);
-  const bottomProducts  = useMemo(()=>BOTTOM_PRODUCT_IDS.map(id=>adultProducts.find(p=>p.id===id)).filter(Boolean),[adultProducts]);
+  const topProducts    = useMemo(()=>TOP_PRODUCT_IDS.map(id=>adultProducts.find(p=>p.id===id)).filter(Boolean),[adultProducts]);
+  const bottomProducts = useMemo(()=>BOTTOM_PRODUCT_IDS.map(id=>adultProducts.find(p=>p.id===id)).filter(Boolean),[adultProducts]);
 
-  // ─────────────────────────────────────────────────────────────────────────
-  // 🎛  RECOMMENDED PRODUCTS — picked from the SAME pool as the carousels
-  //     above (TOP_PRODUCT_IDS + BOTTOM_PRODUCT_IDS) so clicking them works
-  //     exactly like clicking a "Choose Top" / "Choose Bottom" card.
-  //     Picks 2 tops + 1 bottom by default, skipping anything already chosen.
-  //     To change the 3 shown, just edit the indices below.
-  // ─────────────────────────────────────────────────────────────────────────
   const recommendedProducts = useMemo(()=>{
     const availTops    = topProducts.filter(p=>p.id!==selectedTop?.id);
     const availBottoms = bottomProducts.filter(p=>p.id!==selectedBottom?.id);
-    // Tag each item with its kind so the click handler knows which slot to fill
     const pick = [];
     if (availTops[2])    pick.push({ ...availTops[2],    _kind:"top"    });
     if (availBottoms[0]) pick.push({ ...availBottoms[0], _kind:"bottom" });
     if (availTops[5])    pick.push({ ...availTops[5],    _kind:"top"    });
-    // Fallback to fill 3 slots if any index above is missing
     const pool = [
       ...availTops.map(p=>({...p,_kind:"top"})),
       ...availBottoms.map(p=>({...p,_kind:"bottom"})),
@@ -395,27 +398,39 @@ export default function BuildOutfit({ cart=[], setCart, wish=[] }) {
   const favoritesToShow = favorites.length ? favorites.slice(-4) : [...topProducts,...bottomProducts].slice(0,4);
   const selectedCount   = Number(Boolean(selectedTop)) + Number(Boolean(selectedBottom));
   const total           = parsePrice(selectedTop?.price) + parsePrice(selectedBottom?.price);
+  const outfitReady     = Boolean(selectedTop && selectedBottom);
 
-  const selectProduct = (item, type) => {
-    if (type==="top") setSelectedTop(item); else setSelectedBottom(item);
-    setFavorites(prev=>prev.some(s=>s.id===item.id)?prev:[...prev,item]);
+  const handleWish = (item) => {
+    if (!setWish) return;
+    setWish(prev => {
+      const exists = prev.some(w => w.id === item.id);
+      return exists ? prev.filter(w => w.id !== item.id) : [...prev, item];
+    });
   };
 
-  // Click handler for recommended cards — uses the _kind tag set above
+  const selectProduct = (item, type) => {
+    if (type === "top") setSelectedTop(item);
+    else setSelectedBottom(item);
+    setFavorites(prev => prev.some(s => s.id === item.id) ? prev : [...prev, item]);
+  };
+
   const selectRecommended = (item) => {
     const type = item._kind || (TOP_PRODUCT_IDS.includes(item.id) ? "top" : "bottom");
     selectProduct(item, type);
   };
 
   const addOutfit = () => {
-    if (!selectedTop||!selectedBottom||!setCart) return;
-    setCart(prev=>{
-      let c=[...prev];
-      [selectedTop,selectedBottom].forEach(item=>{
-        const size=item.sizes?.[0]||"M";
-        const ex=c.find(x=>x.id===item.id&&x.size===size);
-        if(ex) c=c.map(x=>x.id===item.id&&x.size===size?{...x,qty:x.qty+1}:x);
-        else c=[...c,{id:item.id,size,qty:1}];
+    if (!selectedTop || !selectedBottom || !setCart) return;
+    setCart(prev => {
+      let c = [...prev];
+      const items = [
+        { item: selectedTop,    size: topSize    },
+        { item: selectedBottom, size: bottomSize },
+      ];
+      items.forEach(({ item, size }) => {
+        const ex = c.find(x => x.id === item.id && x.size === size);
+        if (ex) c = c.map(x => x.id === item.id && x.size === size ? { ...x, qty: x.qty + 1 } : x);
+        else c = [...c, { id: item.id, size, qty: 1 }];
       });
       return c;
     });
@@ -438,12 +453,16 @@ export default function BuildOutfit({ cart=[], setCart, wish=[] }) {
             <SilhouettePreview selectedTop={selectedTop} selectedBottom={selectedBottom} body={body}/>
 
             <section className="bo-data bo-soft" style={{marginTop:"1rem",padding:"1.15rem"}}>
-              <div className="bo-card-title" style={{fontSize:".7rem",letterSpacing:".14em",textTransform:"uppercase",color:"#8a8173",marginBottom:"1rem",fontWeight:600}}>Body Measurements</div>
+              <div className="bo-card-title" style={{fontSize:".7rem",letterSpacing:".14em",textTransform:"uppercase",color:"#8a8173",marginBottom:"1rem",fontWeight:600}}>
+                Body Measurements
+              </div>
+
               {[
                 ["height","Height","cm",140,195],
                 ["weight","Weight","kg",45,130],
-                ["chest","Chest","cm",75,125],
-                ["hips","Hips","cm",80,130],
+                ["chest","Chest","cm",80,100],
+                ["waist","Waist","cm",60,80],
+                ["hips","Hips","cm",86,110],
               ].map(([key,label,unit,min,max])=>(
                 <div key={key} style={{marginBottom:".8rem"}}>
                   <div style={{display:"flex",justifyContent:"space-between",fontSize:".72rem",marginBottom:".3rem"}}>
@@ -455,8 +474,25 @@ export default function BuildOutfit({ cart=[], setCart, wish=[] }) {
                     style={{width:"100%",accentColor:"#a7b08a",height:4,cursor:"pointer"}}/>
                 </div>
               ))}
-              <div style={{fontSize:".62rem",color:"#b9b1a3",marginTop:".5rem",lineHeight:1.5}}>
-                Adjust sliders to see how clothes fit your body type
+
+              {/* ── Calculated size result ── */}
+              <div className="bo-size-result">
+                <div className="bo-size-result-label">Your size</div>
+                <div className="bo-size-badges">
+                  <div className="bo-size-badge">
+                    <span>Top</span>
+                    <span>{topSize}</span>
+                  </div>
+                  <div style={{width:"1px",background:"rgba(123,132,91,.25)",margin:"0 .15rem"}}/>
+                  <div className="bo-size-badge">
+                    <span>Bottom</span>
+                    <span>{bottomSize}</span>
+                  </div>
+                </div>
+              </div>
+
+              <div style={{fontSize:".62rem",color:"#b9b1a3",marginTop:".6rem",lineHeight:1.5}}>
+                Sizes update live as you adjust your measurements
               </div>
             </section>
 
@@ -475,13 +511,23 @@ export default function BuildOutfit({ cart=[], setCart, wish=[] }) {
             <section className="bo-step">
               <div className="bo-kicker"><strong>1. Choose Your Items</strong><div>1. Choose Top</div></div>
               <div className="bo-divider"/>
-              <ProductCarousel products={topProducts} selectedId={selectedTop?.id} onSelect={item=>selectProduct(item,"top")} />
+              <ProductCarousel
+                products={topProducts}
+                selectedId={selectedTop?.id}
+                onSelect={item => selectProduct(item, "top")}
+                wish={wish} onWish={handleWish}
+              />
             </section>
 
             <section className="bo-step">
               <div className="bo-kicker">2. Choose Bottom</div>
               <div className="bo-divider"/>
-              <ProductCarousel products={bottomProducts} selectedId={selectedBottom?.id} onSelect={item=>selectProduct(item,"bottom")} />
+              <ProductCarousel
+                products={bottomProducts}
+                selectedId={selectedBottom?.id}
+                onSelect={item => selectProduct(item, "bottom")}
+                wish={wish} onWish={handleWish}
+              />
             </section>
 
             <section className="bo-step">
@@ -489,10 +535,10 @@ export default function BuildOutfit({ cart=[], setCart, wish=[] }) {
               <div className="bo-recs">
                 {recommendedProducts.map(item=>(
                   <RecCard
-                    key={item.id}
-                    item={item}
+                    key={item.id} item={item}
                     selected={selectedTop?.id===item.id||selectedBottom?.id===item.id}
                     onSelect={selectRecommended}
+                    wish={wish} onWish={handleWish}
                   />
                 ))}
               </div>
@@ -500,12 +546,22 @@ export default function BuildOutfit({ cart=[], setCart, wish=[] }) {
 
             <div className="bo-summary">
               <div className="bo-pill"><small>Selected Pieces</small><strong>{selectedCount}/2 chosen</strong></div>
-              <div className="bo-pill"><small>Preview</small><strong>{selectedTop&&selectedBottom?"Full look ready":"Select top + bottom"}</strong></div>
+              <div className="bo-pill">
+                <small>Your Sizes</small>
+                <strong>{outfitReady ? `${topSize} top · ${bottomSize} bottom` : "Set measurements"}</strong>
+              </div>
               <div className="bo-pill"><small>Estimated Total</small><strong>{total?`LE ${total.toLocaleString()}`:"Choose items"}</strong></div>
             </div>
 
             <div className="bo-actions">
-              <button className="bo-primary" type="button" onClick={addOutfit} disabled={!selectedTop||!selectedBottom}>Add Outfit to Cart</button>
+              <button
+                className={`bo-primary${outfitReady ? " ready" : ""}`}
+                type="button"
+                onClick={addOutfit}
+                disabled={!outfitReady}
+              >
+                {outfitReady ? `✓ Add Outfit to Cart (${topSize} / ${bottomSize})` : "Add Outfit to Cart"}
+              </button>
               <button className="bo-secondary" type="button">
                 {selectedTop?.name||selectedBottom?.name?"Fit Adjusted to Your Body":"Pick Items First"}
               </button>
