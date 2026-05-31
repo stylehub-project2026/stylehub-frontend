@@ -7,6 +7,11 @@ const API = "https://stylehub-backend-tau.vercel.app/api";
 // ─── helpers ───
 const toNum = s => parseInt(String(s || "").replace(/\D/g, "")) || 0;
 
+// Unit price = base price + personalization fee (if any)
+const itemUnitPrice = item => toNum(item.product.price) + (item.customization?.fee || 0);
+// Line total = unit price × quantity
+const itemLineTotal = item => itemUnitPrice(item) * item.qty;
+
 // ─── Change this one number to update shipping everywhere ───
 const SHIPPING = 80;
 
@@ -102,6 +107,14 @@ const CSS = `
 .ck-bill-meta { font-size:.65rem; color:var(--warm); margin-top:.15rem; }
 .ck-bill-price { font-size:.82rem; font-weight:600; flex-shrink:0; }
 
+/* CUSTOMIZATION BADGE */
+.ck-custom {
+  font-size:.65rem; color:#8b6f3d; margin-top:.35rem;
+  padding:.3rem .5rem; background:#fbf6ea; border-left:2px solid #c8a96e;
+  font-family:'DM Sans',sans-serif; line-height:1.5;
+}
+.ck-custom strong { color:var(--dark); }
+
 /* ORDER SUMMARY BOX */
 .ck-sumbox { background:#fff; border:1px solid var(--border); padding:1.5rem; }
 .ck-sum-title { font-size:.62rem; letter-spacing:.2em; text-transform:uppercase; font-weight:600; margin-bottom:1.2rem; }
@@ -109,7 +122,7 @@ const CSS = `
 .ck-sum-row span:first-child { color:var(--warm); }
 .ck-sum-divider { border:none; border-top:1px solid var(--border); margin:1rem 0; }
 .ck-sum-total { display:flex; justify-content:space-between; font-size:1rem; font-weight:700; }
-.ck-sum-item { display:flex; gap:.7rem; align-items:center; padding:.5rem 0; border-bottom:1px solid var(--border); }
+.ck-sum-item { display:flex; gap:.7rem; align-items:flex-start; padding:.5rem 0; border-bottom:1px solid var(--border); }
 .ck-sum-item:last-child { border-bottom:none; }
 .ck-sum-img { width:44px; height:54px; object-fit:cover; background:#f0ece6; flex-shrink:0; }
 .ck-sum-name { font-size:.72rem; font-weight:500; line-height:1.3; }
@@ -177,6 +190,21 @@ const CSS = `
 }
 `;
 
+// ─── Customization details badge (reusable) ───
+const FONT_LABELS = { "serif-italic": "Italic", "serif": "Serif", "block": "Block" };
+function CustomBadge({ customization }) {
+  if (!customization) return null;
+  const fontLabel = FONT_LABELS[customization.font] || customization.font;
+  const posLabel = customization.position
+    ? customization.position.charAt(0).toUpperCase() + customization.position.slice(1)
+    : "";
+  return (
+    <div className="ck-custom">
+      ✨ <strong>"{customization.text}"</strong> · {fontLabel}{posLabel ? ` · ${posLabel}` : ""} · <strong>+LE {customization.fee}</strong>
+    </div>
+  );
+}
+
 // ─── STEPPER ───
 function Stepper({ step }) {
   const steps = ["Delivery", "Payment", "Review"];
@@ -202,7 +230,7 @@ function Stepper({ step }) {
 
 // ─── ORDER SUMMARY SIDEBAR ───
 function OrderSummary({ items, brandGroups, shipping }) {
-  const subtotal = items.reduce((s, x) => s + toNum(x.product.price) * x.qty, 0);
+  const subtotal = items.reduce((s, x) => s + itemLineTotal(x), 0);
   const total = subtotal + shipping;
   return (
     <div className="ck-sumbox">
@@ -211,23 +239,24 @@ function OrderSummary({ items, brandGroups, shipping }) {
       {/* Items */}
       <div style={{ marginBottom: "1rem" }}>
         {items.map(item => (
-          <div key={`${item.id}-${item.size}`} className="ck-sum-item">
+          <div key={`${item.id}-${item.size}-${item.customization?.text || ""}`} className="ck-sum-item">
             <img className="ck-sum-img" src={item.product.img} alt={item.product.name}
               onError={e => e.target.style.display = "none"} />
-            <div style={{ flex: 1 }}>
+            <div style={{ flex: 1, minWidth: 0 }}>
               <div className="ck-sum-name">{item.product.name}</div>
               <div className="ck-sum-meta">{item.product.brand} · Size {item.size} · ×{item.qty}</div>
+              {item.customization && <CustomBadge customization={item.customization} />}
             </div>
-            <div className="ck-sum-price">LE {(toNum(item.product.price) * item.qty).toLocaleString()}</div>
+            <div className="ck-sum-price">LE {itemLineTotal(item).toLocaleString()}</div>
           </div>
         ))}
       </div>
 
       <hr className="ck-sum-divider" />
 
-      {/* Per-brand subtotals */}
+      {/* Per-brand subtotals (now include personalization fees) */}
       {Object.entries(brandGroups).map(([brand, bItems]) => {
-        const sub = bItems.reduce((s, x) => s + toNum(x.product.price) * x.qty, 0);
+        const sub = bItems.reduce((s, x) => s + itemLineTotal(x), 0);
         return (
           <div key={brand} className="ck-sum-row">
             <span>{brand}</span>
@@ -388,7 +417,7 @@ function StepPayment({ form, setForm, errors, brandGroups, onNext, onBack }) {
       {/* Per-brand payment */}
       {brands.map((brand, bi) => {
         const bItems = brandGroups[brand];
-        const sub = bItems.reduce((s, x) => s + toNum(x.product.price) * x.qty, 0);
+        const sub = bItems.reduce((s, x) => s + itemLineTotal(x), 0);
         const pKey = `payment_${brand}`;
         const current = form[pKey] || "cod";
 
@@ -446,8 +475,12 @@ function StepPayment({ form, setForm, errors, brandGroups, onNext, onBack }) {
 // ─── STEP 3 — REVIEW ───
 function StepReview({ form, brandGroups, onBack, onPlace, placing }) {
   const brands = Object.keys(brandGroups);
-  const total = Object.values(brandGroups).flat().reduce((s, x) => s + toNum(x.product.price) * x.qty, 0);
+  const allItems = Object.values(brandGroups).flat();
+  const itemsBase = allItems.reduce((s, x) => s + toNum(x.product.price) * x.qty, 0);
+  const customFees = allItems.reduce((s, x) => s + (x.customization?.fee || 0) * x.qty, 0);
+  const total = itemsBase + customFees;
   const shipping = form.delivery === "express" ? 120 : 80;
+  const hasCustom = customFees > 0;
 
   const payLabel = key => ({ cod: "Cash on Delivery", fawry: "Fawry", card: "Credit/Debit Card", instapay: "InstaPay" }[key] || key);
 
@@ -471,7 +504,7 @@ function StepReview({ form, brandGroups, onBack, onPlace, placing }) {
       {/* Per-brand order bills */}
       {brands.map(brand => {
         const bItems = brandGroups[brand];
-        const sub = bItems.reduce((s, x) => s + toNum(x.product.price) * x.qty, 0);
+        const sub = bItems.reduce((s, x) => s + itemLineTotal(x), 0);
         const pKey = form[`payment_${brand}`] || "cod";
         return (
           <div key={brand} className="ck-bill">
@@ -480,14 +513,15 @@ function StepReview({ form, brandGroups, onBack, onPlace, placing }) {
               <span className="ck-bill-subtotal">LE {sub.toLocaleString()} · {payLabel(pKey)}</span>
             </div>
             {bItems.map(item => (
-              <div key={`${item.id}-${item.size}`} className="ck-bill-item">
+              <div key={`${item.id}-${item.size}-${item.customization?.text || ""}`} className="ck-bill-item">
                 <img className="ck-bill-img" src={item.product.img} alt={item.product.name}
                   onError={e => e.target.style.display = "none"} />
                 <div className="ck-bill-info">
                   <div className="ck-bill-name">{item.product.name}</div>
                   <div className="ck-bill-meta">Size: {item.size} · Qty: {item.qty}</div>
+                  {item.customization && <CustomBadge customization={item.customization} />}
                 </div>
-                <div className="ck-bill-price">LE {(toNum(item.product.price) * item.qty).toLocaleString()}</div>
+                <div className="ck-bill-price">LE {itemLineTotal(item).toLocaleString()}</div>
               </div>
             ))}
           </div>
@@ -498,8 +532,14 @@ function StepReview({ form, brandGroups, onBack, onPlace, placing }) {
       <div className="ck-card" style={{ background: "#f8f6f2" }}>
         <div style={{ display: "flex", justifyContent: "space-between", fontSize: ".82rem", marginBottom: ".5rem" }}>
           <span style={{ color: "var(--warm)" }}>Items subtotal</span>
-          <span>LE {total.toLocaleString()}</span>
+          <span>LE {itemsBase.toLocaleString()}</span>
         </div>
+        {hasCustom && (
+          <div style={{ display: "flex", justifyContent: "space-between", fontSize: ".82rem", marginBottom: ".5rem" }}>
+            <span style={{ color: "#8b6f3d" }}>✨ Personalization</span>
+            <span style={{ color: "#8b6f3d", fontWeight: 600 }}>+LE {customFees.toLocaleString()}</span>
+          </div>
+        )}
         <div style={{ display: "flex", justifyContent: "space-between", fontSize: ".82rem", marginBottom: ".5rem" }}>
           <span style={{ color: "var(--warm)" }}>Shipping</span>
           <span style={{ color: "var(--dark)", fontWeight: 600 }}>
@@ -549,7 +589,7 @@ function StepSuccess({ brandGroups, form, confirmedOrder, onContinue }) {
           </div>
         ) : (
           brands.map(brand => {
-            const sub = brandGroups[brand].reduce((s, x) => s + toNum(x.product.price) * x.qty, 0);
+            const sub = brandGroups[brand].reduce((s, x) => s + itemLineTotal(x), 0);
             const pay = form[`payment_${brand}`] || "cod";
             const payLabel = { cod: "Cash on Delivery", fawry: "Fawry", card: "Card", instapay: "InstaPay" }[pay];
             return (
@@ -612,6 +652,7 @@ export default function Checkout({ cart = [], setCart, wish = [], setWish }) {
             size: i.size,
             color: i.color,
             cartItemId: i._id,
+            customization: i.customization || null,
             product: {
               id: i.product._id,
               _id: i.product._id,
@@ -620,7 +661,7 @@ export default function Checkout({ cart = [], setCart, wish = [], setWish }) {
               rawPrice: i.product.salePrice || i.product.price,
               oldPrice: i.product.salePrice ? `LE ${i.product.price}` : null,
               img: i.product.images?.[0] ? (i.product.images[0].startsWith('http') ? i.product.images[0] : `https://stylehub-backend-tau.vercel.app${i.product.images[0]}`) : null,
-              brand: "StyleHub",
+              brand: i.product.seller?.brandName || "StyleHub",
             }
           }));
           setBackendItems(transformed);
@@ -675,11 +716,13 @@ export default function Checkout({ cart = [], setCart, wish = [], setWish }) {
         const paymentMethod = form[`payment_${firstBrand}`] || "cod";
         const validPayment = ["cod", "card", "fawry", "instapay"].includes(paymentMethod) ? paymentMethod : "cod";
 
+        // Include customization in each order item so backend stores + emails it
         const orderItems = items.map(item => ({
           productId: item.product._id || item.product.id,
           quantity: item.qty,
           size: item.size,
           color: item.color,
+          customization: item.customization || null,
         }));
 
         const shippingAddress = {
