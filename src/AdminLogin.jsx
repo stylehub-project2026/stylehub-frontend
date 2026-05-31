@@ -28,37 +28,82 @@ export default function AdminLogin() {
         }
     };
 
+    const inputStyle = {
+        width: '100%', padding: '11px 16px', borderRadius: 11,
+        border: '2px solid transparent', fontSize: '.9rem',
+        background: '#e3e8d9', outline: 'none', fontFamily: 'Jost, sans-serif',
+        color: '#333', transition: 'all .2s', boxSizing: 'border-box',
+    };
+
     return (
-        <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#F8F6F2' }}>
-            <div style={{ width: 400, padding: 40, background: '#fff', border: '1px solid #e4e0da', borderRadius: 12 }}>
-                <h2 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '2rem', marginBottom: 8 }}>Admin Login</h2>
-                <p style={{ color: '#8c8880', fontSize: '.85rem', marginBottom: 28 }}>StyleHub Admin Panel</p>
-                {error && <p style={{ color: '#e63946', marginBottom: 16, fontSize: '.85rem' }}>{error}</p>}
-                <form onSubmit={handleLogin}>
-                    <input
-                        type="email" placeholder="Email" value={email}
-                        onChange={e => setEmail(e.target.value)}
-                        style={{ width: '100%', padding: '10px 14px', marginBottom: 12, borderRadius: 8, border: '1px solid #e4e0da', fontSize: '.9rem', boxSizing: 'border-box' }}
-                    />
-                    <div style={{ position: 'relative', marginBottom: 20 }}>
-                        <input
-                            type={showPassword ? 'text' : 'password'}
-                            placeholder="Password" value={password}
-                            onChange={e => setPassword(e.target.value)}
-                            style={{ width: '100%', padding: '10px 42px 10px 14px', borderRadius: 8, border: '1px solid #e4e0da', fontSize: '.9rem', boxSizing: 'border-box' }}
-                        />
-                        <button
-                            type="button"
-                            onClick={() => setShowPassword(s => !s)}
-                            style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: '#8c8880', fontSize: '.85rem', padding: 0 }}>
-                            {showPassword ? '🙈' : '👁️'}
-                        </button>
+        <>
+            <style>{`
+                @import url('https://fonts.googleapis.com/css2?family=Jost:wght@400;500;600;700;800&display=swap');
+                @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css');
+                * { box-sizing: border-box; margin: 0; padding: 0; }
+                body { font-family: 'Jost', sans-serif; background: #f5f7f0; }
+                .admin-input:focus { border-color: #7b8b5b !important; background: #d4dcbe !important; }
+                .admin-btn { transition: all .25s; }
+                .admin-btn:hover { background: #5e6d41 !important; transform: translateY(-1px); box-shadow: 0 6px 18px rgba(91,109,65,.25); }
+                .eye-btn { position: absolute; right: 14px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: #888; font-size: .9rem; padding: 4px; }
+            `}</style>
+            <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f5f7f0' }}>
+                <div style={{ width: 420, padding: '2.8rem 2.6rem', background: '#fff', borderRadius: 22, boxShadow: '0 20px 50px rgba(0,0,0,0.09)', position: 'relative', overflow: 'hidden' }}>
+
+                    {/* Decorative circle */}
+                    <div style={{ position: 'absolute', top: -60, right: -60, width: 180, height: 180, borderRadius: '50%', background: '#e3e8d9', opacity: .5, pointerEvents: 'none' }} />
+
+                    <div style={{ marginBottom: '1.8rem' }}>
+                        <p style={{ fontSize: '.72rem', fontWeight: 700, color: '#7b8b5b', letterSpacing: '.8px', textTransform: 'uppercase', marginBottom: '.4rem' }}>
+                            StyleHub
+                        </p>
+                        <h2 style={{ fontFamily: 'Jost, sans-serif', fontSize: '1.75rem', fontWeight: 800, color: '#222', lineHeight: 1.2 }}>
+                            Admin <span style={{ color: '#7b8b5b' }}>Login</span>
+                        </h2>
                     </div>
-                    <button type="submit" style={{ width: '100%', padding: 12, background: '#1a1a18', color: '#fff', borderRadius: 8, border: 'none', cursor: 'pointer', fontSize: '.85rem', letterSpacing: '.1em' }}>
-                        LOGIN
-                    </button>
-                </form>
+
+                    {error && (
+                        <div style={{ background: '#fdf0ee', color: '#c0392b', border: '1px solid #f5c6c2', borderRadius: 10, padding: '10px 14px', fontSize: '.83rem', marginBottom: '1rem', fontWeight: 500 }}>
+                            <i className="fas fa-exclamation-circle" style={{ marginRight: 8 }} />{error}
+                        </div>
+                    )}
+
+                    <form onSubmit={handleLogin}>
+                        <label style={{ display: 'block', fontSize: '.78rem', fontWeight: 700, color: '#555', marginBottom: '.45rem', letterSpacing: '.3px' }}>
+                            Email address
+                        </label>
+                        <input
+                            className="admin-input"
+                            type="email" placeholder="admin@stylehub.com" value={email}
+                            onChange={e => setEmail(e.target.value)}
+                            style={{ ...inputStyle, marginBottom: '1rem' }}
+                        />
+
+                        <label style={{ display: 'block', fontSize: '.78rem', fontWeight: 700, color: '#555', marginBottom: '.45rem', letterSpacing: '.3px' }}>
+                            Password
+                        </label>
+                        <div style={{ position: 'relative', marginBottom: '1.5rem' }}>
+                            <input
+                                className="admin-input"
+                                type={showPassword ? 'text' : 'password'}
+                                placeholder="••••••••" value={password}
+                                onChange={e => setPassword(e.target.value)}
+                                style={{ ...inputStyle, paddingRight: 46 }}
+                            />
+                            <button type="button" className="eye-btn" onClick={() => setShowPassword(s => !s)}>
+                                <i className={`far ${showPassword ? 'fa-eye-slash' : 'fa-eye'}`} />
+                            </button>
+                        </div>
+
+                        <button
+                            type="submit"
+                            className="admin-btn"
+                            style={{ width: '100%', padding: 13, background: '#7b8b5b', color: '#fff', border: 'none', borderRadius: 25, fontSize: '.86rem', fontWeight: 700, letterSpacing: '1px', cursor: 'pointer', fontFamily: 'Jost, sans-serif' }}>
+                            SIGN IN
+                        </button>
+                    </form>
+                </div>
             </div>
-        </div>
+        </>
     );
 }
