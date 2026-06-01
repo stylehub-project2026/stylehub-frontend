@@ -166,10 +166,11 @@ function SilhouettePreview({ selectedTop, selectedBottom, body }) {
   const silhouetteTop = shoulderTopPct - silhouetteHeight * SILHOUETTE_SHOULDER;
 
   // ── Garment sizing — كل هدمة بتتأقلم مع منطقتها ───────────────────────────
-  // Top: عرضه عند الكتف
+  // Top: بيبدأ من فوق الكتف عشان الـ hood/collar يبان
   const topGarmentWidth = 62 * shoulderScale;
-  const topGarmentTop = shoulderTopPct;
-  const topGarmentHeight = (waistPct - shoulderTopPct) * 1.45;
+  const neckTopPct = bodyTopPct + bodyHeightPct * 0.06;
+  const topGarmentTop = neckTopPct;
+  const topGarmentHeight = (waistPct - neckTopPct) * 1.35;
 
   // Bottom: عرضه عند الهيبس
   const bottomGarmentWidth = 62 * hipsScale;
