@@ -132,45 +132,37 @@ function SilhouettePreview({ selectedTop, selectedBottom, body }) {
   const wa = body?.waist || 70;
   const hi = body?.hips || 96;
 
-  // ── نطاق طبيعي لكل مقياس ─────────────────────────────────────────────────
-  const norm = (val, min, max) => Math.min(1, Math.max(0, (val - min) / (max - min)));
-
-  // Height scale: 140cm → 0.78 | 195cm → 1.18
-  const heightScale = 0.78 + norm(h, 140, 195) * 0.40;
-
-  // عرض كل منطقة على حدة
-  const shoulderScale = 0.82 + norm(ch, 80, 110) * 0.52;  // chest → كتف
-  const waistScale = 0.72 + norm(wa, 60, 90) * 0.52;  // waist → خصر
-  const hipsScale = 0.82 + norm(hi, 86, 120) * 0.52;  // hips  → ورك
-
-  // الجسم كله بيتسع بناءً على weighted average
-  const bodyWidthScale = Math.min(1.55, Math.max(0.72,
-    shoulderScale * 0.33 + waistScale * 0.30 + hipsScale * 0.37
+  const heightScale = 0.80 + ((h - 140) / 55) * 0.38;
+  const widthScale = Math.min(1.55, Math.max(0.70,
+    0.75
+    + ((w - 45) / 85) * 0.58
+    + ((ch - 75) / 50) * 0.10
+    + ((hi - 80) / 50) * 0.10
   ));
 
-  // ── تحديد نقاط الجسم ─────────────────────────────────────────────────────
-  const bodyHeightPct = 86 * heightScale;
-  const bodyTopPct = 52 - bodyHeightPct / 2;  // مركز الجسم أسفل شوية
+  const clothWidthPct = 68 * widthScale;
+  const bodyTopPct = 50 - (88 * heightScale) / 2;
+  const bodyHeightPct = 88 * heightScale;
 
-  // نسب ثابتة من الـ SVG body
-  const shoulderTopPct = bodyTopPct + bodyHeightPct * 0.13;
-  const waistPct = bodyTopPct + bodyHeightPct * 0.46;
-  const feetPct = bodyTopPct + bodyHeightPct * 0.97;
+  const SVG_SHOULDER_FRAC = 0.14;
+  const SVG_WAIST_FRAC = 0.46;
+  const SVG_HIPS_END_FRAC = 0.63;
+  const SVG_FEET_FRAC = 0.97;
 
-  // حساب الـ silhouette image
-  const silhouetteHeight = (feetPct - shoulderTopPct) / (0.965 - 0.08);
-  const silhouetteTop = shoulderTopPct - silhouetteHeight * 0.08;
+  const shoulderTopPct = bodyTopPct + bodyHeightPct * SVG_SHOULDER_FRAC;
+  const waistPct = bodyTopPct + bodyHeightPct * SVG_WAIST_FRAC;
+  const hipsEndPct = bodyTopPct + bodyHeightPct * SVG_HIPS_END_FRAC;
+  const feetPct = bodyTopPct + bodyHeightPct * SVG_FEET_FRAC;
 
-  // ── الهدوم — بتتأقلم مع كل منطقة ────────────────────────────────────────
-  // Top: عرضه بيتبع الكتف، ارتفاعه من الرقبة للخصر + overlap صغير
-  const topW = Math.min(78, Math.max(52, 62 * shoulderScale));
-  const topTop = bodyTopPct + bodyHeightPct * 0.07;     // بيبدأ من الرقبة
-  const topH = (waistPct - topTop) * 1.38;            // بينتهي تحت الخصر شوية
+  const SILHOUETTE_SHOULDER = 0.08;
+  const SILHOUETTE_FEET = 0.965;
+  const silhouetteHeight = (feetPct - shoulderTopPct) / (SILHOUETTE_FEET - SILHOUETTE_SHOULDER);
+  const silhouetteTop = shoulderTopPct - silhouetteHeight * SILHOUETTE_SHOULDER;
 
-  // Bottom: عرضه بيتبع الهيبس، بيبدأ من تحت الـ top مباشرة
-  const botW = Math.min(82, Math.max(54, 64 * hipsScale));
-  const botTop = topTop + topH * 0.80;                  // overlap مع الـ top
-  const botH = feetPct - botTop;
+  const topGarmentTop = shoulderTopPct;
+  const topGarmentHeight = (waistPct - shoulderTopPct) * 1.45;
+  const bottomGarmentTop = waistPct - (hipsEndPct - waistPct) * 0.18;
+  const bottomGarmentHeight = feetPct - bottomGarmentTop;
 
   return (
     <div className="bo-stage bo-soft" style={{
@@ -183,73 +175,58 @@ function SilhouettePreview({ selectedTop, selectedBottom, body }) {
         color: "rgba(255,255,255,.28)", zIndex: 10, pointerEvents: "none",
       }}>Outfit Preview</div>
 
-      {/* ── Body silhouette ── */}
       <img src="/body.png" alt="" style={{
-        position: "absolute",
-        top: `${silhouetteTop}%`,
-        left: "50%",
-        transform: `translateX(-50%) scaleX(${bodyWidthScale})`,
-        height: `${silhouetteHeight}%`,
-        width: "auto",
-        zIndex: 0,
-        pointerEvents: "none",
-        opacity: 0.50,
-        userSelect: "none",
-        transition: "all .4s cubic-bezier(.4,0,.2,1)",
-        transformOrigin: "center top",
+        position: "absolute", top: `${silhouetteTop}%`, left: "50%",
+        transform: `translateX(-50%) scaleX(${widthScale})`,
+        height: `${silhouetteHeight}%`, width: "auto", zIndex: 0,
+        pointerEvents: "none", opacity: 0.40, userSelect: "none",
       }} draggable={false} />
 
-      {/* ── Top garment ── */}
       <div style={{
-        position: "absolute",
-        top: `${topTop}%`, left: "50%",
-        transform: "translateX(-50%)",
-        width: `${topW}%`, height: `${topH}%`,
-        zIndex: 2,
+        position: "absolute", top: `${topGarmentTop}%`, left: "50%",
+        transform: "translateX(-50%)", width: `${clothWidthPct}%`,
+        height: `${topGarmentHeight}%`, zIndex: 2,
         display: "flex", alignItems: "flex-start", justifyContent: "center",
-        transition: "all .4s cubic-bezier(.4,0,.2,1)",
+        transition: "all .35s ease",
       }}>
         {selectedTop ? (
           <img key={selectedTop.id} src={selectedTop.img3d || selectedTop.img} alt={selectedTop.name}
             style={{
-              width: "100%", height: "100%",
-              objectFit: "contain", objectPosition: "top center",
-              filter: "drop-shadow(0 8px 22px rgba(0,0,0,.65))",
-              animation: "fadeInUp .3s ease",
+              width: "100%", height: "100%", objectFit: "fill",
+              filter: "drop-shadow(0 8px 20px rgba(0,0,0,.6))", animation: "fadeInUp .3s ease"
             }} />
         ) : (
           <div style={{
-            width: "80%", height: "70%", border: "1.5px dashed rgba(255,255,255,.12)",
+            width: "80%", height: "75%", border: "1.5px dashed rgba(255,255,255,.12)",
             borderRadius: 6, display: "flex", alignItems: "center", justifyContent: "center",
             color: "rgba(255,255,255,.2)", fontSize: ".58rem", letterSpacing: ".12em", textTransform: "uppercase"
-          }}>Choose Top</div>
+          }}>
+            Choose Top
+          </div>
         )}
       </div>
 
-      {/* ── Bottom garment ── */}
       <div style={{
-        position: "absolute",
-        top: `${botTop}%`, left: "50%",
-        transform: "translateX(-50%)",
-        width: `${botW}%`, height: `${botH}%`,
-        zIndex: 1,
+        position: "absolute", top: `${bottomGarmentTop}%`, left: "50%",
+        transform: "translateX(-50%)", width: `${clothWidthPct}%`,
+        height: `${bottomGarmentHeight}%`, zIndex: 1,
         display: "flex", alignItems: "flex-start", justifyContent: "center",
-        transition: "all .4s cubic-bezier(.4,0,.2,1)",
+        transition: "all .35s ease",
       }}>
         {selectedBottom ? (
           <img key={selectedBottom.id} src={selectedBottom.img3d || selectedBottom.img} alt={selectedBottom.name}
             style={{
-              width: "100%", height: "100%",
-              objectFit: "contain", objectPosition: "top center",
-              filter: "drop-shadow(0 6px 18px rgba(0,0,0,.55))",
-              animation: "fadeInDown .3s ease",
+              width: "100%", height: "100%", objectFit: "fill",
+              filter: "drop-shadow(0 6px 16px rgba(0,0,0,.5))", animation: "fadeInDown .3s ease"
             }} />
         ) : (
           <div style={{
-            width: "75%", height: "65%", border: "1.5px dashed rgba(255,255,255,.12)",
+            width: "75%", height: "70%", border: "1.5px dashed rgba(255,255,255,.12)",
             borderRadius: 6, display: "flex", alignItems: "center", justifyContent: "center",
             color: "rgba(255,255,255,.2)", fontSize: ".58rem", letterSpacing: ".12em", textTransform: "uppercase"
-          }}>Choose Bottom</div>
+          }}>
+            Choose Bottom
+          </div>
         )}
       </div>
 
