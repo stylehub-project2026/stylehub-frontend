@@ -558,7 +558,6 @@ export default function AdminDashboard() {
                                 { label: 'Total Sellers', value: sellers.length, icon: '🏪', cls: 'green' },
                                 { label: 'Total Customers', value: customers.length, icon: '👥', cls: 'gold' },
                                 { label: 'Subscription Revenue', value: `EGP ${(subRevenue.totalSubscriptionRevenue || 0).toLocaleString()}`, icon: '💳', cls: 'sage2' },
-                                { label: 'Orders Commission', value: `EGP ${(commissions.totalCommission || 0).toLocaleString()}`, icon: '📊', cls: 'dark' },
                             ].map(s => (
                                 <div key={s.label} className={`stat-card ${s.cls}`}>
                                     <div className={`stat-icon ${s.cls}`}>{s.icon}</div>
