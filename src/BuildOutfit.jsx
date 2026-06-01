@@ -132,17 +132,23 @@ function SilhouettePreview({ selectedTop, selectedBottom, body }) {
   const wa = body?.waist || 70;
   const hi = body?.hips || 96;
 
-  const heightScale = 0.80 + ((h - 140) / 55) * 0.38;
-  const widthScale = Math.min(1.55, Math.max(0.70,
-    0.75
-    + ((w - 45) / 85) * 0.58
-    + ((ch - 75) / 50) * 0.10
-    + ((hi - 80) / 50) * 0.10
+  // ── Body scaling ──────────────────────────────────────────────────────────
+  // Height: طول الجسم كله
+  const heightScale = Math.min(1.18, Math.max(0.80, 0.80 + ((h - 140) / 55) * 0.38));
+
+  // Width zones — كل منطقة بتتسع بشكل منفصل
+  const shoulderScale = Math.min(1.50, Math.max(0.75, 0.85 + ((ch - 80) / 40) * 0.55));
+  const waistScale = Math.min(1.45, Math.max(0.70, 0.75 + ((wa - 60) / 40) * 0.55));
+  const hipsScale = Math.min(1.55, Math.max(0.75, 0.85 + ((hi - 86) / 40) * 0.55));
+
+  // عرض عام للجسم (للـ silhouette image)
+  const bodyWidthScale = Math.min(1.50, Math.max(0.75,
+    (shoulderScale * 0.35) + (waistScale * 0.30) + (hipsScale * 0.35)
   ));
 
-  const clothWidthPct = 68 * widthScale;
-  const bodyTopPct = 50 - (88 * heightScale) / 2;
+  // ── Body positioning ───────────────────────────────────────────────────────
   const bodyHeightPct = 88 * heightScale;
+  const bodyTopPct = 50 - bodyHeightPct / 2;
 
   const SVG_SHOULDER_FRAC = 0.14;
   const SVG_WAIST_FRAC = 0.46;
@@ -159,9 +165,15 @@ function SilhouettePreview({ selectedTop, selectedBottom, body }) {
   const silhouetteHeight = (feetPct - shoulderTopPct) / (SILHOUETTE_FEET - SILHOUETTE_SHOULDER);
   const silhouetteTop = shoulderTopPct - silhouetteHeight * SILHOUETTE_SHOULDER;
 
+  // ── Garment sizing — كل هدمة بتتأقلم مع منطقتها ───────────────────────────
+  // Top: عرضه عند الكتف
+  const topGarmentWidth = 62 * shoulderScale;
   const topGarmentTop = shoulderTopPct;
   const topGarmentHeight = (waistPct - shoulderTopPct) * 1.45;
-  const bottomGarmentTop = waistPct - (hipsEndPct - waistPct) * 0.18;
+
+  // Bottom: عرضه عند الهيبس
+  const bottomGarmentWidth = 62 * hipsScale;
+  const bottomGarmentTop = topGarmentTop + topGarmentHeight * 0.82;
   const bottomGarmentHeight = feetPct - bottomGarmentTop;
 
   return (
@@ -175,16 +187,25 @@ function SilhouettePreview({ selectedTop, selectedBottom, body }) {
         color: "rgba(255,255,255,.28)", zIndex: 10, pointerEvents: "none",
       }}>Outfit Preview</div>
 
+      {/* ── Body silhouette — scaleX + scaleY عشان يبان طبيعي ── */}
       <img src="/body.png" alt="" style={{
-        position: "absolute", top: `${silhouetteTop}%`, left: "50%",
-        transform: `translateX(-50%) scaleX(${widthScale})`,
-        height: `${silhouetteHeight}%`, width: "auto", zIndex: 0,
-        pointerEvents: "none", opacity: 0.40, userSelect: "none",
+        position: "absolute",
+        top: `${silhouetteTop}%`,
+        left: "50%",
+        transform: `translateX(-50%) scaleX(${bodyWidthScale})`,
+        height: `${silhouetteHeight}%`,
+        width: "auto",
+        zIndex: 0,
+        pointerEvents: "none",
+        opacity: 0.55,
+        userSelect: "none",
+        transition: "all .35s ease",
       }} draggable={false} />
 
+      {/* ── Top garment — عرضه يتبع الكتف ── */}
       <div style={{
         position: "absolute", top: `${topGarmentTop}%`, left: "50%",
-        transform: "translateX(-50%)", width: `${clothWidthPct}%`,
+        transform: "translateX(-50%)", width: `${topGarmentWidth}%`,
         height: `${topGarmentHeight}%`, zIndex: 2,
         display: "flex", alignItems: "flex-start", justifyContent: "center",
         transition: "all .35s ease",
@@ -206,9 +227,10 @@ function SilhouettePreview({ selectedTop, selectedBottom, body }) {
         )}
       </div>
 
+      {/* ── Bottom garment — عرضه يتبع الهيبس ── */}
       <div style={{
         position: "absolute", top: `${bottomGarmentTop}%`, left: "50%",
-        transform: "translateX(-50%)", width: `${clothWidthPct}%`,
+        transform: "translateX(-50%)", width: `${bottomGarmentWidth}%`,
         height: `${bottomGarmentHeight}%`, zIndex: 1,
         display: "flex", alignItems: "flex-start", justifyContent: "center",
         transition: "all .35s ease",
